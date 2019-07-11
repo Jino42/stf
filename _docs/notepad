@@ -1,0 +1,13 @@
+https://0fps.net/2012/01/14/an-analysis-of-minecraft-like-engines/
+https://0fps.net/2012/06/30/meshing-in-a-minecraft-game/
+
+http://mathworld.wolfram.com/MooreNeighborhood.html
+"If you have two voxels with the same Moore neighborhood, then the result of applying a physics update to each cell will be the same."
+
+https://medium.com/@calebleak/quads-all-the-way-down-simple-voxel-rendering-fea1e4488e26
+
+https://sites.google.com/site/letsmakeavoxelengine/home
+
+https://www.youtube.com/watch?v=2vnTtiLrV1w
+
+https://github.com/nothings/stb/blob/master/stb_voxel_render.h
