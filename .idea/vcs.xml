@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/OpenCL-CLHPP" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/OpenCL-CLHPP/external/CMock" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/OpenCL-CLHPP/external/Unity" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/assimp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/boost-cmake" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/glad" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/glfw" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/glm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/imgui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/stb" vcs="Git" />
+  </component>
+</project>

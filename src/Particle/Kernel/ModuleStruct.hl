@@ -1,0 +1,22 @@
+#ifndef MODULE_STRUCT_HL
+# define MODULE_STRUCT_HL
+
+#include "Range.hl"
+
+typedef struct sModuleRequiredParams {
+    float gravityModifier;
+    float simulationSpeed;
+} ModuleRequiredParams;
+
+typedef struct sModuleSpawnParams {
+    Rangef startLifeTime;
+    Rangef startSpeed;
+    Rangef startSize;
+    Rangef startRotation;
+} ModuleSpawnParams;
+
+typedef struct sModuleSizeOverLifetimeParams {
+    Rangef size;
+} ModuleSizeOverLifetimeParams;
+
+#endif
