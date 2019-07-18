@@ -12,8 +12,37 @@ https://www.youtube.com/watch?v=2vnTtiLrV1w
 
 https://github.com/nothings/stb/blob/master/stb_voxel_render.h
 
-SFML GUI
+###### SFML GUI ###### 
 https://eliasdaler.wordpress.com/2016/05/31/imgui-sfml-tutorial-part-1/
 
-3D Cube World Level Generation
+
+
+###### 3D Cube World Level Generation ###### 
 http://accidentalnoise.sourceforge.net/minecraftworlds.html
+
+
+
+###### If we are lazy as shit: ######
+https://github.com/Auburns/FastNoise
+
+
+###### Notch about it: ######
+https://notch.tumblr.com/post/3746989361/terrain-generation-part-1
+
+
+###### VARIOUS SHIT TO STUDY ######
+https://gamedev.stackexchange.com/questions/16563/how-are-voxel-terrain-engines-made
+https://gamedev.stackexchange.com/questions/55712/how-to-blend-biomes-with-procedural-terrain
+http://procworld.blogspot.com/2016/04/geometry-is-destiny.html
+http://procworld.blogspot.com/2016/07/geometry-is-destiny-part-2.html
+https://proverbsllc.com/2017/04/18/poly-voxel-procedural-generation-introduction/
+https://thebookofshaders.com/11/?lan=fr
+
+https://codepen.io/Tobsta/post/procedural-generation-part-1-1d-perlin-noise
+https://codepen.io/Tobsta/post/procedural-generation-part-2-2d-3d-perlin-noise
+
+###### VARIOUS SHIT TO GOOGLE ######
+google this -> Sparse Voxel Octrees (SVOs) 
+google this -> Constructive Solid Geometry (CSG)
+google this -> 3D Perlin noise map
+
