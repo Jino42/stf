@@ -6,7 +6,7 @@
 
 
 MainGraphic::MainGraphic() :
-        renderBuffer(DisplayWindow::Get().getWidthWindow() / 2.0f, DisplayWindow::Get().getHeightWindow()),
+        renderBuffer(DisplayWindow::Get().getWidthWindow(), DisplayWindow::Get().getHeightWindow()),
 		deltaTime_(0.014f),
 		projection_(1.f),
 		view_(1.f) {
@@ -18,8 +18,8 @@ MainGraphic::MainGraphic() :
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glDepthMask(GL_FALSE);
 
-	projection_ = glm::perspective(glm::radians(45.0f),
-	        (float) (((float)DisplayWindow::Get().getWidthWindow() / 2.0f) / (float)DisplayWindow::Get().getHeightWindow()),
+	projection_ = glm::perspective(glm::radians(80.0f),
+	        (float) (((float)DisplayWindow::Get().getWidthWindow()) / (float)DisplayWindow::Get().getHeightWindow()),
 	        NEAR_PLANE, MAX_PLANE);
 	Camera::Get().setPosition(glm::vec3(0.f, 258.f, -5.f));
 
@@ -45,6 +45,10 @@ void MainGraphic::render() {
         Camera::Get().processPosition(Camera::Movement::BACKWARD, deltaTime_ * 5);
 	if (DisplayWindow::Get().getKey(GLFW_KEY_UP) || DisplayWindow::Get().getKey(GLFW_KEY_W))
         Camera::Get().processPosition(Camera::Movement::FORWARD, deltaTime_ * 5);
+	if (DisplayWindow::Get().getKey(GLFW_KEY_RIGHT_CONTROL) || DisplayWindow::Get().getKey(GLFW_KEY_Q))
+        Camera::Get().processPosition(Camera::Movement::DOWN, deltaTime_ * 5);
+	if (DisplayWindow::Get().getKey(GLFW_KEY_RIGHT_SHIFT) || DisplayWindow::Get().getKey(GLFW_KEY_E))
+        Camera::Get().processPosition(Camera::Movement::UP, deltaTime_ * 5);
 
     renderBuffer.bind();
     renderBuffer.clear();

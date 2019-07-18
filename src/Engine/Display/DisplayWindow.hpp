@@ -45,7 +45,9 @@ public:
 
 
     unsigned int getWidthWindow() const;
+	void		 setWidthWindow(unsigned int width);
     unsigned int getHeightWindow() const;
+    void		 setHeightWindow(unsigned int height);
 
     static void Init(const char *windowName, unsigned int width, unsigned int height);
     static DisplayWindow &Get();
@@ -70,10 +72,12 @@ private:
 	static std::map<GLFWwindow *, DisplayWindow &> glfwByWindow_;
 	static bool firstMouse_;
 
+	// Callbacks
 	static void mouseCallback_(GLFWwindow *, double xpos, double ypos);
-
 	static void callbackKey_(GLFWwindow *window, int key, int, int action, int);
-
+	static void windowSizeCallback_(GLFWwindow* window, int width, int height);
+	static void FramebufferSizeCallback_(GLFWwindow* window, int width, int height);
+	static void WindowContentScaleCallback_(GLFWwindow* window, float xscale, float yscale);
 	static void callbackError_(int, const char *errorMessage);
 
     static std::unique_ptr<DisplayWindow> instance_;

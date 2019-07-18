@@ -9,7 +9,7 @@
 class Gui {
 public:
     Gui() :
-            show_demo_window(true),
+            show_demo_window(false),
             show_another_window(false)
     {
         IMGUI_CHECKVERSION();

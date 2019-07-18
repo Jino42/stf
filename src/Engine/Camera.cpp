@@ -1,5 +1,8 @@
 #include "Camera.hpp"
 
+#include <iostream>
+#include "Display/DisplayWindow.hpp"
+
 Camera::Camera() :
 	position_(glm::vec3(0.0f, 0.0f, 0.0f)),
 	front_(glm::vec3(0.0f, 0.0f, -1.0f)),
@@ -10,6 +13,10 @@ Camera::Camera() :
 	speed_(2.5f),
 	sensitivity_(0.1f),
 	zoom_(45.0f) {
+	
+	// Temp fix to have voxels filled at startup
+	processMouseMovement(0.01, 0.01);
+	
 	updateCameraVectors_();
 }
 
@@ -46,6 +53,10 @@ void		Camera::processPosition(Camera::Movement direction, float deltaTime) {
 		position_ -= right_ * velocity;
 	else if (direction == Camera::Movement::RIGHT)
 		position_ += right_ * velocity;
+	else if (direction == Camera::Movement::DOWN)
+		position_ -= up_ * velocity;
+	else if (direction == Camera::Movement::UP)
+		position_ += up_ * velocity;
 }
 
 void		Camera::setPosition(glm::vec3 const &pos) {
@@ -59,6 +70,7 @@ void		Camera::processPosition(glm::vec3 const &move, float deltaTime) {
 }
 
 void		Camera::processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch) {
+
 	xoffset *= sensitivity_;
 	yoffset *= sensitivity_;
 

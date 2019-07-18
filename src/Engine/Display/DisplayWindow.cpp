@@ -1,11 +1,10 @@
 #include "DisplayWindow.hpp"
 #include "Engine/Camera.hpp"
 
-DisplayWindow::DisplayWindow(std::string const &name, unsigned int width, unsigned int height) :
-    cursor_(true),
-    width_(width),
-    height_(height) {
-    glfwSetErrorCallback(DisplayWindow::callbackError_);
+DisplayWindow::DisplayWindow(std::string const &name, unsigned int width, unsigned int height) : cursor_(true) {
+    DisplayWindow::setWidthWindow(width);
+	DisplayWindow::setHeightWindow(height);
+	glfwSetErrorCallback(DisplayWindow::callbackError_);
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -13,7 +12,7 @@ DisplayWindow::DisplayWindow(std::string const &name, unsigned int width, unsign
     #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
     if (!(window_ = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr))) {
         clean_();
 		throw (DisplayWindow::ConstructorException("GlfwConstructorException: window was not created"));
@@ -24,6 +23,9 @@ DisplayWindow::DisplayWindow(std::string const &name, unsigned int width, unsign
 
 	glfwSetKeyCallback(window_, DisplayWindow::callbackKey_);
     glfwSetCursorPosCallback(window_, DisplayWindow::mouseCallback_);
+	glfwSetWindowSizeCallback(window_, DisplayWindow::windowSizeCallback_);
+	glfwSetFramebufferSizeCallback(window_, DisplayWindow::FramebufferSizeCallback_);
+	glfwSetWindowContentScaleCallback(window_, DisplayWindow::WindowContentScaleCallback_);
 
     DisplayWindow::glfwByWindow_.insert(std::pair<GLFWwindow*, DisplayWindow&>(window_, *this));
 }
@@ -52,11 +54,34 @@ void			DisplayWindow::callbackKey_(GLFWwindow* window, int key, int, int action,
             }
             else if (action == GLFW_PRESS) {
 				glfw.second.callbackKey(key, KeyState::kDown);
-
             }
         }
     }
 }
+
+void			DisplayWindow::windowSizeCallback_(GLFWwindow* window, int width, int height)
+{
+	if (window)
+	{
+		DisplayWindow::Get().setWidthWindow(static_cast<unsigned int>(width));
+		DisplayWindow::Get().setHeightWindow(static_cast<unsigned int>(height));
+	}
+}
+
+void			DisplayWindow::FramebufferSizeCallback_(GLFWwindow* window, int width, int height)
+{
+	if (window)
+	{
+		glViewport(0, 0, width, height);
+
+	}
+}
+
+void			DisplayWindow::WindowContentScaleCallback_(GLFWwindow* window, float xscale, float yscale)
+{
+	;
+}
+
 void DisplayWindow::callbackError_(int, const char* errorMessage) {
     throw (DisplayWindow::ConstructorException(errorMessage));
 }
@@ -122,8 +147,16 @@ unsigned int DisplayWindow::getWidthWindow() const {
     return width_;
 }
 
+void DisplayWindow::setWidthWindow(unsigned int width) {
+    width_ = width;
+}
+
 unsigned int DisplayWindow::getHeightWindow() const {
     return height_;
+}
+
+void DisplayWindow::setHeightWindow(unsigned int height) {
+    height_ = height;
 }
 
 void		DisplayWindow::Init(char const *windowName, unsigned int width, unsigned int height) {
