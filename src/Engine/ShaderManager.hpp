@@ -1,4 +1,11 @@
 #pragma once
+///
+/// \file       ShaderManager.hpp
+/// \author     Noé
+/// \version    1.0
+/// \brief      Singleton, Store shader
+/// \details    A Shader can be use anywhere, and permit to recompile one or all Shader easily
+///
 
 #include <Engine/Shader.hpp>
 #include <map>
@@ -12,9 +19,26 @@ public:
         return *ShaderManager::instance_;
     }
 
+    /// \brief Add Shader place
+    /// \details Create a Shader, only, with default constructor, and store him to a Map, associated with his name.
+    /// \param Name of Shader
+    /// \section Example
+    /// \snippet snippetShaderManager.cpp ShaderManagerAddShader example
     void addShader(std::string const &name);
+
+    /// \brief Get Shader reference
+    /// \details Shearch in map, the Shader associated to this name
+    /// \param Name of Shader
+    /// \return Shader Reference
+    /// \throw It throws out_of_range if "Name" is not the key of an element in the Shaders map.
+    /// \section Example
+    /// \snippet snippetShaderManager.cpp ShaderManagerGetShader example
     Shader &getShader(std::string const &name);
 
+    /// \brief Recompile all Shader
+    /// \details ForEach Shader stored, recompile
+    /// \section Example
+    /// \snippet snippetShaderManager.cpp ShaderManagerReload example
     void reload();
 
 private:

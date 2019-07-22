@@ -80,11 +80,11 @@ Collaboration diagram for ShaderManager:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a95d8c2f8df7181996375e3e17664aed0"><td class="memItemLeft" align="right" valign="top"><a id="a95d8c2f8df7181996375e3e17664aed0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>addShader</b> (std::string const &amp;name)</td></tr>
+<tr class="memitem:a95d8c2f8df7181996375e3e17664aed0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_shader_manager.html#a95d8c2f8df7181996375e3e17664aed0">addShader</a> (std::string const &amp;name)</td></tr>
+<tr class="memdesc:a95d8c2f8df7181996375e3e17664aed0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add <a class="el" href="class_shader.html">Shader</a> place.  <a href="#a95d8c2f8df7181996375e3e17664aed0">More...</a><br /></td></tr>
 <tr class="separator:a95d8c2f8df7181996375e3e17664aed0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac2a3736d562c127a10e44ed4aff9e206"><td class="memItemLeft" align="right" valign="top"><a id="ac2a3736d562c127a10e44ed4aff9e206"></a>
-<a class="el" href="class_shader.html">Shader</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getShader</b> (std::string const &amp;name)</td></tr>
+<tr class="memitem:ac2a3736d562c127a10e44ed4aff9e206"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_shader.html">Shader</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_shader_manager.html#ac2a3736d562c127a10e44ed4aff9e206">getShader</a> (std::string const &amp;name)</td></tr>
+<tr class="memdesc:ac2a3736d562c127a10e44ed4aff9e206"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get <a class="el" href="class_shader.html">Shader</a> reference.  <a href="#ac2a3736d562c127a10e44ed4aff9e206">More...</a><br /></td></tr>
 <tr class="separator:ac2a3736d562c127a10e44ed4aff9e206"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f0b00a5c79252a2245992af4a8d236d"><td class="memItemLeft" align="right" valign="top"><a id="a5f0b00a5c79252a2245992af4a8d236d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>reload</b> ()</td></tr>
@@ -96,6 +96,70 @@ Static Public Member Functions</h2></td></tr>
 static <a class="el" href="class_shader_manager.html">ShaderManager</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>Get</b> ()</td></tr>
 <tr class="separator:a1a71cdc00830482b522684b3b0040772"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a95d8c2f8df7181996375e3e17664aed0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95d8c2f8df7181996375e3e17664aed0">&#9670;&nbsp;</a></span>addShader()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ShaderManager::addShader </td>
+          <td>(</td>
+          <td class="paramtype">std::string const &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Add <a class="el" href="class_shader.html">Shader</a> place. </p>
+<p>Create a <a class="el" href="class_shader.html">Shader</a>, only, with default constructor, and store him to a Map, associated with his name. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Name</td><td>of <a class="el" href="class_shader.html">Shader</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<h1><a class="anchor" id="Example"></a>
+Example</h1>
+<div class="fragment"><div class="line">ShaderManager::Get().<a class="code" href="class_shader_manager.html#a95d8c2f8df7181996375e3e17664aed0">addShader</a>(<span class="stringliteral">&quot;VoxelShader&quot;</span>);</div><div class="line">ShaderManager::Get().<a class="code" href="class_shader_manager.html#a95d8c2f8df7181996375e3e17664aed0">addShader</a>(<span class="stringliteral">&quot;DebugNormal&quot;</span>);</div></div><!-- fragment -->
+</div>
+</div>
+<a id="ac2a3736d562c127a10e44ed4aff9e206"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2a3736d562c127a10e44ed4aff9e206">&#9670;&nbsp;</a></span>getShader()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_shader.html">Shader</a> &amp; ShaderManager::getShader </td>
+          <td>(</td>
+          <td class="paramtype">std::string const &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get <a class="el" href="class_shader.html">Shader</a> reference. </p>
+<p>Shearch in map, the <a class="el" href="class_shader.html">Shader</a> associated to this name </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Name</td><td>of <a class="el" href="class_shader.html">Shader</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="class_shader.html">Shader</a> Reference </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">It</td><td>throws out_of_range if "Name" is not the key of an element in the Shaders map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<h1><a class="anchor" id="Example"></a>
+Example</h1>
+<div class="fragment"><div class="line">ShaderManager::Get().<a class="code" href="class_shader_manager.html#ac2a3736d562c127a10e44ed4aff9e206">getShader</a>(<span class="stringliteral">&quot;VoxelShader&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/voxel.vert&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/voxel.frag&quot;</span>);</div><div class="line">ShaderManager::Get().<a class="code" href="class_shader_manager.html#ac2a3736d562c127a10e44ed4aff9e206">getShader</a>(<span class="stringliteral">&quot;VoxelShader&quot;</span>).<a class="code" href="class_shader.html#a465cfda26417957c71e4812c06227ff0">link</a>();</div><div class="line"></div><div class="line"><a class="code" href="class_shader.html">Shader</a> &amp;shader = ShaderManager::Get().<a class="code" href="class_shader_manager.html#ac2a3736d562c127a10e44ed4aff9e206">getShader</a>(<span class="stringliteral">&quot;DebugNormal&quot;</span>);</div><div class="line">shader.<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./debug.vert&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./debug.geom&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./debug.frag&quot;</span>).<a class="code" href="class_shader.html#a465cfda26417957c71e4812c06227ff0">link</a>();</div></div><!-- fragment -->
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/Engine/<a class="el" href="_shader_manager_8hpp_source.html">ShaderManager.hpp</a></li>
 <li>src/Engine/ShaderManager.cpp</li>

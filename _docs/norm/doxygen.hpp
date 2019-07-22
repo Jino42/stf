@@ -40,6 +40,7 @@ namespace UJK {
     /// \details
     /// \param
     /// \return
+    /// \throw invalid_argument : If glGetUniformLocation dont find Uniform location
     /// \section Example
     /// \snippet snippetPrint42.cpp Print42 example
     void print42(int nbToPrint)

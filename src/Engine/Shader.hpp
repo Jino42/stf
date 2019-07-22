@@ -1,3 +1,4 @@
+#pragma once
 ///
 /// \file       Shader.hpp
 /// \author     Noé
@@ -5,9 +6,6 @@
 /// \brief      Generate Shader program from sources files
 /// \details    Sources files accepted : .vert .geom .frag
 ///
-
-
-#pragma once
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -53,9 +51,9 @@ public:
 
     /// \brief Compile file and Link the Program Shader
     /// \details Process when you are attach all your file to the Shader.
-    ///             If compilation doesnt work, Throw a CreateExpretion with log
-    ///             If Link doesnt work, Throw a LinkException
     /// \return Itself reference
+    /// \throw CreateException : If compilation doesnt work
+    /// \throw LinkException : If Link doesnt work
     /// \section Example
     /// \snippet snippetShader.cpp ShaderLink example
     /// \snippet snippetShader.cpp ShaderLink exampleChaining
@@ -78,9 +76,10 @@ public:
     /// \name Set Uniform
     /// \snippet snippetShader.cpp ShaderSetUniform example
     /// \snippet snippetShader.cpp ShaderSetUniform exampleChaining
-    /// \return Itself const reference for chaining
     /// \param name : Name of Uniform Shader
     /// \param value : Value to set to the Uniform target
+    /// \return Itself const reference for chaining
+    /// \throw invalid_argument : If glGetUniformLocation dont find Uniform location
     /// @{
     Shader		const &setFloat(const std::string &name, float value) const;
 	Shader		const &setMat4(const std::string &name, const glm::mat4 &value) const;

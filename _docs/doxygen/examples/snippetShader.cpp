@@ -20,7 +20,15 @@ shader.attach("./shader/shader.vert");
 shader.attach("./shader/shader.frag").
 shader.attach("./shader/shader.geom");
 
-shader.link();
+try {
+    shader.link();
+} catch (Shader::LinkException const &e) {
+    // Do some stuff
+    std::cerr << e.what() << std::endl;
+}  catch (Shader::CreateException const &e) {
+    // Do some stuff
+    std::cerr << e.what() << std::endl;
+}
 /// [ShaderLink example]
 /// [ShaderLink exampleChaining]
 Shader shader;

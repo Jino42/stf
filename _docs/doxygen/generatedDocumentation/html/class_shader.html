@@ -106,11 +106,17 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a7ca2fa2fde95553e850384e7c7e65253"><td class="mdescLeft">&#160;</td><td class="mdescRight">Activate the Program <a class="el" href="class_shader.html">Shader</a>.  <a href="#a7ca2fa2fde95553e850384e7c7e65253">More...</a><br /></td></tr>
 <tr class="separator:a7ca2fa2fde95553e850384e7c7e65253"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Set Uniform</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><div class="fragment"><div class="line"></div><div class="line">vec3 position(0.0f, 0.0f, 0.0f);</div><div class="line">shader.activate();</div><div class="line">shader.setVec3(<span class="stringliteral">&quot;uNumber&quot;</span>, position); <span class="comment">//Set uniform to the Activated Shader</span></div></div><!-- fragment --><div class="fragment"></div><!-- fragment --><dl class="section return"><dt>Returns</dt><dd>Itself const reference for chaining </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
+<tr><td colspan="2"><div class="groupText"><div class="fragment"><div class="line"></div><div class="line">vec3 position(0.0f, 0.0f, 0.0f);</div><div class="line">shader.activate();</div><div class="line">shader.setVec3(<span class="stringliteral">&quot;uNumber&quot;</span>, position); <span class="comment">//Set uniform to the Activated Shader</span></div></div><!-- fragment --><div class="fragment"></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name</td><td>: Name of Uniform <a class="el" href="class_shader.html">Shader</a> </td></tr>
     <tr><td class="paramname">value</td><td>: Value to set to the Uniform target </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Itself const reference for chaining </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">invalid_argument</td><td>: If glGetUniformLocation dont find Uniform location </td></tr>
   </table>
   </dd>
 </dl>
@@ -177,10 +183,17 @@ Example</h1>
 </div><div class="memdoc">
 
 <p>Compile file and Link the Program <a class="el" href="class_shader.html">Shader</a>. </p>
-<p>Process when you are attach all your file to the <a class="el" href="class_shader.html">Shader</a>. If compilation doesnt work, Throw a CreateExpretion with log If Link doesnt work, Throw a <a class="el" href="class_shader_1_1_link_exception.html">LinkException</a> </p><dl class="section return"><dt>Returns</dt><dd>Itself reference </dd></dl>
+<p>Process when you are attach all your file to the <a class="el" href="class_shader.html">Shader</a>. </p><dl class="section return"><dt>Returns</dt><dd>Itself reference </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="class_shader_1_1_create_exception.html">CreateException</a></td><td>: If compilation doesnt work </td></tr>
+    <tr><td class="paramname"><a class="el" href="class_shader_1_1_link_exception.html">LinkException</a></td><td>: If Link doesnt work </td></tr>
+  </table>
+  </dd>
+</dl>
 <h1><a class="anchor" id="Example"></a>
 Example</h1>
-<div class="fragment"><div class="line"><a class="code" href="class_shader.html">Shader</a> shader;</div><div class="line"></div><div class="line">shader.<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.vert&quot;</span>);</div><div class="line">shader.<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.frag&quot;</span>).</div><div class="line">shader.<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.geom&quot;</span>);</div><div class="line"></div><div class="line">shader.<a class="code" href="class_shader.html#a465cfda26417957c71e4812c06227ff0">link</a>();</div></div><!-- fragment --><div class="fragment"><div class="line"><a class="code" href="class_shader.html">Shader</a> shader;</div><div class="line"></div><div class="line">shader.<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.vert&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.frag&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.geom&quot;</span>).<a class="code" href="class_shader.html#a465cfda26417957c71e4812c06227ff0">link</a>();</div></div><!-- fragment --><div class="dynheader">
+<div class="fragment"><div class="line"><a class="code" href="class_shader.html">Shader</a> shader;</div><div class="line"></div><div class="line">shader.<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.vert&quot;</span>);</div><div class="line">shader.<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.frag&quot;</span>).</div><div class="line">shader.<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.geom&quot;</span>);</div><div class="line"></div><div class="line"><span class="keywordflow">try</span> {</div><div class="line">    shader.<a class="code" href="class_shader.html#a465cfda26417957c71e4812c06227ff0">link</a>();</div><div class="line">} <span class="keywordflow">catch</span> (<a class="code" href="class_shader_1_1_link_exception.html">Shader::LinkException</a> <span class="keyword">const</span> &amp;e) {</div><div class="line">    <span class="comment">// Do some stuff</span></div><div class="line">    std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;</div><div class="line">}  <span class="keywordflow">catch</span> (<a class="code" href="class_shader_1_1_create_exception.html">Shader::CreateException</a> <span class="keyword">const</span> &amp;e) {</div><div class="line">    <span class="comment">// Do some stuff</span></div><div class="line">    std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;</div><div class="line">}</div></div><!-- fragment --><div class="fragment"><div class="line"><a class="code" href="class_shader.html">Shader</a> shader;</div><div class="line"></div><div class="line">shader.<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.vert&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.frag&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/shader.geom&quot;</span>).<a class="code" href="class_shader.html#a465cfda26417957c71e4812c06227ff0">link</a>();</div></div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_shader_a465cfda26417957c71e4812c06227ff0_icgraph.png" border="0" usemap="#class_shader_a465cfda26417957c71e4812c06227ff0_icgraph" alt=""/></div>
