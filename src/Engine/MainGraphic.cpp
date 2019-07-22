@@ -58,7 +58,7 @@ void MainGraphic::render() {
     renderBuffer.clear();
 
     MainGraphicExtendModel::Get().update(0.014f);
-    TestParticle::Get().update(0.014f);
+    //TestParticle::Get().update(0.014f);
 //    VoxelWorld::Get().render();
 
 

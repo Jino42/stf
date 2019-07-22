@@ -24,7 +24,7 @@ void TestParticle::init() {
 
 //Sprite Emitter
 
-	particleSystem_.addEmitter<ParticleEmitterSprite>("Lol", 10240.f / 5 * 0.9f, 10240);
+	particleSystem_.addEmitter<ParticleEmitterSprite>("Lol", 10240.f / 8 * 0.9f, 7050);
     //particleSystem_.addEmitter<ParticleEmitterSprite>("Lol", 50.0f / 5.0f * 0.9f, 50);
 	particleSystem_.setPosition(glm::vec3(0.0f, 258.0f, -30.0f));
 	AParticleEmitter &emitter = particleSystem_.getEmitter<ParticleEmitterSprite>("Lol");
