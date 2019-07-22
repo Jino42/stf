@@ -11,7 +11,11 @@ public:
 
     void update(float deltaTime);
 
+
+    static TestParticle &Get();
 private:
     ParticleSystem					particleSystem_;
+
+    static std::unique_ptr<TestParticle> instance_;
 
 };

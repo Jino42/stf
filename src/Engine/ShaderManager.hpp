@@ -12,7 +12,10 @@ public:
         return *ShaderManager::instance_;
     }
 
-    void addShader(std::string const &name, std::string const &path);
+    void addShader(std::string const &name);
+    Shader &getShader(std::string const &name);
+
+    void reload();
 
 private:
     std::map< std::string, Shader > mapShaders_;

@@ -9,7 +9,7 @@ nbParticlePerSec_ (emitter.getNbParticlePerSec()),
 nbParticleActive_ (emitter.getNbParticleActive())
 {
     pathKernel_ = ROOT_PATH;
-    pathKernel_ = pathKernel_ / "src" / "Kernel";
+    pathKernel_ = pathKernel_ / "src" / "Particle" / "Kernel";
 }
 
 bool AParticleModule::debug_ = true;

@@ -1,16 +1,14 @@
 #pragma once
 
-#include <Engine/Shader.hpp>
 #include <Voxel/Chunk.hpp>
 #include <Engine/Camera.hpp>
 #include <memory>
 
-#define DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE 2
+#define DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE 1
 
 class VoxelWorld {
 public:
     VoxelWorld(Camera &camera);
-    Shader &getShaderChunk();
 
     void update();
     void render();
@@ -20,7 +18,6 @@ public:
 
 private:
     Camera &camera_;
-    Shader shaderChunk_;
     std::vector< Chunk > chunks_;
 
     static std::unique_ptr<VoxelWorld> instance_;

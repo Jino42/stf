@@ -1,6 +1,7 @@
 #include "Chunk.hpp"
 #include <Engine/MainGraphic.hpp>
 #include <Voxel/VoxelWorld.hpp>
+#include <Engine/ShaderManager.hpp>
 
 Chunk::Chunk(glm::vec3 position, int id) :
     id_(id),
@@ -38,7 +39,7 @@ Chunk::Chunk(glm::vec3 position, int id) :
 
 void Chunk::render()
 {
-    Shader &shader = VoxelWorld::Get().getShaderChunk();
+    Shader &shader = ShaderManager::Get().getShader("voxel");
     shader.activate();
     shader.setMat4("projection", MainGraphic::Get().getProjectionMatrix());
     shader.setMat4("view", MainGraphic::Get().getViewMatrix());

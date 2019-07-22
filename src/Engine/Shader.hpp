@@ -1,62 +1,106 @@
+///
+/// \file       Shader.hpp
+/// \author     Noé
+/// \version    1.0
+/// \brief      Generate Shader program from sources files
+/// \details    Sources files accepted : .vert .geom .frag
+///
+
+
 #pragma once
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <string>
+#include <vector>
 
 class Shader {
 public:
-	class CreateException : public std::invalid_argument {
-	public:
-		CreateException() noexcept;
-		CreateException(std::string) noexcept;
-		virtual const char* what() const noexcept;
-		~CreateException() noexcept;
-		CreateException(CreateException const &src) noexcept;
-	private:
-		CreateException &operator=(CreateException const &rhs) noexcept;
-		std::string			_error;
-	};
-	class LinkException : public std::invalid_argument {
-	public:
-		LinkException() noexcept;
-		explicit LinkException(std::string) noexcept;
-		const char* what() const noexcept override;
-		~LinkException() noexcept override;
-		LinkException(LinkException const &src) noexcept;
-	private:
-		LinkException &operator=(LinkException const &rhs) noexcept;
-		std::string			_error;
-	};
+
+    class LinkException : public std::invalid_argument {
+    public:
+        LinkException() noexcept = delete;
+        explicit LinkException(std::string const &s) noexcept : invalid_argument(s) {};
+        ~LinkException() noexcept override = default;
+        LinkException(LinkException const &src) noexcept = delete;
+        LinkException &operator=(LinkException const &rhs) noexcept = delete;
+    };
+
+    class CreateException : public std::invalid_argument {
+    public:
+        CreateException() noexcept = delete;
+        explicit CreateException(std::string const &s) noexcept : invalid_argument(s) {};
+        ~CreateException() noexcept override = default;
+        CreateException(CreateException const &src) noexcept = delete;
+        CreateException &operator=(CreateException const &rhs) noexcept = delete;
+    };
 	
     Shader() noexcept;
-	Shader(std::string const &file1, std::string const &file2);
 	~Shader() noexcept;
     Shader(Shader const &shader) = delete;
     Shader &operator=(Shader const &shader) = delete;
 
-    Shader		&activate() noexcept;
+
+    /// \brief Attach a file
+    /// \details Dont compile the Shader, only store the path of the attached file
+    ///             You need make multiple attach if you want put the Vertex + Geometry + Fragment
+    /// \param Path to the shader
+    /// \return Itself reference
+    /// \section Example
+    /// \snippet snippetShader.cpp ShaderAttach example
+    /// \snippet snippetShader.cpp ShaderAttach exampleChaining
 	Shader		&attach(std::string const &filename);
-	GLuint		create(std::string const &filename);
+
+    /// \brief Compile file and Link the Program Shader
+    /// \details Process when you are attach all your file to the Shader.
+    ///             If compilation doesnt work, Throw a CreateExpretion with log
+    ///             If Link doesnt work, Throw a LinkException
+    /// \return Itself reference
+    /// \section Example
+    /// \snippet snippetShader.cpp ShaderLink example
+    /// \snippet snippetShader.cpp ShaderLink exampleChaining
 	Shader		&link();
 
-	void		setFloat(const std::string &name, float value) const;
-	void		setMat4(const std::string &name, const glm::mat4 &mat) const;
-	void		setInt(const std::string &name, int aint) const;
-	void		setUInt(const std::string &name, unsigned int i) const;
-	void		setVec3(const std::string &name, const glm::vec3 &vec) const;
+    /// \brief Recompile the Shader
+    /// \details Try to Compile and link to a new Shader,
+    ///             If will success, destroy the old Shader to replace by the newest
+    /// \return Itself reference for chaining
+    /// \section Example
+    /// \snippet snippetShader.cpp ShaderRecompile example
+	Shader      &recompile();
 
-	GLuint 		getId() const;
+    /// \brief Activate the Program Shader
+    /// \return Itself reference for chaining
+    /// \section Example
+    /// \snippet snippetShader.cpp ShaderActivate example
+    Shader		&activate() noexcept;
+
+    /// \name Set Uniform
+    /// \snippet snippetShader.cpp ShaderSetUniform example
+    /// \snippet snippetShader.cpp ShaderSetUniform exampleChaining
+    /// \return Itself const reference for chaining
+    /// \param name : Name of Uniform Shader
+    /// \param value : Value to set to the Uniform target
+    /// @{
+    Shader		const &setFloat(const std::string &name, float value) const;
+	Shader		const &setMat4(const std::string &name, const glm::mat4 &value) const;
+	Shader		const &setInt(const std::string &name, int value) const;
+	Shader		const &setUInt(const std::string &name, unsigned int value) const;
+	Shader		const &setVec3(const std::string &name, const glm::vec3 &value) const;
+	/// @}
 
 private:
 
+    std::vector< std::string > files_;
 	GLuint program_;
 	GLint  status_;
 	GLint  length_;
 
-	void	clean_() noexcept;
-	
+    GLuint		create_(std::string const &filename);
+    void        compileShader_(std::string const &filename);
+
 	static bool				debug_;
 };
+
+/// \example exampleShader.cpp
+/// This is an example of how to use the Shader class.

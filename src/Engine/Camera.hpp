@@ -12,9 +12,7 @@ public:
 		FORWARD,
 		BACKWARD,
 		LEFT,
-		RIGHT,
-		UP,
-		DOWN
+		RIGHT
 	};
 
 	Camera();

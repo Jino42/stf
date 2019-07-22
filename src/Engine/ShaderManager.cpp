@@ -1,8 +1,17 @@
 #include "ShaderManager.hpp"
 
-std::unique_ptr<ShaderManager> ShaderManager::instance_ = nullptr;
 
-void ShaderManager::addShader(std::string const &name, std::string const &path) {
-    //shaders_.insert(std::pair< std::string, Shader >(name, Shader()));
-//    mapShaders_.emplace(1, std::make_pair(name));
+void ShaderManager::addShader(std::string const &name) {
+    mapShaders_.try_emplace(name);
 }
+
+Shader &ShaderManager::getShader(std::string const &name) {
+    return mapShaders_.at(name);
+}
+
+void ShaderManager::reload() {
+    for (auto &shader: mapShaders_)
+        shader.second.recompile();
+}
+
+std::unique_ptr<ShaderManager> ShaderManager::instance_ = nullptr;

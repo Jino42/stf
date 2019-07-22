@@ -8,59 +8,48 @@ Shader::Shader() noexcept :
 		program_(glCreateProgram()) {
 }
 
-Shader::Shader(std::string const &file1, std::string const &file2) :
-		program_(glCreateProgram()) {
-	attach(file1);
-	attach(file2);
-	link();
-}
-
 Shader::~Shader() noexcept {
-	clean_();
-}
-
-void		Shader::clean_() noexcept {
-	glDeleteProgram(program_);
-}
-
-Shader &Shader::activate() noexcept {
-	glUseProgram(program_);
-	return (*this);
+    glDeleteProgram(program_);
 }
 
 Shader	&Shader::attach(std::string const &filename) {
-	// Get Shader source
-	std::ifstream fd(filename);
-	std::string src = std::string(std::istreambuf_iterator<char>(fd),
-						   (std::istreambuf_iterator<char>()));
-	const char *source = src.c_str();
-
-	if (Shader::debug_) {
-		std::cout << "Source path :" <<  filename << std::endl;
-		std::cout << source << std::endl;
-	}
-	
-	auto shader = create(filename);
-	glShaderSource(shader, 1, &source, nullptr);
-	glCompileShader(shader);
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status_);
-
-	if (!status_) {
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, & length_);
-		std::unique_ptr<char[]> buffer(new char[length_]);
-		glGetShaderInfoLog(shader, length_, nullptr, buffer.get());
-		if (Shader::debug_)
-			std::cerr << filename.c_str() << std::endl << buffer.get() << std::endl;
-		glDeleteShader(shader);
-		throw (Shader::CreateException(filename + buffer.get()));
-	}
-	
-	glAttachShader(program_, shader);
-	glDeleteShader(shader);
-	return (*this);
+    files_.emplace_back(filename);
+    return (*this);
 }
 
-GLuint Shader::create(std::string const &filename)
+void Shader::compileShader_(std::string const &filename)
+{
+    // Get Shader source
+    std::ifstream fd(filename);
+    std::string src = std::string(std::istreambuf_iterator<char>(fd),
+                                  (std::istreambuf_iterator<char>()));
+    const char *source = src.c_str();
+
+    if (Shader::debug_) {
+        std::cout << "Source path :" <<  filename << std::endl;
+        std::cout << source << std::endl;
+    }
+
+    auto shader = create_(filename);
+    glShaderSource(shader, 1, &source, nullptr);
+    glCompileShader(shader);
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &status_);
+
+    if (!status_) {
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, & length_);
+        std::unique_ptr<char[]> buffer(new char[length_]);
+        glGetShaderInfoLog(shader, length_, nullptr, buffer.get());
+        if (Shader::debug_)
+            std::cerr << filename.c_str() << std::endl << buffer.get() << std::endl;
+        glDeleteShader(shader);
+        throw (Shader::CreateException(filename + buffer.get()));
+    }
+
+    glAttachShader(program_, shader);
+    glDeleteShader(shader);
+}
+
+GLuint Shader::create_(std::string const &filename)
 {
 	auto index = filename.rfind('.');
 	auto ext = filename.substr(index + 1);
@@ -78,6 +67,8 @@ GLuint Shader::create(std::string const &filename)
 
 Shader &Shader::link()
 {
+    for (auto &file : files_)
+        compileShader_(file);
 	glLinkProgram(program_);
 	glGetProgramiv(program_, GL_LINK_STATUS, &status_);
 	if(!status_) {
@@ -91,68 +82,60 @@ Shader &Shader::link()
 	return *this;
 }
 
-void		Shader::setFloat(const std::string &name, float value) const {
+Shader &Shader::recompile()
+{
+    GLuint oldProgram = program_;
+    program_ = glCreateProgram();
+    try {
+        link();
+    } catch (std::exception const &e) {
+        glDeleteProgram(program_);
+        program_ = oldProgram;
+        throw e;
+    }
+    glDeleteProgram(oldProgram);
+    return *this;
+}
+
+Shader &Shader::activate() noexcept {
+    glUseProgram(program_);
+    return (*this);
+}
+
+Shader		const &Shader::setFloat(const std::string &name, float value) const {
 	GLint uniform = glGetUniformLocation(program_, name.c_str());
 	if (uniform == -1)
 		throw (std::invalid_argument(std::string("glGetUniformLocation::setFloat failed [") + name + "]"));
 	glUniform1f(uniform, value);
+	return *this;
 }
-void		Shader::setMat4(const std::string &name, const glm::mat4 &mat) const  {
+Shader		const &Shader::setMat4(const std::string &name, const glm::mat4 &mat) const  {
 	GLint uniform = glGetUniformLocation(program_, name.c_str());
 	if (uniform == -1)
 		throw (std::invalid_argument(std::string("glGetUniformLocation::setMat4 failed [") + name + "]"));
 	glUniformMatrix4fv(uniform, 1, GL_FALSE, &mat[0][0]);
+	return *this;
 }
-void		Shader::setVec3(const std::string &name, const glm::vec3 &vec) const  {
+Shader		const &Shader::setVec3(const std::string &name, const glm::vec3 &vec) const  {
 	GLint uniform = glGetUniformLocation(program_, name.c_str());
 	if (uniform == -1)
 		throw (std::invalid_argument(std::string("glGetUniformLocation::setVec3 failed [") + name + "]"));
 	glUniform3fv(glGetUniformLocation(program_, name.c_str()), 1, &vec[0]);
+	return *this;
 }
-void		Shader::setInt(const std::string &name, int i) const  {
+Shader		const &Shader::setInt(const std::string &name, int i) const  {
 	GLint uniform = glGetUniformLocation(program_, name.c_str());
 	if (uniform == -1)
 		throw (std::invalid_argument(std::string("glGetUniformLocation::setInt failed [") + name + "]"));
 	glUniform1i(uniform, i);
+	return *this;
 }
-void		Shader::setUInt(const std::string &name, unsigned int i) const  {
+Shader		const &Shader::setUInt(const std::string &name, unsigned int i) const  {
 	GLint uniform = glGetUniformLocation(program_, name.c_str());
 	if (uniform == -1)
 		throw (std::invalid_argument(std::string("glGetUniformLocation::setInt failed [") + name + "]"));
 	glUniform1ui(uniform, i);
-}
-
-GLuint 		Shader::getId() const {
-	return (program_);
+	return *this;
 }
 
 bool				Shader::debug_ = true;
-
-
-Shader::CreateException::~CreateException() noexcept = default;
-Shader::CreateException::CreateException() noexcept :
-		invalid_argument(this->_error),
-		_error("You make a CreateException") {}
-Shader::CreateException::CreateException(std::string s) noexcept :
-		invalid_argument(s),
-		_error(s) { }
-Shader::CreateException::CreateException(Shader::CreateException const &src) noexcept :
-		invalid_argument(this->_error),
-		_error(src._error)
-{ this->_error = src._error; }
-const char	*Shader::CreateException::what() const noexcept
-{ return (this->_error.c_str()); }
-
-Shader::LinkException::~LinkException() noexcept = default;
-Shader::LinkException::LinkException() noexcept :
-		invalid_argument(this->_error),
-		_error("You make a LinkException") {}
-Shader::LinkException::LinkException(std::string s) noexcept :
-		invalid_argument(s),
-		_error(s) { }
-Shader::LinkException::LinkException(Shader::LinkException const &src) noexcept :
-		invalid_argument(this->_error),
-		_error(src._error)
-{ this->_error = src._error; }
-const char	*Shader::LinkException::what() const noexcept
-{ return (this->_error.c_str()); }
