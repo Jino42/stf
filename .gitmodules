@@ -3,16 +3,16 @@
 	url = https://github.com/Orphis/boost-cmake
 [submodule "extern/assimp"]
 	path = extern/assimp
-	url = https://github.com/assimp/assimp.git
+	url = https://github.com/assimp/assimp
 [submodule "extern/glad"]
 	path = extern/glad
-	url = https://github.com/Dav1dde/glad.git
+	url = https://github.com/Dav1dde/glad
 [submodule "extern/glm"]
 	path = extern/glm
 	url = https://github.com/g-truc/glm
 [submodule "extern/stb"]
 	path = extern/stb
-	url = https://github.com/nothings/stb.git
+	url = https://github.com/nothings/stb
 [submodule "extern/glfw"]
 	path = extern/glfw
 	url = https://github.com/glfw/glfw
@@ -21,4 +21,4 @@
 	url = https://github.com/KhronosGroup/OpenCL-CLHPP
 [submodule "extern/imgui"]
 	path = extern/imgui
-	url = https://github.com/ocornut/imgui.git
+	url = https://github.com/ocornut/imgui
