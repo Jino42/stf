@@ -16,16 +16,18 @@
 int main() {
 	srand(time(NULL));
 	try {
-	    DisplayWindow::Init("Lul", 1024, 720);
+		std::string windowTitle = "ft_vox";
+		DisplayWindow::Init(windowTitle.c_str(), 1024, 720);
 
 		Gui gui;
+        // WidgetOption widgetOption;
+        // WidgetEditor widgetEditor;
+        // WidgetRender &widgetRender = WidgetRender::Get();
+		
 		ClContext::Get();
 
 		int fpsCount = 0;
 		std::chrono::time_point<std::chrono::system_clock> time_fps = std::chrono::system_clock::now();
-        WidgetOption widgetOption;
-        WidgetEditor widgetEditor;
-        WidgetRender &widgetRender = WidgetRender::Get();
         bool stopAllFrame = false;
 
         while (!DisplayWindow::Get().exit()) {
@@ -58,9 +60,13 @@ int main() {
             //FPS Count
             fpsCount++;
 			if (std::chrono::system_clock::now() - time_fps > std::chrono::seconds(1)) {
+				// Disabled to avoid flooding stdout
+				// std::cout << fpsCount << "fps" << std::endl;
+				windowTitle = "ft_vox | " + std::to_string(fpsCount) + " fps";
+				glfwSetWindowTitle(DisplayWindow::Get().getWindow(), windowTitle.c_str());
+				time_fps = std::chrono::system_clock::now();
 				time_fps = std::chrono::system_clock::now();
 				std::cout << fpsCount << "fps" << std::endl;
-				fpsCount = 0;
 			}
 
 			//Reload OpenCL Kernel
@@ -82,13 +88,13 @@ int main() {
             }
 
 			// GUI
-            widgetOption.render(true);
-            ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(0, 0)));
-            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
-            widgetRender.render(true);
-            ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(50, 0)));
-            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
-            widgetEditor.render(true);
+            // widgetOption.render(true);
+            // ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(0, 0)));
+            // ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
+            WidgetRender::Get().render(true);
+            // ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(50, 0)));
+            // ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
+            // widgetEditor.render(true);
 			gui.render();
         }
 	}
