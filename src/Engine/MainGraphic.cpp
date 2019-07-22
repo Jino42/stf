@@ -27,7 +27,8 @@ MainGraphic::MainGraphic() :
 
     MainGraphicExtendModel::Get();
     TestParticle::Get().init();
-    VoxelWorld::Init(Camera::Get());
+
+    //VoxelWorld::Init(Camera::Get());
 
 }
 
@@ -58,7 +59,7 @@ void MainGraphic::render() {
 
     MainGraphicExtendModel::Get().update(0.014f);
     TestParticle::Get().update(0.014f);
-    VoxelWorld::Get().render();
+//    VoxelWorld::Get().render();
 
 
     renderBuffer.unbind();

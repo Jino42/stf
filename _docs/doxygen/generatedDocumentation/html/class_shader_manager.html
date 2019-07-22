@@ -69,12 +69,17 @@ $(function() {
 <div class="title">ShaderManager Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Singleton.  
+ <a href="class_shader_manager.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_shader_manager_8hpp_source.html">ShaderManager.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for ShaderManager:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_shader_manager__coll__graph.png" border="0" usemap="#_shader_manager_coll__map" alt="Collaboration graph"/></div>
 <map name="_shader_manager_coll__map" id="_shader_manager_coll__map">
-<area shape="rect"  title=" " alt="" coords="5,5,122,119"/>
+<area shape="rect"  title="Singleton." alt="" coords="5,5,122,119"/>
 </map>
 </div>
 <table class="memberdecls">
@@ -86,8 +91,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac2a3736d562c127a10e44ed4aff9e206"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_shader.html">Shader</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_shader_manager.html#ac2a3736d562c127a10e44ed4aff9e206">getShader</a> (std::string const &amp;name)</td></tr>
 <tr class="memdesc:ac2a3736d562c127a10e44ed4aff9e206"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get <a class="el" href="class_shader.html">Shader</a> reference.  <a href="#ac2a3736d562c127a10e44ed4aff9e206">More...</a><br /></td></tr>
 <tr class="separator:ac2a3736d562c127a10e44ed4aff9e206"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f0b00a5c79252a2245992af4a8d236d"><td class="memItemLeft" align="right" valign="top"><a id="a5f0b00a5c79252a2245992af4a8d236d"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>reload</b> ()</td></tr>
+<tr class="memitem:a5f0b00a5c79252a2245992af4a8d236d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_shader_manager.html#a5f0b00a5c79252a2245992af4a8d236d">reload</a> ()</td></tr>
+<tr class="memdesc:a5f0b00a5c79252a2245992af4a8d236d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recompile all <a class="el" href="class_shader.html">Shader</a>.  <a href="#a5f0b00a5c79252a2245992af4a8d236d">More...</a><br /></td></tr>
 <tr class="separator:a5f0b00a5c79252a2245992af4a8d236d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
@@ -96,7 +101,9 @@ Static Public Member Functions</h2></td></tr>
 static <a class="el" href="class_shader_manager.html">ShaderManager</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>Get</b> ()</td></tr>
 <tr class="separator:a1a71cdc00830482b522684b3b0040772"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Singleton. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a95d8c2f8df7181996375e3e17664aed0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a95d8c2f8df7181996375e3e17664aed0">&#9670;&nbsp;</a></span>addShader()</h2>
 
@@ -158,6 +165,28 @@ Example</h1>
 <h1><a class="anchor" id="Example"></a>
 Example</h1>
 <div class="fragment"><div class="line">ShaderManager::Get().<a class="code" href="class_shader_manager.html#ac2a3736d562c127a10e44ed4aff9e206">getShader</a>(<span class="stringliteral">&quot;VoxelShader&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/voxel.vert&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./shader/voxel.frag&quot;</span>);</div><div class="line">ShaderManager::Get().<a class="code" href="class_shader_manager.html#ac2a3736d562c127a10e44ed4aff9e206">getShader</a>(<span class="stringliteral">&quot;VoxelShader&quot;</span>).<a class="code" href="class_shader.html#a465cfda26417957c71e4812c06227ff0">link</a>();</div><div class="line"></div><div class="line"><a class="code" href="class_shader.html">Shader</a> &amp;shader = ShaderManager::Get().<a class="code" href="class_shader_manager.html#ac2a3736d562c127a10e44ed4aff9e206">getShader</a>(<span class="stringliteral">&quot;DebugNormal&quot;</span>);</div><div class="line">shader.<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./debug.vert&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./debug.geom&quot;</span>).<a class="code" href="class_shader.html#a5fadc4218cba27400f6189fd9b3ffd19">attach</a>(<span class="stringliteral">&quot;./debug.frag&quot;</span>).<a class="code" href="class_shader.html#a465cfda26417957c71e4812c06227ff0">link</a>();</div></div><!-- fragment -->
+</div>
+</div>
+<a id="a5f0b00a5c79252a2245992af4a8d236d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f0b00a5c79252a2245992af4a8d236d">&#9670;&nbsp;</a></span>reload()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ShaderManager::reload </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Recompile all <a class="el" href="class_shader.html">Shader</a>. </p>
+<p>ForEach <a class="el" href="class_shader.html">Shader</a> stored, recompile </p>
+<h1><a class="anchor" id="Example"></a>
+Example</h1>
+<div class="fragment"><div class="line">ShaderManager::Get().<a class="code" href="class_shader_manager.html#a5f0b00a5c79252a2245992af4a8d236d">reload</a>();</div></div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>

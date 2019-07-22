@@ -65,8 +65,8 @@ int main() {
 				windowTitle = "ft_vox | " + std::to_string(fpsCount) + " fps";
 				glfwSetWindowTitle(DisplayWindow::Get().getWindow(), windowTitle.c_str());
 				time_fps = std::chrono::system_clock::now();
-				time_fps = std::chrono::system_clock::now();
 				std::cout << fpsCount << "fps" << std::endl;
+                fpsCount = 0;
 			}
 
 			//Reload OpenCL Kernel

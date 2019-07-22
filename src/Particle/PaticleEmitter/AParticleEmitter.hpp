@@ -55,7 +55,7 @@ public:
         reload();
         for (auto &module : modules_)
             module->reload();
-        startEmitter_ = std::chrono::high_resolution_clock::now();
+        startEmitter_ = std::chrono::steady_clock::now();
 	}
 
 
@@ -73,7 +73,7 @@ public:
         return nbParticleActive_;
     }
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> &getStartPoint() {
+    std::chrono::time_point<std::chrono::steady_clock> &getStartPoint() {
         return startEmitter_;
     }
 
@@ -110,7 +110,7 @@ protected:
 	unsigned int									shouldBeSpawn_;
 	unsigned int									at_;
 	bool                                            needReload_;
-    std::chrono::time_point<std::chrono::high_resolution_clock> startEmitter_;
+    std::chrono::time_point<std::chrono::steady_clock> startEmitter_;
 
 	static bool debug_;
 };

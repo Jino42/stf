@@ -10,6 +10,7 @@
 #include <Engine/Shader.hpp>
 #include <map>
 
+/// \brief Singleton
 class ShaderManager {
 public:
 
