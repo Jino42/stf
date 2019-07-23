@@ -44,6 +44,9 @@ public:
      */
     void stop();
 
+    void setSpeed(float speed);
+    float getSpeed() const;
+
     void applyWorldStart();
     void applyWorldStop();
 
@@ -77,6 +80,7 @@ private:
 
     bool started_;
     bool paused_;
+    float speed_;
     std::chrono::steady_clock::time_point timePointTimerCreated_;
     std::chrono::steady_clock::time_point reference_;
     std::chrono::duration<long double> accumulated_;
@@ -152,7 +156,7 @@ duration_t Timer::getDuration() const {
                 std::cout << "now - ref : " << std::chrono::duration_cast<duration_t>((std::chrono::steady_clock::now() - reference_)).count() << std::endl;
             }
             return std::chrono::duration_cast<duration_t>(
-                    accumulated_ + (std::chrono::steady_clock::now() - reference_));
+                    accumulated_ + (std::chrono::steady_clock::now() - reference_) * speed_);
         }
     } else {
         return duration_t(0);
@@ -171,7 +175,7 @@ typename duration_t::rep Timer::count() const {
                 std::cout << "now - ref : " << std::chrono::duration_cast<duration_t>((std::chrono::steady_clock::now() - reference_)).count() << std::endl;
             }
             return std::chrono::duration_cast<duration_t>(
-                    accumulated_ + (std::chrono::steady_clock::now() - reference_)).count();
+                    accumulated_ + (std::chrono::steady_clock::now() - reference_) * speed_).count();
         }
     } else {
         return duration_t(0).count();

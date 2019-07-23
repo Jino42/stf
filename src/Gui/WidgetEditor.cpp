@@ -28,6 +28,13 @@ void WidgetEditor::beginContent_() {
     std::string s = ss.str();
     ImGui::Text(s.c_str());
 
+    const float   u32_zonce = -1.0f, u32_max = 10.f;
+    static float    timerSpeed = test.getSpeed();
+    ImGui::SliderScalar("Max",   ImGuiDataType_Float,  &timerSpeed, &u32_zonce, &u32_max);
+    if (DisplayWindow::Get().getKey(GLFW_KEY_3) == KeyState::kDown) {
+        test.setSpeed(timerSpeed);
+    }
+
     /*
     if (ImGui::CollapsingHeader("Required")) {
         //static float begin = 1, end = 1000;

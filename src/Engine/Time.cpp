@@ -5,6 +5,7 @@
 Timer::Timer(bool canStart) :
         started_(false),
         paused_(false),
+        speed_(1.0f),
         timePointTimerCreated_(std::chrono::steady_clock::now()),
         reference_(std::chrono::steady_clock::now()),
         accumulated_(std::chrono::duration<long double>(0)) {
@@ -33,7 +34,7 @@ void Timer::stop() {
     if (started_ && !paused_) {
         if (!Time::Get().isPause()) {
             std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-            accumulated_ = accumulated_ + std::chrono::duration_cast< std::chrono::duration<long double> >(now - reference_);
+            accumulated_ = accumulated_ + std::chrono::duration_cast< std::chrono::duration<long double> >(now - reference_) * speed_;
         }
         paused_ = true;
     }
@@ -43,9 +44,21 @@ void Timer::reset() {
     if (started_) {
         started_ = false;
         paused_ = false;
+        speed_ = 1.0f;
         reference_ = std::chrono::steady_clock::now();
         accumulated_ = std::chrono::duration<long double>(0);
     }
+}
+
+void Timer::setSpeed(float speed) {
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    accumulated_ = accumulated_ + std::chrono::duration_cast< std::chrono::duration<long double> >(now - reference_) * speed_;
+    reference_ = std::chrono::steady_clock::now();
+    speed_ = speed;
+}
+
+float Timer::getSpeed() const {
+    return speed_;
 }
 
 void Timer::applyWorldStart() {
@@ -61,7 +74,7 @@ void Timer::applyWorldStop() {
         return ;
     if (Time::Get().isPause()) {
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-        accumulated_ = accumulated_ + std::chrono::duration_cast< std::chrono::duration<long double> >(now - reference_);
+        accumulated_ = accumulated_ + std::chrono::duration_cast< std::chrono::duration<long double> >(now - reference_) * speed_;
     }
 }
 
@@ -152,10 +165,22 @@ std::ostream &operator<<(std::ostream &os, Timer const &timer) {
     os << std::boolalpha;
     time_t timeCratedTimer = steady_clock_to_time_t(timer.timePointTimerCreated_);
     time_t timeReferenceTimer = steady_clock_to_time_t(timer.reference_);
-    os << "World pause [" << Time::Get().isPause() << "]" << std::endl;
-    os << "Timer created at : [" << std::ctime(&timeCratedTimer) << "] { started_ [" << timer.started_ << "], paused_ [" << timer.paused_ << "], " << std::endl;
-    os << "reference_ [" << std::ctime(&timeReferenceTimer);
+
+    std::string strTimeCreatedTimer(std::ctime(&timeCratedTimer));
+    strTimeCreatedTimer.erase(std::remove(strTimeCreatedTimer.begin(), strTimeCreatedTimer.end(), '\n'), strTimeCreatedTimer.end());
+
+    std::string strTimeReferenceTimer(std::ctime(&timeReferenceTimer));
+    strTimeReferenceTimer.erase(std::remove(strTimeReferenceTimer.begin(), strTimeReferenceTimer.end(), '\n'), strTimeReferenceTimer.end());
+
+    os << "Timer {";
+    os << "World pause [" << Time::Get().isPause() << "]," << std::endl;
+    os << "Timer created at : [" << strTimeCreatedTimer << "]," << std::endl;
+    os << "Started_[" << timer.started_ << "]," << std::endl;
+    os << "paused_ [" << timer.paused_ << "], " << std::endl;
+    os << "reference_ [" << strTimeReferenceTimer << "]," << std::endl;
     os << "accumulated_ [ms:" << (std::chrono::duration_cast<std::chrono::milliseconds>(timer.accumulated_).count() / 1000.f) << "] }" << std::endl;
     os << "Timer actual ms : [" << timer.count() << "]" << std::endl;
+    os << "Speed : [" << timer.speed_ << "]" << std::endl;
+    os << "}" << std::endl;
     return os;
 }
