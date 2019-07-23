@@ -37,7 +37,7 @@ void	ParticleSpawnModule::init() {
         printf("%s\n", __FUNCTION_NAME__);
 }
 void	ParticleSpawnModule::update(float deltaTime) {
-    int shouldBeAlreadySpawn = (int)(Time::Get().getFloatSinceTimePoint(emitter_.getStartPoint()) / (1.f / nbParticlePerSec_));
+    int shouldBeAlreadySpawn = (int)(emitter_.getTimer().count() / (1000.f / nbParticlePerSec_));
 
     std::cout << shouldBeAlreadySpawn << " >=" << spwaned_ << std::endl;
     if (shouldBeAlreadySpawn < 0 || shouldBeAlreadySpawn < spwaned_)

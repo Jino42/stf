@@ -1,3 +1,24 @@
+/// [Shader example]
+Shader shader;
+
+shader.attach("./shader/shader.vert");
+shader.attach("./shader/shader.frag").
+shader.attach("./shader/shader.geom");
+
+try {
+    shader.link();
+} catch (Shader::LinkException const &e) {
+    std::cerr << e.what() << std::endl;
+}  catch (Shader::CreateException const &e) {
+    std::cerr << e.what() << std::endl;
+}
+
+shader.activate();
+//Use your shader
+shader.setInt("uNumber", 42); //Set uniform to the Activated Shader
+
+/// [Shader example]
+
 /// [ShaderAttach example]
 Shader shader;
 
@@ -23,10 +44,8 @@ shader.attach("./shader/shader.geom");
 try {
     shader.link();
 } catch (Shader::LinkException const &e) {
-    // Do some stuff
     std::cerr << e.what() << std::endl;
 }  catch (Shader::CreateException const &e) {
-    // Do some stuff
     std::cerr << e.what() << std::endl;
 }
 /// [ShaderLink example]
@@ -51,10 +70,8 @@ shader.link();
 try {
     shader.recompile();
 } catch (Shader::LinkException const &e) {
-    // Do some stuff
     std::cerr << e.what() << std::endl;
 }  catch (Shader::CreateException const &e) {
-    // Do some stuff
     std::cerr << e.what() << std::endl;
 }
 
@@ -69,8 +86,8 @@ shader.attach("./shader/shader.geom");
 shader.link();
 
 shader.activate();
+//Use your shader
 shader.setInt("uNumber", 42); //Set uniform to the Activated Shader
-
 /// [ShaderActivate example]
 
 /// [ShaderSetUniform example]

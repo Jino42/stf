@@ -9,74 +9,70 @@
 #include <vector>
 #include <iostream>
 
-/// \brief Singleton
-/// \details Time get somes Function for play with Time.
-///             Can have FixedUpdate, for each 16milliseconds (See example)
-///             Can make a World Pause
+/// \brief For play with Time
+/// \details    Timer is like a stopwatch
+/// \section HowToUse
+/// \snippet snippetTime.cpp Timer example
 
 class Timer {
-
+    friend class Time;
+    friend std::ostream &operator<<(std::ostream &os, Timer const &timer);
 public:
-    /**
-     * Constructor.
-     *
-     * @param   start
-     *          If true, the timer is started just after construction.
-     *          Otherwise, it will not be automatically started.
-     */
+    /// \param canStart : If true, the timer is started just after construction. Otherwise, it will not be automatically started.
     explicit Timer(bool canStart = true);
-
     Timer(Timer const &other) = delete;
     Timer& operator=(Timer const &other) = delete;
-
-    /**
-     * Destructor.
-     */
     virtual ~Timer();
 
-    /**
-     * Start/resume the timer.
-     */
+    /// \brief Start/resume the timer.
     void start();
 
-    /**
-     * Stop/pause the timer.
-     */
+    /// \brief Stop/pause the timer.
     void stop();
 
+    /// \brief Set speed of Timer
+    /// \param speed : Speed to set
+    /// \details Can set any speed (Negative/Positive) to timer
     void setSpeed(float speed);
+
+    /// \brief Get speed of Timer
+    /// \return Speed of Timer
     float getSpeed() const;
 
-    void applyWorldStart();
-    void applyWorldStop();
 
-    /**
-     * Reset the timer.
-     */
+    /// \brief Reset Timer
+    /// \details Timer need to be start after a reset
     void reset();
 
-    std::chrono::steady_clock::time_point getReference();
 
-    /**
-     * Return the elapsed time.
-     *
-     * @param   duration_t
-     *          The duration type used to return the time elapsed. If not
-     *          specified, it returns the time as represented by
-     *          std::chrono::milliseconds.
-     *
-     * @return  The elapsed time.
-     */
+    /// \brief Return the elapsed time.
+    /// \details duration_t :
+    ///           The duration type used to return the time elapsed. If not
+    ///           specified, it returns the time as represented by
+    ///           std::chrono::milliseconds.
+    /// \return   The elapsed time in rep type . Rep is defined by duration type used (float in case of std::chrono::milliseconds)
     template <class duration_t = std::chrono::milliseconds>
     typename duration_t::rep count() const;
 
+    /// \brief Return the duration of elapsed time
+    /// \details duration_t :
+    ///           The duration type used to return the time elapsed. If not
+    ///           specified, it returns the time as represented by
+    ///           std::chrono::milliseconds.
+    /// \return   The elapsed time in duration type . std::chrono::milliseconds if not defined
     template <class duration_t = std::chrono::milliseconds>
     duration_t getDuration() const;
 
-    static void worldStart();
-    static void worldStop();
+
 
 private:
+
+    //Friendly
+    static void worldStart_();
+    static void worldStop_();
+    void applyWorldStart_();
+    void applyWorldStop_();
+    std::chrono::steady_clock::time_point getReference_();
 
     bool started_;
     bool paused_;
@@ -94,34 +90,45 @@ private:
     static bool debug_;
 
 
-    friend std::ostream &operator<<(std::ostream &os, Timer const &timer);
 };
 
+/// \brief Singleton
+/// \details Is a module who permit to Play with Time.
+///             Can have "FixedUpdate", for each 16milliseconds (See example)
+///             Can make a World Pause, (Pause all Timer and himself)
+
 class Time {
+    friend class Timer;
 public:
+
 	Time();
 
+    /// \brief Update of Time module
+    /// \details    Time need to be update up to your render loop
+    ///             Permit to set DeltaTime, Stack the Lag (Talk to ntoniolo for understand)
 	void update();
-	bool shouldUpdateLogic();
-	float getFloatStartProgramTimePoint();
-    float getFloatSinceTimePoint(std::chrono::time_point<std::chrono::steady_clock> &point);
-	static Time &Get();
-	void pause(bool b) {
-        pause_ = b;
-	    if (b) {
-            startPause_ = std::chrono::steady_clock::now();
-            Timer::worldStop();
-	    }
-	    else {
-            elapsedTimeInPause_ += std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startPause_);
-            Timer::worldStart();
-        }
-	}
-	bool isPause() const {
-	    return pause_;
-	}
 
+    /// \brief FixedUpdate
+    /// \details    Check if Lag is > then the TimeStep (16milliseconds)
+    /// \return bool : Do FixedUpdate if return true
+	bool shouldUpdateLogic();
+	static Time &Get();
+
+    /// \brief Make WorldPause/WorldUnPause
+    /// \details    Make a WorldPause/WorldUnPause and Apply for each Timer exist, a pause
+    ///             If a Timer was already in a pause, it will remain after WorldUnPause
+    /// \param b : True if you want WorldPause
+    ///            False if you want WorldUnPause
+	void pause(bool b);
+
+    /// \brief Get Bool of WorldPause
+    /// \return Bool of WorldPause
+	bool isPause() const;
+
+    /// \brief Timer reset each Frame
     Timer sinceWorldStartFrame;
+
+    /// \brief Timer start during Time Constructor
     Timer sinceWorldStartProgram;
 
 private:
@@ -140,9 +147,6 @@ private:
 };
 
 std::ostream &operator<<(std::ostream &os, Timer const &timer);
-
-/// \example exampleTime.cpp
-/// This is an example of how to use the Time class.
 
 template <class duration_t>
 duration_t Timer::getDuration() const {
@@ -181,3 +185,6 @@ typename duration_t::rep Timer::count() const {
         return duration_t(0).count();
     }
 }
+
+/// \example exampleTime.cpp
+/// This is an example of how to use the Time class.

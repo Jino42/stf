@@ -61,7 +61,7 @@ float Timer::getSpeed() const {
     return speed_;
 }
 
-void Timer::applyWorldStart() {
+void Timer::applyWorldStart_() {
     if (!started_)
         return ;
     if (!Time::Get().isPause()) {
@@ -69,7 +69,7 @@ void Timer::applyWorldStart() {
             reference_ = std::chrono::steady_clock::now();
     }
 }
-void Timer::applyWorldStop() {
+void Timer::applyWorldStop_() {
     if (!started_ || paused_)
         return ;
     if (Time::Get().isPause()) {
@@ -78,13 +78,13 @@ void Timer::applyWorldStop() {
     }
 }
 
-void Timer::worldStart() {
+void Timer::worldStart_() {
     for (auto *timer : Timer::timers_)
-        timer->applyWorldStart();
+        timer->applyWorldStart_();
 }
-void Timer::worldStop() {
+void Timer::worldStop_() {
     for (auto *timer : Timer::timers_)
-        timer->applyWorldStop();
+        timer->applyWorldStop_();
 }
 
 void Timer::addTimer_(Timer *timer) {
@@ -96,6 +96,10 @@ void Timer::deleteTimer_(Timer *timer) {
     if (position == Timer::timers_.end())
         throw std::runtime_error("Timer not found in timers_ vector.");
     Timer::timers_.erase(position);
+}
+
+std::chrono::steady_clock::time_point Timer::getReference_() {
+    return reference_;
 }
 
 std::vector< Timer *> Timer::timers_;
@@ -112,12 +116,11 @@ Time::Time() :
 }
 
 void Time::update() {
-    std::chrono::high_resolution_clock::duration deltaTime = std::chrono::high_resolution_clock::now() - sinceWorldStartFrame.getReference();
-//  std::chrono::nanoseconds deltaTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch()) - sinceWorldStartFrame_.getDuration<std::chrono::nanoseconds>();
+    std::chrono::high_resolution_clock::duration deltaTime = std::chrono::high_resolution_clock::now() -
+            sinceWorldStartFrame.getReference_();
     sinceWorldStartFrame.reset();
     sinceWorldStartFrame.start();
     lag_ += std::chrono::duration_cast<std::chrono::nanoseconds>(deltaTime);
-
 }
 bool Time::shouldUpdateLogic() {
 	if (lag_ >= timeStep_) {
@@ -127,19 +130,20 @@ bool Time::shouldUpdateLogic() {
 	return false;
 }
 
-float Time::getFloatStartProgramTimePoint() {
-	return (sinceWorldStartFrame.count() - sinceWorldStartProgram.count()) / 1000.f;
+
+void Time::pause(bool b) {
+    pause_ = b;
+    if (b) {
+        startPause_ = std::chrono::steady_clock::now();
+        Timer::worldStop_();
+    }
+    else {
+        elapsedTimeInPause_ += std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startPause_);
+        Timer::worldStart_();
+    }
 }
-
-float Time::getFloatSinceTimePoint(std::chrono::time_point<std::chrono::steady_clock> &point) {
-    std::chrono::steady_clock::duration delta =  sinceWorldStartFrame.getReference() - point;
-    return (std::chrono::duration_cast<std::chrono::milliseconds>(delta) - elapsedTimeInPause_).count() / 1000.f;
-
-}
-
-std::chrono::steady_clock::time_point Timer::getReference()
-{
-    return reference_;
+bool Time::isPause() const {
+    return pause_;
 }
 
 Time &Time::Get() {

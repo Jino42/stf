@@ -18,7 +18,6 @@ AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::
         needReload_(false)
 {
 	modules_.emplace_back(std::make_unique<ParticleRequiredModule>(*this));
-    startEmitter_ = std::chrono::steady_clock::now();
     ClProgram::Get().addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel" / "Print.cl");
 }
 

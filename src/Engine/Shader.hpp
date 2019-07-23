@@ -12,6 +12,9 @@
 #include <string>
 #include <vector>
 
+/// \brief Shader class
+/// \section HowToUse
+/// \snippet snippetShader.cpp Shader example
 class Shader {
 public:
 

@@ -12,7 +12,7 @@ while (!DisplayWindow::Get().exit()) {
     {
         //Logical Loop
         while (Time::Get().shouldUpdateLogic()) {
-            //Logic
+            //FixedUpdate
         }
 
         //Render

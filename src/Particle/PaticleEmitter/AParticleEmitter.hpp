@@ -9,8 +9,8 @@
 #include "DeviceBuffer.hpp"
 #include "Particle/ParticleModule/AParticleModule.hpp"
 #include "Engine/Shader.hpp"
-#include <chrono>
 #include "NTL.hpp"
+#include <Engine/Time.hpp>
 
 class ParticleSystem;
 
@@ -55,9 +55,13 @@ public:
         reload();
         for (auto &module : modules_)
             module->reload();
-        startEmitter_ = std::chrono::steady_clock::now();
-	}
+        timerEmitter_.reset();
+        timerEmitter_.start();
+    }
 
+    Timer &getTimer() {
+	    return timerEmitter_;
+	}
 
 	ClQueue &getQueue() const {
 	    return queue_;
@@ -71,10 +75,6 @@ public:
     }
     unsigned int &getNbParticleActive() {
         return nbParticleActive_;
-    }
-
-    std::chrono::time_point<std::chrono::steady_clock> &getStartPoint() {
-        return startEmitter_;
     }
 
     void setNbParticleMax(unsigned int value) {
@@ -101,16 +101,16 @@ protected:
 	ParticleSystem									&system_;
 	std::string										name_;
 	ClQueue											&queue_;
-	unsigned int 											nbParticleMax_;
-    unsigned int 											nbParticlePerSec_;
-	unsigned int											nbParticleActive_;
+	unsigned int 									nbParticleMax_;
+    unsigned int 									nbParticlePerSec_;
+	unsigned int									nbParticleActive_;
 	std::vector<std::shared_ptr<AParticleModule>>	modules_;
 	DeviceBuffer									deviceBuffer_;
 	Shader											shader_;
 	unsigned int									shouldBeSpawn_;
 	unsigned int									at_;
 	bool                                            needReload_;
-    std::chrono::time_point<std::chrono::steady_clock> startEmitter_;
+    Timer                                           timerEmitter_;
 
 	static bool debug_;
 };
