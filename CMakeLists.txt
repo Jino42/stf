@@ -19,6 +19,14 @@ else()
     endif()
 endif()
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    message(STATUS "noiseutils - using optimized compile settings with all warnings enabled")
+    add_compile_options(-Wall -Werror -Wextra -ansi -pedantic -O3)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    message(STATUS "noiseutils - using optimized compile settings with all warnings enabled")
+    add_compile_options(/Wall /Ox)
+endif()
+
 find_package(Git QUIET)
 if (GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init extern/stb extern/glad extern/imgui
@@ -144,6 +152,11 @@ option(BUILD_EXAMPLES OFF)
 option(BUILD_TESTS OFF)
 #add_subdirectory(extern/OpenCL-CLHPP)
 
+option(BUILD_LIBNOISE_DOCUMENTATION OFF)
+option(BUILD_LIBNOISE_UTILS ON)
+option(BUILD_LIBNOISE_EXAMPLES ON)
+add_subdirectory(extern/libnoise)
+
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIMGUI_USER_CONFIG=\"<../imconfig-sfml.h>\"")
 #add_subdirectory(extern/imgui)
@@ -159,6 +172,7 @@ include_directories(SYSTEM
         ${CMAKE_SOURCE_DIR}/extern/glfw/include/
         ${CMAKE_SOURCE_DIR}/extern/glm/
         ${CMAKE_SOURCE_DIR}/extern/stb/
+        ${LIBNOISE_INCLUDE_DIR}
         ${CMAKE_BINARY_DIR}/extern/OpenCL-CLHPP/include/
         ${CMAKE_SOURCE_DIR}/extern/imgui/
         ${CMAKE_SOURCE_DIR}/extern/imgui/examples/
@@ -166,6 +180,8 @@ include_directories(SYSTEM
 
 
 add_executable(${NAME}
+        include/noiseutils.cpp
+
         extern/glad/src/glad.c
         src/Engine/ModelEngine/ActorModel.cpp
         src/Engine/Camera.hpp
@@ -199,7 +215,7 @@ add_executable(${NAME}
         src/Particle/ParticleSystem.cpp src/Particle/ParticleSystem.hpp
         src/Particle/ParticleModule/AParticleModule.hpp src/Particle/ParticleModule/ParticleRequiredModule.cpp src/Particle/ParticleModule/ParticleRequiredModule.hpp
         src/Particle/ParticleModule/ParticleSpawnModule.cpp src/Particle/ParticleModule/ParticleSpawnModule.hpp src/Cl/ClContext.cpp
-        src/Cl/ClContext.hpp src/Cl/ClQueue.cpp src/Cl/ClQueue.hpp src/DeviceBuffer.cpp src/DeviceBuffer.hpp src/Cl/ClProgram.cpp src/Cl/ClProgram.hpp src/Cl/ClError.cpp src/Cl/ClError.hpp src/Particle/ParticleData.hpp src/Particle/ParticleModule/ParticleAttractorModule.cpp src/Particle/ParticleModule/ParticleAttractorModule.hpp src/Particle/PaticleEmitter/ParticleEmitterPoint.cpp src/Particle/PaticleEmitter/ParticleEmitterPoint.hpp src/Particle/PaticleEmitter/AParticleEmitter.hpp src/Particle/PaticleEmitter/AParticleEmitter.cpp src/Particle/ParticleModule/ParticleColorModule.cpp src/Particle/ParticleModule/ParticleColorModule.hpp src/Particle/PaticleEmitter/ParticleEmitterSprite.cpp src/Particle/PaticleEmitter/ParticleEmitterSprite.hpp src/Particle/PaticleEmitter/ParticleSpriteAtlas.cpp src/Particle/PaticleEmitter/ParticleSpriteAtlas.hpp src/Engine/Graphic/Texture.cpp src/Engine/Graphic/Texture.hpp src/Engine/Time.cpp src/Engine/Time.hpp src/Particle/ParticleModule/ParticleMovementModule.cpp src/Particle/ParticleModule/ParticleMovementModule.hpp include/Range.hpp include/OpenCGL_Tools.hpp include/OpenCGL_Tools.cpp src/Engine/Random.hpp src/Engine/Rancom.cpp src/Gui/Gui.cpp src/Gui/Gui.hpp src/Gui/AWidget.cpp src/Gui/AWidget.hpp src/Gui/WidgetOption.cpp src/Gui/WidgetOption.hpp src/Engine/RenderBuffer.cpp src/Engine/RenderBuffer.hpp src/Gui/WidgetRender.cpp src/Gui/WidgetRender.hpp src/Gui/WidgetEditor.cpp src/Gui/WidgetEditor.hpp src/Particle/ParticleModule/AParticleModule.cpp src/Particle/ParticleModule/ModuleSizeOverLifetime.cpp src/Particle/ParticleModule/ModuleSizeOverLifetime.hpp include/NTL.hpp include/NTL_Debug.cpp include/cl_type.cpp src/Particle/PaticleEmitter/MeshParticulizer.cpp src/Particle/PaticleEmitter/MeshParticulizer.hpp src/Voxel/Chunk.cpp src/Voxel/Chunk.hpp src/Voxel/VoxelWorld.cpp src/Voxel/VoxelWorld.hpp src/Engine/ShaderManager.cpp src/Engine/ShaderManager.hpp src/Engine/TestParticle.cpp src/Engine/TestParticle.hpp src/Engine/ModelEngine/MainGraphicExtendModel.cpp src/Engine/ModelEngine/MainGraphicExtendModel.hpp)
+        src/Cl/ClContext.hpp src/Cl/ClQueue.cpp src/Cl/ClQueue.hpp src/DeviceBuffer.cpp src/DeviceBuffer.hpp src/Cl/ClProgram.cpp src/Cl/ClProgram.hpp src/Cl/ClError.cpp src/Cl/ClError.hpp src/Particle/ParticleData.hpp src/Particle/ParticleModule/ParticleAttractorModule.cpp src/Particle/ParticleModule/ParticleAttractorModule.hpp src/Particle/PaticleEmitter/ParticleEmitterPoint.cpp src/Particle/PaticleEmitter/ParticleEmitterPoint.hpp src/Particle/PaticleEmitter/AParticleEmitter.hpp src/Particle/PaticleEmitter/AParticleEmitter.cpp src/Particle/ParticleModule/ParticleColorModule.cpp src/Particle/ParticleModule/ParticleColorModule.hpp src/Particle/PaticleEmitter/ParticleEmitterSprite.cpp src/Particle/PaticleEmitter/ParticleEmitterSprite.hpp src/Particle/PaticleEmitter/ParticleSpriteAtlas.cpp src/Particle/PaticleEmitter/ParticleSpriteAtlas.hpp src/Engine/Graphic/Texture.cpp src/Engine/Graphic/Texture.hpp src/Engine/Time.cpp src/Engine/Time.hpp src/Particle/ParticleModule/ParticleMovementModule.cpp src/Particle/ParticleModule/ParticleMovementModule.hpp include/Range.hpp include/OpenCGL_Tools.hpp include/OpenCGL_Tools.cpp src/Engine/Random.hpp src/Engine/Rancom.cpp src/Gui/Gui.cpp src/Gui/Gui.hpp src/Gui/AWidget.cpp src/Gui/AWidget.hpp src/Gui/WidgetOption.cpp src/Gui/WidgetOption.hpp src/Engine/RenderBuffer.cpp src/Engine/RenderBuffer.hpp src/Gui/WidgetRender.cpp src/Gui/WidgetRender.hpp src/Gui/WidgetEditor.cpp src/Gui/WidgetEditor.hpp src/Particle/ParticleModule/AParticleModule.cpp src/Particle/ParticleModule/ModuleSizeOverLifetime.cpp src/Particle/ParticleModule/ModuleSizeOverLifetime.hpp include/NTL.hpp include/NTL_Debug.cpp include/cl_type.cpp src/Particle/PaticleEmitter/MeshParticulizer.cpp src/Particle/PaticleEmitter/MeshParticulizer.hpp src/Voxel/Chunk.cpp src/Voxel/Chunk.hpp src/Voxel/VoxelWorld.cpp src/Voxel/VoxelWorld.hpp src/Engine/ShaderManager.cpp src/Engine/ShaderManager.hpp src/Engine/TestParticle.cpp src/Engine/TestParticle.hpp src/Engine/ModelEngine/MainGraphicExtendModel.cpp src/Engine/ModelEngine/MainGraphicExtendModel.hpp src/Engine/Frustum.cpp src/Engine/Frustum.hpp)
 
 add_definitions(-DGLFW_INCLUDE_NONE
         -DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
@@ -209,6 +225,7 @@ target_link_libraries(${NAME} PRIVATE Boost::filesystem)
 target_link_libraries(${NAME} PRIVATE Boost::program_options)
 target_link_libraries(${NAME} PRIVATE assimp)
 target_link_libraries(${NAME} PRIVATE glfw)
+target_link_libraries(${NAME} PRIVATE noise)
 target_link_libraries(${NAME} PRIVATE ${GLFW_LIBRARIES})
 target_link_libraries(${NAME} PRIVATE ${GLAD_LIBRARIES})
 target_link_libraries(${NAME} PRIVATE ${OpenCL_LIBRARY})

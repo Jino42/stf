@@ -2,6 +2,8 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <Engine/ShaderManager.hpp>
+#include <Engine/MainGraphic.hpp>
+#include <Engine/Frustum.hpp>
 
 VoxelWorld::VoxelWorld(Camera &camera) :
 camera_(camera) {
@@ -13,11 +15,20 @@ camera_(camera) {
     ShaderManager::Get().getShader("voxel").attach((pathRoot / "shader" / "voxel.frag").generic_string());
     //ShaderManager::Get().getShader("voxel").attach()
     ShaderManager::Get().getShader("voxel").link();
+}
+
+void VoxelWorld::start() {
+
+    heightMapBuilder.SetSourceModule (VoxelWorld::Get().myModule);
+    heightMapBuilder.SetDestNoiseMap (heightMap);
+    heightMapBuilder.SetDestSize (CHUNK_SIZE, CHUNK_SIZE);
+
 
     for (int y = -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; y < DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; y++)
         for (int x = -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; x < DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; x++)
-            chunks_.emplace_back(glm::vec3(x * CHUNK_SIZE_X, 0.0f, y * CHUNK_SIZE_Z),
+            chunks_.emplace_back(glm::vec3(x * CHUNK_SIZE, 0.0f, y * CHUNK_SIZE),
                                  (x + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) + (y + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) * DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE);
+
 }
 
 void VoxelWorld::update() {
@@ -25,8 +36,19 @@ void VoxelWorld::update() {
 }
 
 void VoxelWorld::render() {
-    for (auto &i : chunks_)
-        i.render();
+    Frustum frustum;
+    frustum.build(MainGraphic::Get().getProjectionMatrix(), MainGraphic::Get().getViewMatrix());
+
+    Shader &shader = ShaderManager::Get().getShader("voxel");
+
+    shader.activate();
+    shader.setMat4("projection", MainGraphic::Get().getProjectionMatrix());
+    shader.setMat4("view", MainGraphic::Get().getViewMatrix());
+
+    for (auto &i : chunks_) {
+        if (frustum.pointIn(i.position_.x + (CHUNK_SIZE >> 1), i.position_.y + (CHUNK_SIZE >> 1), i.position_.z + (CHUNK_SIZE >> 1)))
+            i.render();
+    }
 }
 
 void VoxelWorld::Init(Camera &camera) {

@@ -22,13 +22,13 @@ MainGraphic::MainGraphic() :
 	projection_ = glm::perspective(glm::radians(80.0f),
 	        (float) (((float)DisplayWindow::Get().getWidthWindow()) / (float)DisplayWindow::Get().getHeightWindow()),
 			NEAR_PLANE, MAX_PLANE);
-	Camera::Get().setPosition(glm::vec3(0.f, 258.f, -5.f));
+	Camera::Get().setPosition(glm::vec3(0.f, 20.f, -5.f));
 
 
     MainGraphicExtendModel::Get();
-    TestParticle::Get().init();
-
-    //VoxelWorld::Init(Camera::Get());
+    //TestParticle::Get().init();
+    VoxelWorld::Init(Camera::Get());
+    VoxelWorld::Get().start();
 
 }
 
@@ -59,7 +59,7 @@ void MainGraphic::render() {
 
     MainGraphicExtendModel::Get().update(0.014f);
     //TestParticle::Get().update(0.014f);
-//    VoxelWorld::Get().render();
+    VoxelWorld::Get().render();
 
 
     renderBuffer.unbind();

@@ -10,7 +10,7 @@ layout(triangle_strip, max_vertices = 12) out;
 //    flat uint color;
 //}   gs_out;
 
-uniform float voxSize = 0.25f;
+uniform float voxSize = 0.5f;
 uniform mat4 projection;
 uniform mat4 view;
 

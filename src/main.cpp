@@ -11,9 +11,31 @@
 #include "Gui/WidgetEditor.hpp"
 #include "NTL_Debug.hpp"
 #include <Engine/ShaderManager.hpp>
-
+#include <noise/noise.h>
+#include "noiseutils.h"
 
 int main() {
+    noise::module::Perlin myModule;
+/*
+    utils::NoiseMap heightMap;
+    utils::NoiseMapBuilderPlane heightMapBuilder;
+    heightMapBuilder.SetSourceModule (myModule);
+    heightMapBuilder.SetDestNoiseMap (heightMap);
+    heightMapBuilder.SetDestSize (256, 256);
+    heightMapBuilder.SetBounds (2.0, 6.0, 1.0, 5.0);
+    heightMapBuilder.Build ();
+
+    utils::RendererImage renderer;
+    utils::Image image;
+    renderer.SetSourceNoiseMap (heightMap);
+    renderer.SetDestImage (image);
+    renderer.Render ();
+
+    utils::WriterBMP writer;
+    writer.SetSourceImage (image);
+    writer.SetDestFilename ("tutorial.bmp");
+    writer.WriteDestFile ();
+*/
 	srand(time(NULL));
 	try {
 		std::string windowTitle = "ft_vox";
