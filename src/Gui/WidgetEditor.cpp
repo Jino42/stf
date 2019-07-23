@@ -5,12 +5,29 @@
 #include "WidgetEditor.hpp"
 #include "Engine/MainGraphic.hpp"
 #include "Particle/ParticleModule/ModuleSizeOverLifetime.hpp"
+#include <Engine/Time.hpp>
+#include <sstream>
+#include <Engine/Display/DisplayWindow.hpp>
 
 WidgetEditor::WidgetEditor() :
         AWidget("Editor", NTL_IMGUI_WINDOW_NO_FLAGS) {
 }
 
 void WidgetEditor::beginContent_() {
+    static Timer test;
+
+    if (DisplayWindow::Get().getKey(GLFW_KEY_1) == KeyState::kDown)
+        test.stop();
+    if (DisplayWindow::Get().getKey(GLFW_KEY_2) == KeyState::kDown)
+        test.start();
+
+    std::stringstream ss;
+
+    ss << test;
+
+    std::string s = ss.str();
+    ImGui::Text(s.c_str());
+
     /*
     if (ImGui::CollapsingHeader("Required")) {
         //static float begin = 1, end = 1000;

@@ -21,8 +21,8 @@ int main() {
 
 		Gui gui;
         // WidgetOption widgetOption;
-        // WidgetEditor widgetEditor;
-        // WidgetRender &widgetRender = WidgetRender::Get();
+        WidgetEditor widgetEditor;
+        WidgetRender &widgetRender = WidgetRender::Get();
 		
 		ClContext::Get();
 
@@ -67,7 +67,7 @@ int main() {
 				time_fps = std::chrono::system_clock::now();
 				std::cout << fpsCount << "fps" << std::endl;
                 fpsCount = 0;
-			}
+            }
 
 			//Reload OpenCL Kernel
 			if (DisplayWindow::Get().getKey(GLFW_KEY_R) == KeyState::kDown) {
@@ -89,12 +89,12 @@ int main() {
 
 			// GUI
             // widgetOption.render(true);
-            // ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(0, 0)));
-            // ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
+            ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(0, 0)));
+            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
             WidgetRender::Get().render(true);
-            // ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(50, 0)));
-            // ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
-            // widgetEditor.render(true);
+            ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(50, 0)));
+            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
+            widgetEditor.render(true);
 			gui.render();
         }
 	}

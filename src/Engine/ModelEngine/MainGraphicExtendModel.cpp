@@ -122,7 +122,7 @@ void MainGraphicExtendModel::update(float deltaTime)
     shader_.setInt("uBackground", 0);
 
 
-    float time = Time::Get().getFloatStartProgramTimePoint();
+    float time = static_cast<float>(Time::Get().sinceWorldStartProgram.count<std::chrono::milliseconds>()) / 1000.0f;
     shader_.setFloat("uTime", time);
     Material::unsetMaterial(shader_);
 }

@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <vector>
+#include <iostream>
 
 /// \brief Singleton
 /// \details Time get somes Function for play with Time.
@@ -16,7 +17,6 @@
 class Timer {
 
 public:
-
     /**
      * Constructor.
      *
@@ -65,32 +65,10 @@ public:
      * @return  The elapsed time.
      */
     template <class duration_t = std::chrono::milliseconds>
-    typename duration_t::rep count() const {
-        if (started_) {
-            if (paused_) {
-                return std::chrono::duration_cast<duration_t>(accumulated_).count();
-            } else {
-                return std::chrono::duration_cast<duration_t>(
-                        accumulated_ + (std::chrono::steady_clock::now() - reference_)).count();
-            }
-        } else {
-            return duration_t(0).count();
-        }
-    }
+    typename duration_t::rep count() const;
 
     template <class duration_t = std::chrono::milliseconds>
-    duration_t getDuration() const {
-        if (started_) {
-            if (paused_) {
-                return std::chrono::duration_cast<duration_t>(accumulated_);
-            } else {
-                return std::chrono::duration_cast<duration_t>(
-                        accumulated_ + (std::chrono::steady_clock::now() - reference_));
-            }
-        } else {
-            return duration_t(0);
-        }
-    }
+    duration_t getDuration() const;
 
     static void worldStart();
     static void worldStop();
@@ -99,12 +77,20 @@ private:
 
     bool started_;
     bool paused_;
+    std::chrono::steady_clock::time_point timePointTimerCreated_;
     std::chrono::steady_clock::time_point reference_;
     std::chrono::duration<long double> accumulated_;
+
+
     static std::vector< Timer * > timers_;
 
     static void addTimer_(Timer *timer);
     static void deleteTimer_(Timer *timer);
+
+    static bool debug_;
+
+
+    friend std::ostream &operator<<(std::ostream &os, Timer const &timer);
 };
 
 class Time {
@@ -131,20 +117,63 @@ public:
 	    return pause_;
 	}
 
+    Timer sinceWorldStartFrame;
+    Timer sinceWorldStartProgram;
+
 private:
     bool pause_;
     std::chrono::time_point<std::chrono::steady_clock> startPause_;
     std::chrono::milliseconds elapsedTimeInPause_;
 
-    Timer sinceWorldStartFrame_;
-    Timer sinceWorldStartProgram_;
     std::chrono::time_point<std::chrono::steady_clock> sinceRealStartProgram_;
 
 	std::chrono::nanoseconds timeStep_;
 	std::chrono::nanoseconds lag_;
 
 	static std::unique_ptr<Time> instance_;
+
+    static bool debug_;
 };
+
+std::ostream &operator<<(std::ostream &os, Timer const &timer);
 
 /// \example exampleTime.cpp
 /// This is an example of how to use the Time class.
+
+template <class duration_t>
+duration_t Timer::getDuration() const {
+    if (started_) {
+        if (paused_ || Time::Get().isPause()) {
+            return std::chrono::duration_cast<duration_t>(accumulated_);
+        } else {
+            if (debug_) {
+                std::cout << "Timer::getDuration() : " << std::endl;
+                std::cout << "accumulated : " << std::chrono::duration_cast<duration_t>(accumulated_).count() << std::endl;
+                std::cout << "now - ref : " << std::chrono::duration_cast<duration_t>((std::chrono::steady_clock::now() - reference_)).count() << std::endl;
+            }
+            return std::chrono::duration_cast<duration_t>(
+                    accumulated_ + (std::chrono::steady_clock::now() - reference_));
+        }
+    } else {
+        return duration_t(0);
+    }
+}
+
+template <class duration_t>
+typename duration_t::rep Timer::count() const {
+    if (started_) {
+        if (paused_ || Time::Get().isPause()) {
+            return std::chrono::duration_cast<duration_t>(accumulated_).count();
+        } else {
+            if (debug_) {
+                std::cout << "Timer::getDuration() : " << std::endl;
+                std::cout << "accumulated : " << std::chrono::duration_cast<duration_t>(accumulated_).count() << std::endl;
+                std::cout << "now - ref : " << std::chrono::duration_cast<duration_t>((std::chrono::steady_clock::now() - reference_)).count() << std::endl;
+            }
+            return std::chrono::duration_cast<duration_t>(
+                    accumulated_ + (std::chrono::steady_clock::now() - reference_)).count();
+        }
+    } else {
+        return duration_t(0).count();
+    }
+}
