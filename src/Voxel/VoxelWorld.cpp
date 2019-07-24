@@ -4,6 +4,7 @@
 #include <Engine/ShaderManager.hpp>
 #include <Engine/MainGraphic.hpp>
 #include <Engine/Frustum.hpp>
+#include <Engine/Display/DisplayWindow.hpp>
 
 VoxelWorld::VoxelWorld(Camera &camera) :
 camera_(camera) {
@@ -36,8 +37,13 @@ void VoxelWorld::update() {
 }
 
 void VoxelWorld::render() {
-    Frustum frustum;
-    frustum.build(MainGraphic::Get().getProjectionMatrix(), MainGraphic::Get().getViewMatrix());
+    static Frustum frustum;
+    if (DisplayWindow::Get().getKey(GLFW_KEY_B) == KeyState::kDown)
+    {
+        frustum.build(MainGraphic::Get().getProjectionMatrix(), MainGraphic::Get().getViewMatrix());
+    }
+    frustum.render();
+
 
     Shader &shader = ShaderManager::Get().getShader("voxel");
 

@@ -2,10 +2,13 @@
 
 
 void ShaderManager::addShader(std::string const &name) {
-    mapShaders_.try_emplace(name);
+    if (mapShaders_.find(name) == mapShaders_.end())
+        mapShaders_.try_emplace(name);
 }
 
 Shader &ShaderManager::getShader(std::string const &name) {
+    if (mapShaders_.find(name) == mapShaders_.end())
+        mapShaders_.try_emplace(name);
     return mapShaders_.at(name);
 }
 

@@ -11,6 +11,7 @@
     <mapping directory="$PROJECT_DIR$/extern/glfw" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/extern/glm" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/extern/imgui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/libnoise" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/extern/stb" vcs="Git" />
   </component>
 </project>

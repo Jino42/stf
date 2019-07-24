@@ -22,6 +22,7 @@ public:
 
     /// \brief Add Shader place
     /// \details Create a Shader, only, with default constructor, and store him to a Map, associated with his name.
+    ///              He is not necessary. You can getShader without add Shader, that will create them
     /// \param Name of Shader
     /// \section Example
     /// \snippet snippetShaderManager.cpp ShaderManagerAddShader example
@@ -29,6 +30,7 @@ public:
 
     /// \brief Get Shader reference
     /// \details Shearch in map, the Shader associated to this name
+    ///             If the name are not found, addShader will called for add it
     /// \param Name of Shader
     /// \return Shader Reference
     /// \throw It throws out_of_range if "Name" is not the key of an element in the Shaders map.

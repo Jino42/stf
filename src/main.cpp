@@ -52,6 +52,14 @@ int main() {
 		std::chrono::time_point<std::chrono::system_clock> time_fps = std::chrono::system_clock::now();
         bool stopAllFrame = false;
 
+        boost::filesystem::path pathRoot(ROOT_PATH);
+
+        ShaderManager::Get().addShader("debugWireFrame");
+        ShaderManager::Get().getShader("debugWireFrame").attach((pathRoot / "shader" / "debugWireFrame.vert").generic_string());
+        ShaderManager::Get().getShader("debugWireFrame").attach((pathRoot / "shader" / "debugWireFrame.frag").generic_string());
+        //ShaderManager::Get().getShader("debugWireFrame").attach((pathRoot / "shader" / "debugWireFrame.geom").generic_string());
+        ShaderManager::Get().getShader("debugWireFrame").link();
+
         while (!DisplayWindow::Get().exit()) {
 
 			//Update

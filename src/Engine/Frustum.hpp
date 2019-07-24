@@ -2,6 +2,7 @@
 
 #include "NTL.hpp"
 
+
 enum {
     FRUSTUM_PLANE_NEAR = 0,
     FRUSTUM_PLANE_FAR,
@@ -16,9 +17,15 @@ public:
 
     void    build(glm::mat4 const &projection, glm::mat4 const &view);
     bool    pointIn(float x, float y, float z);
+    void    render();
+
+    glm::mat4 projection;
+    glm::mat4 view;
 
 private:
-    glm::mat4 projection_;
-    glm::mat4 view_;
+
     glm::vec4 planes_[6];
+    unsigned int VAO;
+    unsigned int VBO;
+    unsigned int EBO;
 };
