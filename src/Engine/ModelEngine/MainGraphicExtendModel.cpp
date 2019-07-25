@@ -78,7 +78,7 @@ void MainGraphicExtendModel::update(float deltaTime)
 {
 
     MainGraphic &main = MainGraphic::Get();
-    Camera &camera = Camera::Get();
+    Camera &camera = *Camera::focus;
 
     if (DisplayWindow::Get().getKey(GLFW_KEY_G))
         distanceAttractor += deltaTime * 10;
@@ -99,9 +99,9 @@ void MainGraphicExtendModel::update(float deltaTime)
     glm::vec3 ray_nds(x, y, z);
     glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
 
-    glm::vec4 ray_eye = inverse(Camera::Get().getProjectionMatrix()) * ray_clip;
+    glm::vec4 ray_eye = inverse(Camera::focus->getProjectionMatrix()) * ray_clip;
     ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
-    glm::vec3 ray_wor = (inverse(Camera::Get().getViewMatrix()) * ray_eye);
+    glm::vec3 ray_wor = (inverse(Camera::focus->getViewMatrix()) * ray_eye);
     ray_wor = glm::normalize(ray_wor);
 
     if (updateAttractor) {
@@ -113,9 +113,9 @@ void MainGraphicExtendModel::update(float deltaTime)
     vectorMap_[1].putMaterialToShader(shader_);
     shader_.setInt("uBackground", 1);
     light_.putLightToShader(shader_);
-    shader_.setMat4("projection", Camera::Get().getProjectionMatrix());
-    shader_.setMat4("view", Camera::Get().getViewMatrix());
-    shader_.setVec3("uCameraPosition", Camera::Get().getPosition());
+    shader_.setMat4("projection", Camera::focus->getProjectionMatrix());
+    shader_.setMat4("view", Camera::focus->getViewMatrix());
+    shader_.setVec3("uCameraPosition", Camera::focus->getPosition());
     actor_.resetTransform();
     actor_.translate(attractorPoint);
     actor_.render(shader_);

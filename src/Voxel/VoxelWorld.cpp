@@ -40,7 +40,7 @@ void VoxelWorld::render() {
     static Frustum frustum;
     if (DisplayWindow::Get().getKey(GLFW_KEY_M) == KeyState::kDown)
     {
-        frustum.build(Camera::Get().getProjectionMatrix(), Camera::Get().getViewMatrix());
+        frustum.build(Camera::focus->getProjectionMatrix(), Camera::focus->getViewMatrix());
     }
     frustum.render();
 
@@ -48,8 +48,8 @@ void VoxelWorld::render() {
     Shader &shader = ShaderManager::Get().getShader("voxel");
 
     shader.activate();
-    shader.setMat4("projection", Camera::Get().getProjectionMatrix());
-    shader.setMat4("view", Camera::Get().getViewMatrix());
+    shader.setMat4("projection", Camera::focus->getProjectionMatrix());
+    shader.setMat4("view", Camera::focus->getViewMatrix());
 
     for (auto &i : chunks_) {
         if (frustum.pointIn(i.position_.x + (CHUNK_SIZE >> 1), i.position_.y + (CHUNK_SIZE >> 1), i.position_.z + (CHUNK_SIZE >> 1)))

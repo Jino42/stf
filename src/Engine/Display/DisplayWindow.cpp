@@ -75,7 +75,6 @@ void			DisplayWindow::FramebufferSizeCallback_(GLFWwindow* window, int width, in
 	if (window)
 	{
 		glViewport(0, 0, width, height);
-
 	}
 }
 
@@ -101,7 +100,7 @@ void            DisplayWindow::update() {
 	KeyStateManager::update();
 
     if (!cursor_  && DisplayWindow::mouseCallbackCalled_) {
-        Camera::Get().processMouseMovement(DisplayWindow::offsetX_, DisplayWindow::offsetY_);
+        Camera::focus->processMouseMovement(DisplayWindow::offsetX_, DisplayWindow::offsetY_);
         DisplayWindow::mouseCallbackCalled_ = false;
     }
 	if (getKeyState(GLFW_KEY_ESCAPE) == KeyState::kDown)

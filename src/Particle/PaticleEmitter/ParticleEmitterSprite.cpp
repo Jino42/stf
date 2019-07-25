@@ -158,8 +158,8 @@ void ParticleEmitterSprite::render() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glDepthMask(GL_FALSE);
 	shader_.activate();
-	shader_.setMat4("projection", Camera::Get().getProjectionMatrix());
-	shader_.setMat4("view", Camera::Get().getViewMatrix());
+	shader_.setMat4("projection", Camera::focus->getProjectionMatrix());
+	shader_.setMat4("view", Camera::focus->getViewMatrix());
 	shader_.setUInt("numberOfRows", atlas_.getNumberOfRows());
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, atlas_.getAtlasId());
@@ -194,7 +194,7 @@ void ParticleEmitterSprite::sortDeviceBufferCalculateDistanceParticle_() {
 	cl::Kernel &kernel = ClProgram::Get().getKernel("calculateDistanceBetweenParticleAndCamera");
 
 	kernel.setArg(0, deviceBuffer_.mem);
-	glm::vec3 cameraPosition = Camera::Get().getPosition();
+	glm::vec3 cameraPosition = Camera::focus->getPosition();
 	kernel.setArg(1, distBuffer_);
 	kernel.setArg(2, glmVec3toClFloat3(cameraPosition));
 
@@ -218,7 +218,7 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 	//kernel.getWorkGroupInfo(ClContext::Get().deviceDefault, CL_KERNEL_WORK_GROUP_SIZE, &localWorkGroupeSize);
 	//localWorkGroupeSize /= 2;
 	//int blockFactor = 2;
-	glm::vec3 cameraPosition = Camera::Get().getPosition();
+	glm::vec3 cameraPosition = Camera::focus->getPosition();
 	kernel.setArg(2, distBuffer_);
 	std::cout << "8" << std::endl;
 	cl_float3 temp;

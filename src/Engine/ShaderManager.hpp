@@ -22,7 +22,9 @@ public:
 
     /// \brief Add Shader place
     /// \details Create a Shader, only, with default constructor, and store him to a Map, associated with his name.
+    ///              If name are already mapped with a Sahder, do nothing
     ///              He is not necessary. You can getShader without add Shader, that will create them
+    ///              Maybe i should remove it ...
     /// \param Name of Shader
     /// \section Example
     /// \snippet snippetShaderManager.cpp ShaderManagerAddShader example

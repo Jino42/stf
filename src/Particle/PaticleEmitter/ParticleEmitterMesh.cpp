@@ -63,8 +63,8 @@ void ParticleEmitterMesh::update(float deltaTime) {
 
 void ParticleEmitterMesh::render() {
 	shader_.activate();
-	shader_.setMat4("projection", Camera::Get().getProjectionMatrix());
-	shader_.setMat4("view", Camera::Get().getViewMatrix());
+	shader_.setMat4("projection", Camera::focus->getProjectionMatrix());
+	shader_.setMat4("view", Camera::focus->getViewMatrix());
 
 	for (const auto &mesh : model_.getMeshes()) {
 		mesh.activeTexture();

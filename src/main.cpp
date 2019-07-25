@@ -13,6 +13,7 @@
 #include <Engine/ShaderManager.hpp>
 #include <noise/noise.h>
 #include "noiseutils.h"
+#include <Engine/CameraManager.hpp>
 
 int main() {
     noise::module::Perlin myModule;
@@ -45,8 +46,14 @@ int main() {
         // WidgetOption widgetOption;
         WidgetEditor widgetEditor;
         WidgetRender &widgetRender = WidgetRender::Get();
-		
+
+		std::cout << 1 << std::endl;
 		ClContext::Get();
+		std::cout << 2 << std::endl;
+		MainGraphic::Get();
+		std::cout << 3 << std::endl;
+		CameraManager::Get();
+		std::cout << 4 << std::endl;
 
 		int fpsCount = 0;
 		std::chrono::time_point<std::chrono::system_clock> time_fps = std::chrono::system_clock::now();
@@ -59,18 +66,15 @@ int main() {
         ShaderManager::Get().getShader("debugWireFrame").attach((pathRoot / "shader" / "debugWireFrame.frag").generic_string());
         //ShaderManager::Get().getShader("debugWireFrame").attach((pathRoot / "shader" / "debugWireFrame.geom").generic_string());
         ShaderManager::Get().getShader("debugWireFrame").link();
-
+		std::cout << 5 << std::endl;
 		MainGraphic::Get().init();
-
+		std::cout << 6 << std::endl;
         while (!DisplayWindow::Get().exit()) {
-
 			//Update
-			std::cout << 1 << std::endl;
             Time::Get().update();
             DisplayWindow::Get().update();
             gui.update();
 
-			std::cout << 2 << std::endl;
             //Pause management
             if (DisplayWindow::Get().getKey(GLFW_KEY_K) == KeyState::kDown)
                 stopAllFrame = !stopAllFrame;

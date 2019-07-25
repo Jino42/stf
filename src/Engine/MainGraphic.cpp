@@ -1,7 +1,7 @@
 #include "MainGraphic.hpp"
 #include "Time.hpp"
 #include <Voxel/VoxelWorld.hpp>
-#include "Engine/Camera.hpp"
+#include "Engine/CameraManager.hpp"
 #include "Engine/Display/DisplayWindow.hpp"
 #include <Engine/TestParticle.hpp>
 #include <Engine/ModelEngine/MainGraphicExtendModel.hpp>
@@ -25,27 +25,27 @@ MainGraphic &MainGraphic::Get() {
 }
 
 void MainGraphic::init() {
-	Camera::Get().setPosition(glm::vec3(0.f, 20.f, -5.f));
+	CameraManager::Get().getFocus().setPosition(glm::vec3(0.f, 20.f, -5.f));
 
 	MainGraphicExtendModel::Get();
 	//TestParticle::Get().init();
-	VoxelWorld::Init(Camera::Get());
+	VoxelWorld::Init(*Camera::focus);
 	VoxelWorld::Get().start();
 }
 
 void MainGraphic::render() {
 	if (DisplayWindow::Get().getKey(GLFW_KEY_RIGHT) || DisplayWindow::Get().getKey(GLFW_KEY_D))
-        Camera::Get().processPosition(Camera::Movement::RIGHT, deltaTime_ * 5);
+		Camera::focus->processPosition(Camera::Movement::RIGHT, deltaTime_ * 5);
 	if (DisplayWindow::Get().getKey(GLFW_KEY_LEFT) || DisplayWindow::Get().getKey(GLFW_KEY_A))
-        Camera::Get().processPosition(Camera::Movement::LEFT, deltaTime_ * 5);
+		Camera::focus->processPosition(Camera::Movement::LEFT, deltaTime_ * 5);
 	if (DisplayWindow::Get().getKey(GLFW_KEY_DOWN) || DisplayWindow::Get().getKey(GLFW_KEY_S))
-        Camera::Get().processPosition(Camera::Movement::BACKWARD, deltaTime_ * 5);
+		Camera::focus->processPosition(Camera::Movement::BACKWARD, deltaTime_ * 5);
 	if (DisplayWindow::Get().getKey(GLFW_KEY_UP) || DisplayWindow::Get().getKey(GLFW_KEY_W))
-        Camera::Get().processPosition(Camera::Movement::FORWARD, deltaTime_ * 5);
+		Camera::focus->processPosition(Camera::Movement::FORWARD, deltaTime_ * 5);
 	if (DisplayWindow::Get().getKey(GLFW_KEY_RIGHT_CONTROL) || DisplayWindow::Get().getKey(GLFW_KEY_Q))
-        Camera::Get().processPosition(Camera::Movement::DOWN, deltaTime_ * 5);
+		Camera::focus->processPosition(Camera::Movement::DOWN, deltaTime_ * 5);
 	if (DisplayWindow::Get().getKey(GLFW_KEY_RIGHT_SHIFT) || DisplayWindow::Get().getKey(GLFW_KEY_E))
-        Camera::Get().processPosition(Camera::Movement::UP, deltaTime_ * 5);
+		Camera::focus->processPosition(Camera::Movement::UP, deltaTime_ * 5);
 
     renderBuffer_.bind();
     renderBuffer_.clear();

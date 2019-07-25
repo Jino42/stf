@@ -145,8 +145,8 @@ void Frustum::build(glm::mat4 const &projection, glm::mat4 const &view)
 
 void    Frustum::render() {
     ShaderManager::Get().getShader("debugWireFrame").activate();
-    ShaderManager::Get().getShader("debugWireFrame").setMat4("projection", Camera::Get().getProjectionMatrix());
-    ShaderManager::Get().getShader("debugWireFrame").setMat4("view", Camera::Get().getViewMatrix());
+    ShaderManager::Get().getShader("debugWireFrame").setMat4("projection", Camera::focus->getProjectionMatrix());
+    ShaderManager::Get().getShader("debugWireFrame").setMat4("view", Camera::focus->getViewMatrix());
 
     glBindVertexArray(VAO);
     //glDrawArrays(GL_POINTS, 0, 8);

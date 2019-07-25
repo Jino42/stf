@@ -50,8 +50,8 @@ void ParticleEmitterPoint::update(float deltaTime) {
 
 void ParticleEmitterPoint::render() {
 	shader_.activate();
-	shader_.setMat4("projection", Camera::Get().getProjectionMatrix());
-	shader_.setMat4("view", Camera::Get().getViewMatrix());
+	shader_.setMat4("projection", Camera::focus->getProjectionMatrix());
+	shader_.setMat4("view", Camera::focus->getViewMatrix());
 	//shader_.setVec3("uCameraPosition", Camera::Get().getPosition());
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_POINTS, 0, nbParticleMax_);

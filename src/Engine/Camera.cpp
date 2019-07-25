@@ -114,10 +114,4 @@ void		Camera::updateCameraVectors_() {
 	needUpdateViewMatrix_ = true;
 }
 
-Camera &Camera::Get() {
-    if (!Camera::instance_)
-        instance_ = std::make_unique<Camera>();
-    return *Camera::instance_;
-}
-
-std::unique_ptr<Camera> Camera::instance_ = nullptr;
+Camera *Camera::focus = nullptr;

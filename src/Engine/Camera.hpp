@@ -41,7 +41,7 @@ public:
 	glm::vec3 getPosition() const;
 	glm::vec3 getFront() const;
 
-    static Camera &Get();
+	static Camera *focus;
 
 private:
 	bool needUpdateViewMatrix_ ;
@@ -61,5 +61,4 @@ private:
 
 	void updateCameraVectors_();
 
-    static std::unique_ptr<Camera> instance_;
 };
