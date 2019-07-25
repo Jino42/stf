@@ -90,8 +90,8 @@ void MainGraphicExtendModel::update(float deltaTime)
     WidgetRender &wrender = WidgetRender::Get();
 
 
-    ImVec2 screenToRender = ImVec2(static_cast<float>(main.renderBuffer.width) / static_cast<float>(DisplayWindow::Get().getWidthWindow()),
-                                   static_cast<float>(main.renderBuffer.height) / static_cast<float>(DisplayWindow::Get().getHeightWindow()));
+    ImVec2 screenToRender = ImVec2(static_cast<float>(main.getRenderBuffer().width) / static_cast<float>(DisplayWindow::Get().getWidthWindow()),
+                                   static_cast<float>(main.getRenderBuffer().height) / static_cast<float>(DisplayWindow::Get().getHeightWindow()));
     float x = (2.0f * (DisplayWindow::lastX_ - wrender.widgetPosition.x)) / (DisplayWindow::Get().getWidthWindow() * screenToRender.x) - 1.0f;
     float y = 1.0f - (2.0f * (DisplayWindow::lastY_ - wrender.widgetPosition.y)) / (DisplayWindow::Get().getHeightWindow() * screenToRender.y);
     float z = 1.0f;
@@ -99,9 +99,9 @@ void MainGraphicExtendModel::update(float deltaTime)
     glm::vec3 ray_nds(x, y, z);
     glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
 
-    glm::vec4 ray_eye = inverse(main.getProjectionMatrix()) * ray_clip;
+    glm::vec4 ray_eye = inverse(Camera::Get().getProjectionMatrix()) * ray_clip;
     ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
-    glm::vec3 ray_wor = (inverse(main.getViewMatrix()) * ray_eye);
+    glm::vec3 ray_wor = (inverse(Camera::Get().getViewMatrix()) * ray_eye);
     ray_wor = glm::normalize(ray_wor);
 
     if (updateAttractor) {
@@ -113,8 +113,8 @@ void MainGraphicExtendModel::update(float deltaTime)
     vectorMap_[1].putMaterialToShader(shader_);
     shader_.setInt("uBackground", 1);
     light_.putLightToShader(shader_);
-    shader_.setMat4("projection", MainGraphic::Get().getProjectionMatrix());
-    shader_.setMat4("view", MainGraphic::Get().getViewMatrix());
+    shader_.setMat4("projection", Camera::Get().getProjectionMatrix());
+    shader_.setMat4("view", Camera::Get().getViewMatrix());
     shader_.setVec3("uCameraPosition", Camera::Get().getPosition());
     actor_.resetTransform();
     actor_.translate(attractorPoint);

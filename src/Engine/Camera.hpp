@@ -6,6 +6,9 @@
 #include <vector>
 #include <memory>
 
+#define NEAR_PLANE 0.1f
+#define MAX_PLANE 300.f
+
 class Camera {
 public:
 	enum Movement {
@@ -20,8 +23,8 @@ public:
 	Camera();
 	~Camera() = default;
 
-	Camera(Camera const &camera);
-	Camera &operator=(Camera const &camera);
+	Camera(Camera const &camera) = default;
+	Camera &operator=(Camera const &camera) = default;
 
 	void update();
 	void setPosition(glm::vec3 const &pos);
@@ -32,13 +35,16 @@ public:
 	void processPosition(glm::vec3 const &, float deltaTime = 1.f);
 	void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 
-	glm::mat4 getViewMatrix() const;
+	glm::mat4 getViewMatrix();
+	glm::mat4 getProjectionMatrix() const;
+
 	glm::vec3 getPosition() const;
 	glm::vec3 getFront() const;
 
     static Camera &Get();
 
 private:
+	bool needUpdateViewMatrix_ ;
 	glm::vec3 position_;
 	glm::vec3 front_;
 	glm::vec3 up_;
@@ -49,6 +55,9 @@ private:
 	float speed_;
 	float sensitivity_;
 	float zoom_;
+
+	glm::mat4	viewMatrix_;
+	glm::mat4	projectionMatrix_;
 
 	void updateCameraVectors_();
 

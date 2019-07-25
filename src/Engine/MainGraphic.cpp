@@ -7,10 +7,8 @@
 #include <Engine/ModelEngine/MainGraphicExtendModel.hpp>
 
 MainGraphic::MainGraphic() :
-        renderBuffer(DisplayWindow::Get().getWidthWindow(), DisplayWindow::Get().getHeightWindow()),
-		deltaTime_(0.014f),
-		projection_(1.f),
-		view_(1.f) {
+        renderBuffer_(DisplayWindow::Get().getWidthWindow() / 2, DisplayWindow::Get().getHeightWindow()),
+		deltaTime_(0.014f) {
 	glEnable(GL_DEPTH_TEST);
 	glPointSize(1.0f);
 	glLineWidth(5.0f);
@@ -18,18 +16,6 @@ MainGraphic::MainGraphic() :
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glDepthMask(GL_FALSE);
-
-	projection_ = glm::perspective(glm::radians(80.0f),
-	        (float) (((float)DisplayWindow::Get().getWidthWindow()) / (float)DisplayWindow::Get().getHeightWindow()),
-			NEAR_PLANE, MAX_PLANE);
-	Camera::Get().setPosition(glm::vec3(0.f, 20.f, -5.f));
-
-
-    MainGraphicExtendModel::Get();
-    //TestParticle::Get().init();
-    VoxelWorld::Init(Camera::Get());
-    VoxelWorld::Get().start();
-
 }
 
 MainGraphic &MainGraphic::Get() {
@@ -38,9 +24,16 @@ MainGraphic &MainGraphic::Get() {
 	return *MainGraphic::instance_;
 }
 
-void MainGraphic::render() {
-    view_ = Camera::Get().getViewMatrix();
+void MainGraphic::init() {
+	Camera::Get().setPosition(glm::vec3(0.f, 20.f, -5.f));
 
+	MainGraphicExtendModel::Get();
+	//TestParticle::Get().init();
+	VoxelWorld::Init(Camera::Get());
+	VoxelWorld::Get().start();
+}
+
+void MainGraphic::render() {
 	if (DisplayWindow::Get().getKey(GLFW_KEY_RIGHT) || DisplayWindow::Get().getKey(GLFW_KEY_D))
         Camera::Get().processPosition(Camera::Movement::RIGHT, deltaTime_ * 5);
 	if (DisplayWindow::Get().getKey(GLFW_KEY_LEFT) || DisplayWindow::Get().getKey(GLFW_KEY_A))
@@ -54,15 +47,15 @@ void MainGraphic::render() {
 	if (DisplayWindow::Get().getKey(GLFW_KEY_RIGHT_SHIFT) || DisplayWindow::Get().getKey(GLFW_KEY_E))
         Camera::Get().processPosition(Camera::Movement::UP, deltaTime_ * 5);
 
-    renderBuffer.bind();
-    renderBuffer.clear();
+    renderBuffer_.bind();
+    renderBuffer_.clear();
 
     MainGraphicExtendModel::Get().update(0.014f);
     //TestParticle::Get().update(0.014f);
     VoxelWorld::Get().render();
 
 
-    renderBuffer.unbind();
+    renderBuffer_.unbind();
 }
 
 void MainGraphic::update() {
@@ -70,11 +63,8 @@ void MainGraphic::update() {
         DisplayWindow::Get().swapCursor();
 }
 
-glm::mat4 const &MainGraphic::getViewMatrix() const {
-	return view_;
-}
-glm::mat4 const &MainGraphic::getProjectionMatrix() const {
-	return projection_;
-}
-
 std::unique_ptr<MainGraphic> MainGraphic::instance_ = nullptr;
+
+RenderBuffer &MainGraphic::getRenderBuffer() {
+	return renderBuffer_;
+}

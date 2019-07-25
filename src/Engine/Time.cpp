@@ -170,18 +170,26 @@ std::ostream &operator<<(std::ostream &os, Timer const &timer) {
     time_t timeCratedTimer = steady_clock_to_time_t(timer.timePointTimerCreated_);
     time_t timeReferenceTimer = steady_clock_to_time_t(timer.reference_);
 
+#ifdef __APPLE__
     std::string strTimeCreatedTimer(std::ctime(&timeCratedTimer));
     strTimeCreatedTimer.erase(std::remove(strTimeCreatedTimer.begin(), strTimeCreatedTimer.end(), '\n'), strTimeCreatedTimer.end());
 
     std::string strTimeReferenceTimer(std::ctime(&timeReferenceTimer));
     strTimeReferenceTimer.erase(std::remove(strTimeReferenceTimer.begin(), strTimeReferenceTimer.end(), '\n'), strTimeReferenceTimer.end());
+#endif
+
+
 
     os << "Timer {";
     os << "World pause [" << Time::Get().isPause() << "]," << std::endl;
+#ifdef __APPLE__
     os << "Timer created at : [" << strTimeCreatedTimer << "]," << std::endl;
+#endif
     os << "Started_[" << timer.started_ << "]," << std::endl;
     os << "paused_ [" << timer.paused_ << "], " << std::endl;
+#ifdef __APPLE__
     os << "reference_ [" << strTimeReferenceTimer << "]," << std::endl;
+#endif
     os << "accumulated_ [ms:" << (std::chrono::duration_cast<std::chrono::milliseconds>(timer.accumulated_).count() / 1000.f) << "] }" << std::endl;
     os << "Timer actual ms : [" << timer.count() << "]" << std::endl;
     os << "Speed : [" << timer.speed_ << "]" << std::endl;

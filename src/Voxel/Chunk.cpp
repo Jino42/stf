@@ -25,13 +25,7 @@ Chunk::Chunk(glm::vec3 position, int id) :
     int i = 0;
     for (int z = 0; z < CHUNK_SIZE; z++) {
         for (int x = 0; x < CHUNK_SIZE; x++) {
-            std::cout << "[" << x + position.x << "][" << z + position.z << "]" << std::endl;
-            std::cout << vw.image.GetValue(x, z).blue / 16.0f << std::endl;
 
-            std::cout << vw.image.GetValue(x - 1, z).blue / 16.0f << std::endl;
-            std::cout << vw.image.GetValue(x + 1, z).blue / 16.0f << std::endl;
-            std::cout << vw.image.GetValue(x, z - 1).blue / 16.0f << std::endl;
-            std::cout << vw.image.GetValue(x, z + 1).blue / 16.0f << std::endl;
 
             int south = vw.image.GetValue(x + 1, z).blue / 16.0f;
             int north = vw.image.GetValue(x - 1, z).blue / 16.0f;

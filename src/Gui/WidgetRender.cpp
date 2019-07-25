@@ -13,10 +13,10 @@ WidgetRender::WidgetRender() :
 void WidgetRender::beginContent_() {
 
     ImGui::GetWindowDrawList()->AddImage(
-            (void *)MainGraphic::Get().renderBuffer.getTextureBufferId(),
+            (void *)MainGraphic::Get().getRenderBuffer().getTextureBufferId(),
             ImVec2(ImGui::GetCursorScreenPos()),
-            ImVec2(ImGui::GetCursorScreenPos().x + MainGraphic::Get().renderBuffer.width,
-                   ImGui::GetCursorScreenPos().y + MainGraphic::Get().renderBuffer.height), ImVec2(0, 1), ImVec2(1, 0));
+            ImVec2(ImGui::GetCursorScreenPos().x + MainGraphic::Get().getRenderBuffer().width,
+                   ImGui::GetCursorScreenPos().y + MainGraphic::Get().getRenderBuffer().height), ImVec2(0, 1), ImVec2(1, 0));
     widgetPosition = ImGui::GetWindowPos();
     widgetSize = ImGui::GetWindowSize();
 }

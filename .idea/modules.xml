@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/NTL.iml" filepath="$PROJECT_DIR$/.idea/NTL.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ft_vox.iml" filepath="$PROJECT_DIR$/.idea/ft_vox.iml" />
     </modules>
   </component>
 </project>

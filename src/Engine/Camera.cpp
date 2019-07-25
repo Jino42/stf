@@ -1,8 +1,9 @@
 #include <iostream>
 #include "Camera.hpp"
-#include "Display/DisplayWindow.hpp"
+#include <Engine/MainGraphic.hpp>
 
 Camera::Camera() :
+		needUpdateViewMatrix_ (false),
 	position_(glm::vec3(0.0f, 0.0f, 0.0f)),
 	front_(glm::vec3(0.0f, 0.0f, -1.0f)),
 	up_(glm::vec3(0.0f, 1.0f, 0.0f)),
@@ -11,32 +12,19 @@ Camera::Camera() :
 	pitch_(0.0f),
 	speed_(2.5f),
 	sensitivity_(0.1f),
-	zoom_(45.0f) {
+	zoom_(45.0f),
+	projectionMatrix_(1.0f),
+	viewMatrix_(1.0f) {
 	
 	// Temp fix to have voxels filled at startup
 	// new edit: do not work anymore :(
 	processMouseMovement(0.01, 0.01);
-	
-	updateCameraVectors_();
-}
 
-Camera::Camera(Camera const &camera) {
-	*this = camera;
-}
-Camera &Camera::operator=(Camera const &camera) {
-	if (this != &camera) {
-		position_ = camera.position_;
-		front_ = camera.front_;
-		up_ = camera.up_;
-		right_ = camera.right_;
-		worldUp_ = camera.worldUp_;
-		yaw_ = camera.yaw_;
-		pitch_ = camera.pitch_;
-		speed_ = camera.speed_;
-		sensitivity_ = camera.sensitivity_;
-		zoom_ = camera.zoom_;
-	}
-	return (*this);
+	projectionMatrix_ = glm::perspective(glm::radians(80.0f),
+								   static_cast<float>(MainGraphic::Get().getRenderBuffer().width) / static_cast<float>(MainGraphic::Get().getRenderBuffer().height),
+								   NEAR_PLANE, MAX_PLANE);
+
+	updateCameraVectors_();
 }
 
 void 		Camera::update() {
@@ -57,6 +45,7 @@ void		Camera::processPosition(Camera::Movement direction, float deltaTime) {
 		position_ -= up_ * velocity;
 	else if (direction == Camera::Movement::UP)
 		position_ += up_ * velocity;
+	needUpdateViewMatrix_ = true;
 }
 
 void		Camera::setPosition(glm::vec3 const &pos) {
@@ -95,9 +84,18 @@ void Camera::setUp(glm::vec3 const &up) {
 	up_ = up;
 }
 
-glm::mat4	Camera::getViewMatrix() const {
-	return glm::lookAt(position_, position_ + front_, up_);
+glm::mat4	Camera::getViewMatrix() {
+	if (needUpdateViewMatrix_) {
+		viewMatrix_ = glm::lookAt(position_, position_ + front_, up_);
+		needUpdateViewMatrix_ = false;
+	}
+	return viewMatrix_;
 }
+
+glm::mat4 Camera::getProjectionMatrix() const {
+	return projectionMatrix_;
+}
+
 glm::vec3	Camera::getPosition() const {
 	return position_;
 }
@@ -113,6 +111,7 @@ void		Camera::updateCameraVectors_() {
 	front_ = glm::normalize(front);
 	right_ = glm::normalize(glm::cross(front_, worldUp_));
 	up_    = glm::normalize(glm::cross(right_, front_));
+	needUpdateViewMatrix_ = true;
 }
 
 Camera &Camera::Get() {

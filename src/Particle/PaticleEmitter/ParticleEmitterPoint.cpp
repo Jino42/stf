@@ -3,7 +3,7 @@
 #include "Cl/ClQueue.hpp"
 #include "Particle/ParticleData.hpp"
 #include "Particle/ParticleModule/ParticleAttractorModule.hpp"
-#include "Engine/MainGraphic.hpp"
+#include "Engine/Camera.hpp"
 
 ParticleEmitterPoint::ParticleEmitterPoint(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticle) :
 	AParticleEmitter(system, queue, name, nbParticle, 0)
@@ -50,8 +50,8 @@ void ParticleEmitterPoint::update(float deltaTime) {
 
 void ParticleEmitterPoint::render() {
 	shader_.activate();
-	shader_.setMat4("projection", MainGraphic::Get().getProjectionMatrix());
-	shader_.setMat4("view", MainGraphic::Get().getViewMatrix());
+	shader_.setMat4("projection", Camera::Get().getProjectionMatrix());
+	shader_.setMat4("view", Camera::Get().getViewMatrix());
 	//shader_.setVec3("uCameraPosition", Camera::Get().getPosition());
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_POINTS, 0, nbParticleMax_);

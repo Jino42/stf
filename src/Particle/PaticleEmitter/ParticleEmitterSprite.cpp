@@ -158,8 +158,8 @@ void ParticleEmitterSprite::render() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glDepthMask(GL_FALSE);
 	shader_.activate();
-	shader_.setMat4("projection", MainGraphic::Get().getProjectionMatrix());
-	shader_.setMat4("view", MainGraphic::Get().getViewMatrix());
+	shader_.setMat4("projection", Camera::Get().getProjectionMatrix());
+	shader_.setMat4("view", Camera::Get().getViewMatrix());
 	shader_.setUInt("numberOfRows", atlas_.getNumberOfRows());
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, atlas_.getAtlasId());

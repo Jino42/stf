@@ -3,7 +3,7 @@
 #include <Engine/ShaderManager.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
-#include <Engine/MainGraphic.hpp>
+#include <Engine/Camera.hpp>
 
 void Frustum::build(glm::mat4 const &projection, glm::mat4 const &view)
 {
@@ -26,15 +26,15 @@ void Frustum::build(glm::mat4 const &projection, glm::mat4 const &view)
 
     float ar = static_cast<float>(1024.f / 720.f);
     float fov = 80.f;
-    float near = 0.1f;
-    float far = 300.f;
+    float distNear = 0.1f;
+    float distFar = 300.f;
     float halfHeight = tanf((3.14159265358979323846f / 180.f) * (fov / 2.f));
     float halfWidth = halfHeight * ar;
 
-    float xn = halfWidth * near;
-    float xf = halfWidth * far;
-    float yn = halfHeight * near;
-    float yf = halfHeight * far;
+    float xn = halfWidth * distNear;
+    float xf = halfWidth * distFar;
+    float yn = halfHeight * distNear;
+    float yf = halfHeight * distFar;
 
 /*
     glm::mat4 inverse = glm::inverse(view);
@@ -42,16 +42,16 @@ void Frustum::build(glm::mat4 const &projection, glm::mat4 const &view)
     glm::vec4 f[8u] =
             {
                     // near face
-                    {xn, yn, -near, 1.f},
-                    {-xn, yn, -near, 1.f},
-                    {xn, -yn, -near, 1.f},
-                    {-xn, -yn, -near , 1.f},
+                    {xn, yn, -distNear, 1.f},
+                    {-xn, yn, -distNear, 1.f},
+                    {xn, -yn, -distNear, 1.f},
+                    {-xn, -yn, -distNear , 1.f},
 
                     // far face
-                    {xf, yf, -far, 1.f},
-                    {-xf, yf, -far , 1.f},
-                    {xf, -yf, -far , 1.f},
-                    {-xf, -yf, -far, 1.f},
+                    {xf, yf, -distFar, 1.f},
+                    {-xf, yf, -distFar , 1.f},
+                    {xf, -yf, -distFar , 1.f},
+                    {-xf, -yf, -distFar, 1.f},
             };
 
     glm::vec3 v[8];
@@ -145,8 +145,8 @@ void Frustum::build(glm::mat4 const &projection, glm::mat4 const &view)
 
 void    Frustum::render() {
     ShaderManager::Get().getShader("debugWireFrame").activate();
-    ShaderManager::Get().getShader("debugWireFrame").setMat4("projection", MainGraphic::Get().getProjectionMatrix());
-    ShaderManager::Get().getShader("debugWireFrame").setMat4("view", MainGraphic::Get().getViewMatrix());
+    ShaderManager::Get().getShader("debugWireFrame").setMat4("projection", Camera::Get().getProjectionMatrix());
+    ShaderManager::Get().getShader("debugWireFrame").setMat4("view", Camera::Get().getViewMatrix());
 
     glBindVertexArray(VAO);
     //glDrawArrays(GL_POINTS, 0, 8);

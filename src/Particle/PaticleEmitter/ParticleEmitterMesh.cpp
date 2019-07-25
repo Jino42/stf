@@ -3,7 +3,7 @@
 #include "Cl/ClQueue.hpp"
 #include "Particle/ParticleData.hpp"
 #include "Particle/ParticleModule/ParticleAttractorModule.hpp"
-#include "Engine/MainGraphic.hpp"
+#include "Engine/Camera.hpp"
 
 ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticle, size_t nbParticlePerSec) :
 	AParticleEmitter(system, queue, name, nbParticle, nbParticlePerSec)
@@ -63,8 +63,8 @@ void ParticleEmitterMesh::update(float deltaTime) {
 
 void ParticleEmitterMesh::render() {
 	shader_.activate();
-	shader_.setMat4("projection", MainGraphic::Get().getProjectionMatrix());
-	shader_.setMat4("view", MainGraphic::Get().getViewMatrix());
+	shader_.setMat4("projection", Camera::Get().getProjectionMatrix());
+	shader_.setMat4("view", Camera::Get().getViewMatrix());
 
 	for (const auto &mesh : model_.getMeshes()) {
 		mesh.activeTexture();

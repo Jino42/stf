@@ -4,7 +4,7 @@
 
 #include "MeshParticulizer.hpp"
 #include "Particle/ParticleData.hpp"
-#include "Engine/MainGraphic.hpp"
+#include "Engine/Camera.hpp"
 
 
 MeshParticulizer::MeshParticulizer(ParticleSystem &system, ClQueue &queue, std::string const &name, Mesh &mesh) :
@@ -83,8 +83,8 @@ void MeshParticulizer::render() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glDepthMask(GL_FALSE);
     shader_.activate();
-    shader_.setMat4("projection", MainGraphic::Get().getProjectionMatrix());
-    shader_.setMat4("view", MainGraphic::Get().getViewMatrix());
+    shader_.setMat4("projection", Camera::Get().getProjectionMatrix());
+    shader_.setMat4("view", Camera::Get().getViewMatrix());
     glActiveTexture(GL_TEXTURE0);
 
     glBindVertexArray(VAO);

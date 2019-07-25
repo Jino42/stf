@@ -60,13 +60,17 @@ int main() {
         //ShaderManager::Get().getShader("debugWireFrame").attach((pathRoot / "shader" / "debugWireFrame.geom").generic_string());
         ShaderManager::Get().getShader("debugWireFrame").link();
 
+		MainGraphic::Get().init();
+
         while (!DisplayWindow::Get().exit()) {
 
 			//Update
+			std::cout << 1 << std::endl;
             Time::Get().update();
             DisplayWindow::Get().update();
             gui.update();
 
+			std::cout << 2 << std::endl;
             //Pause management
             if (DisplayWindow::Get().getKey(GLFW_KEY_K) == KeyState::kDown)
                 stopAllFrame = !stopAllFrame;
@@ -77,7 +81,9 @@ int main() {
             if (!Time::Get().isPause())
                 MainGraphic::Get().update();
 
-            //Logical Loop
+
+
+			//Logical Loop
 			while (Time::Get().shouldUpdateLogic()) {
 			}
 

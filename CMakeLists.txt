@@ -7,24 +7,21 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DROOT_PATH=\\\"${CMAKE_SOURCE_DIR}\\\"")
 set(CMAKE_BUILD_PARALLEL_LEVEL true)
 set(CMAKE_MACOSX_RPATH 1)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 else()
     link_directories(/usr/lib/)
     link_directories($ENV{HOME}/.brew/lib/)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wvla")
     if(NOT WIN32)
         set(GLAD_LIBRARIES dl)
     endif()
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    message(STATUS "noiseutils - using optimized compile settings with all warnings enabled")
-    add_compile_options(-Wall -Werror -Wextra -ansi -pedantic -O3)
+    add_compile_options(-Wall -Werror -Wextra -Wvla -Wpedantic -ansi -pedantic -O3)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    message(STATUS "noiseutils - using optimized compile settings with all warnings enabled")
-    add_compile_options(/Wall /Ox)
 endif()
 
 find_package(Git QUIET)
@@ -152,6 +149,16 @@ option(BUILD_EXAMPLES OFF)
 option(BUILD_TESTS OFF)
 #add_subdirectory(extern/OpenCL-CLHPP)
 
+
+message("EXTERN : libnoise cloning...")
+if (GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init extern/libnoise
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            RESULT_VARIABLE GIT_SUBMOD_RESULT)
+    if (NOT GIT_SUBMOD_RESULT EQUAL "0")
+        message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+    endif ()
+endif ()
 option(BUILD_LIBNOISE_DOCUMENTATION OFF)
 option(BUILD_LIBNOISE_UTILS ON)
 option(BUILD_LIBNOISE_EXAMPLES ON)
@@ -233,3 +240,5 @@ target_link_libraries(${NAME} PRIVATE ${OPENGL_LIBRARIES})
 target_link_libraries(${NAME} PRIVATE imgui)
 
 set_target_properties(${NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+
+#target_compile_options
