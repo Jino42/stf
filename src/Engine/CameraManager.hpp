@@ -10,8 +10,14 @@ class CameraManager {
 public:
 
 	/// \brief Constructor
-	/// \details Create a default Camera, mapped with "Default" name
+	/// \details Create Singleton
 	CameraManager();
+	/// \details Create a default Camera, mapped with "Default" name
+	void init();
+
+	/// \brief Update all camera
+	/// \details Do it when a Frame is started
+	void update();
 
 	/// \brief Set Focused Camera
 	/// \brief Set Focused Camera for get him with :

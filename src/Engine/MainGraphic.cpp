@@ -54,6 +54,8 @@ void MainGraphic::render() {
     //TestParticle::Get().update(0.014f);
     VoxelWorld::Get().render();
 
+	debug_.render();
+
 
     renderBuffer_.unbind();
 }
@@ -67,4 +69,8 @@ std::unique_ptr<MainGraphic> MainGraphic::instance_ = nullptr;
 
 RenderBuffer &MainGraphic::getRenderBuffer() {
 	return renderBuffer_;
+}
+
+DebugGraphic &MainGraphic::getDebugGraphic() {
+	return debug_;
 }

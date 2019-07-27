@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 #include <memory>
+#include <Engine/Frustum.hpp>
 
 #define NEAR_PLANE 0.1f
 #define MAX_PLANE 300.f
@@ -41,6 +42,9 @@ public:
 	glm::vec3 getPosition() const;
 	glm::vec3 getFront() const;
 
+	void	setDebugFrustum(bool b);
+	bool	getDebugFrustum() const;
+
 	static Camera *focus;
 
 private:
@@ -58,6 +62,10 @@ private:
 
 	glm::mat4	viewMatrix_;
 	glm::mat4	projectionMatrix_;
+
+	Frustum		frustum_;
+	bool		debugFrustum_;
+	bool		needUpdateDebugFrustum_;
 
 	void updateCameraVectors_();
 

@@ -14,7 +14,9 @@ Camera::Camera() :
 	sensitivity_(0.1f),
 	zoom_(45.0f),
 	projectionMatrix_(1.0f),
-	viewMatrix_(1.0f) {
+	viewMatrix_(1.0f),
+	debugFrustum_(false),
+	needUpdateDebugFrustum_(false) {
 	
 	// Temp fix to have voxels filled at startup
 	// new edit: do not work anymore :(
@@ -28,6 +30,11 @@ Camera::Camera() :
 }
 
 void 		Camera::update() {
+	if (debugFrustum_) {
+		if (needUpdateDebugFrustum_)
+			frustum_.build(getProjectionMatrix(), getViewMatrix());
+		frustum_.render();
+	}
 }
 
 void		Camera::processPosition(Camera::Movement direction, float deltaTime) {
@@ -88,6 +95,7 @@ glm::mat4	Camera::getViewMatrix() {
 	if (needUpdateViewMatrix_) {
 		viewMatrix_ = glm::lookAt(position_, position_ + front_, up_);
 		needUpdateViewMatrix_ = false;
+		needUpdateDebugFrustum_ = true;
 	}
 	return viewMatrix_;
 }
@@ -115,3 +123,11 @@ void		Camera::updateCameraVectors_() {
 }
 
 Camera *Camera::focus = nullptr;
+
+bool Camera::getDebugFrustum() const {
+	return needUpdateDebugFrustum_;
+}
+
+void Camera::setDebugFrustum(bool b) {
+	debugFrustum_ = needUpdateDebugFrustum_ = b;
+}

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "NTL.hpp"
-
+#include <Engine/DebugGraphic.hpp>
 
 enum {
     FRUSTUM_PLANE_NEAR = 0,
@@ -12,8 +11,11 @@ enum {
     FRUSTUM_PLANE_DOWN
 };
 
-class Frustum {
+class Frustum : public ADebugObject {
 public:
+
+	void	init() override;
+	void	updateLines() override;
 
     void    build(glm::mat4 const &projection, glm::mat4 const &view);
     bool    pointIn(float x, float y, float z);
@@ -27,5 +29,4 @@ private:
     glm::vec4 planes_[6];
     unsigned int VAO;
     unsigned int VBO;
-    unsigned int EBO;
 };

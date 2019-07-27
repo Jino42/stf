@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include "RenderBuffer.hpp"
+#include <Engine/DebugGraphic.hpp>
 
 class MainGraphic {
 public:
@@ -17,10 +18,12 @@ public:
 	static MainGraphic &Get();
 
 	RenderBuffer					&getRenderBuffer();
+	DebugGraphic					&getDebugGraphic();
 
 private:
 	float							deltaTime_;
 	RenderBuffer                    renderBuffer_;
+	DebugGraphic					debug_;
 
 	static std::unique_ptr<MainGraphic> instance_;
 };

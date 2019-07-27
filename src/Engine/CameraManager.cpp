@@ -3,8 +3,16 @@
 
 CameraManager::CameraManager() :
 	focus_(nullptr){
+}
+
+void CameraManager::init() {
 	addCamera("Default");
 	setFocus("Default");
+}
+
+void CameraManager::update() {
+	for (auto &pair : mapCameras_)
+		pair.second.update();
 }
 
 void CameraManager::setFocus(Camera &camera) {

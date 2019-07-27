@@ -47,13 +47,13 @@ int main() {
         WidgetEditor widgetEditor;
         WidgetRender &widgetRender = WidgetRender::Get();
 
-		std::cout << 1 << std::endl;
 		ClContext::Get();
-		std::cout << 2 << std::endl;
 		MainGraphic::Get();
-		std::cout << 3 << std::endl;
+		ShaderManager::Get();
 		CameraManager::Get();
-		std::cout << 4 << std::endl;
+
+		CameraManager::Get().init();
+		MainGraphic::Get().init();
 
 		int fpsCount = 0;
 		std::chrono::time_point<std::chrono::system_clock> time_fps = std::chrono::system_clock::now();
@@ -61,18 +61,21 @@ int main() {
 
         boost::filesystem::path pathRoot(ROOT_PATH);
 
+
         ShaderManager::Get().addShader("debugWireFrame");
         ShaderManager::Get().getShader("debugWireFrame").attach((pathRoot / "shader" / "debugWireFrame.vert").generic_string());
         ShaderManager::Get().getShader("debugWireFrame").attach((pathRoot / "shader" / "debugWireFrame.frag").generic_string());
         //ShaderManager::Get().getShader("debugWireFrame").attach((pathRoot / "shader" / "debugWireFrame.geom").generic_string());
         ShaderManager::Get().getShader("debugWireFrame").link();
-		std::cout << 5 << std::endl;
-		MainGraphic::Get().init();
-		std::cout << 6 << std::endl;
+
+
+		CameraManager::Get().addCamera("DebguFrustum");
+
         while (!DisplayWindow::Get().exit()) {
 			//Update
             Time::Get().update();
             DisplayWindow::Get().update();
+			CameraManager::Get().update();
             gui.update();
 
             //Pause management
@@ -86,6 +89,12 @@ int main() {
                 MainGraphic::Get().update();
 
 
+			if (DisplayWindow::Get().getKey(GLFW_KEY_Z) == KeyState::kDown)
+				CameraManager::Get().setFocus("Default");
+			if (DisplayWindow::Get().getKey(GLFW_KEY_X) == KeyState::kDown)
+				CameraManager::Get().setFocus("DebguFrustum");
+			if (DisplayWindow::Get().getKey(GLFW_KEY_C) == KeyState::kDown)
+				Camera::focus->setDebugFrustum(!Camera::focus->getDebugFrustum());
 
 			//Logical Loop
 			while (Time::Get().shouldUpdateLogic()) {
