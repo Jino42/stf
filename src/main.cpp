@@ -15,7 +15,29 @@
 #include "noiseutils.h"
 #include <Engine/CameraManager.hpp>
 
-int main() {
+void demoGui() {
+    Gui gui;
+
+    gui.setDemo(true);
+    WidgetEditor widgetEditor;
+
+    while (!DisplayWindow::Get().exit()) {
+        //Update
+        DisplayWindow::Get().update();
+        gui.update();
+
+
+        ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(0, 0)));
+        ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
+        widgetEditor.render(true);
+        gui.render();
+        DisplayWindow::Get().render();
+        DisplayWindow::Get().clear();
+    }
+
+}
+
+int main(int argc, char **argv) {
     noise::module::Perlin myModule;
 /*
     utils::NoiseMap heightMap;
@@ -41,6 +63,11 @@ int main() {
 	try {
 		std::string windowTitle = "ft_vox";
 		DisplayWindow::Init(windowTitle.c_str(), 1024, 720);
+
+		if (argc > 1 && !strcmp(argv[1], "-gd")) {
+		    demoGui();
+		    return 0;
+        }
 
 		Gui gui;
         // WidgetOption widgetOption;

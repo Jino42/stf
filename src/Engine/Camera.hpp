@@ -6,11 +6,12 @@
 #include <vector>
 #include <memory>
 #include <Engine/Frustum.hpp>
+#include <IGuiEntity.hpp>
 
 #define NEAR_PLANE 0.1f
 #define MAX_PLANE 300.f
 
-class Camera {
+class Camera : public IGuiEntity {
 public:
 	enum Movement {
 		FORWARD,
@@ -21,7 +22,8 @@ public:
 		DOWN
 	};
 
-	Camera();
+	Camera() = delete;
+    Camera(std::string const &name);
 	~Camera() = default;
 
 	Camera(Camera const &camera) = default;

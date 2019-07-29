@@ -2,7 +2,8 @@
 #include "Camera.hpp"
 #include <Engine/MainGraphic.hpp>
 
-Camera::Camera() :
+Camera::Camera(std::string const &name) :
+        IGuiEntity(name),
 		needUpdateViewMatrix_ (false),
 	position_(glm::vec3(0.0f, 0.0f, 0.0f)),
 	front_(glm::vec3(0.0f, 0.0f, -1.0f)),
@@ -17,7 +18,7 @@ Camera::Camera() :
 	viewMatrix_(1.0f),
 	needUpdateDebugFrustum_(true),
 	frustum_(*this) {
-	
+
 	// Temp fix to have voxels filled at startup
 	// new edit: do not work anymore :(
 	processMouseMovement(0.01, 0.01);
