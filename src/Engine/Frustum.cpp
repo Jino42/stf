@@ -187,8 +187,6 @@ void Frustum::updateLines() {
 	linesObject_.emplace_back(v[2], glm::vec4(0, 1, 0, 1));
 	linesObject_.emplace_back(v[6], glm::vec4(0, 1, 0, 1));
 
-	std::cout << "IIIII " << linesObject_.size() << std::endl;
-
     updateDebug();
 }
 

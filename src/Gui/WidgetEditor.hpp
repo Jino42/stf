@@ -1,6 +1,9 @@
 #pragma once
 
 #include "AWidget.hpp"
+#include <Gui/EditorCamera.hpp>
+
+class EditorCamera;
 
 class WidgetEditor : public AWidget {
 public:
@@ -11,4 +14,6 @@ public:
 
 private:
     void beginContent_() override;
+
+    EditorCamera    editorCamera_;
 };

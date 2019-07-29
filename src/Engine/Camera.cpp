@@ -3,8 +3,9 @@
 #include <Engine/MainGraphic.hpp>
 
 Camera::Camera(std::string const &name) :
-        IGuiEntity(name),
-		needUpdateViewMatrix_ (false),
+    IGuiEntity(name),
+    needUpdateViewMatrix_ (true),
+    needUpdateProjectionMatrix_(true),
 	position_(glm::vec3(0.0f, 0.0f, 0.0f)),
 	front_(glm::vec3(0.0f, 0.0f, -1.0f)),
 	up_(glm::vec3(0.0f, 1.0f, 0.0f)),
@@ -16,17 +17,15 @@ Camera::Camera(std::string const &name) :
 	zoom_(45.0f),
 	projectionMatrix_(1.0f),
 	viewMatrix_(1.0f),
+	fov_(80.0f),
+	near_(NEAR_PLANE),
+	far_(MAX_PLANE),
 	needUpdateDebugFrustum_(true),
 	frustum_(*this) {
 
 	// Temp fix to have voxels filled at startup
 	// new edit: do not work anymore :(
 	processMouseMovement(0.01, 0.01);
-
-	projectionMatrix_ = glm::perspective(glm::radians(80.0f),
-								   static_cast<float>(MainGraphic::Get().getRenderBuffer().width) / static_cast<float>(MainGraphic::Get().getRenderBuffer().height),
-								   NEAR_PLANE, MAX_PLANE);
-
 	updateCameraVectors_();
 }
 
@@ -100,7 +99,14 @@ glm::mat4	Camera::getViewMatrix() {
 	return viewMatrix_;
 }
 
-glm::mat4 Camera::getProjectionMatrix() const {
+glm::mat4 Camera::getProjectionMatrix() {
+    if (needUpdateProjectionMatrix_) {
+        projectionMatrix_ = glm::perspective(glm::radians(fov_),
+                                             static_cast<float>(MainGraphic::Get().getRenderBuffer().width) / static_cast<float>(MainGraphic::Get().getRenderBuffer().height),
+                                             near_, far_);
+        needUpdateProjectionMatrix_ = false;
+        needUpdateDebugFrustum_ = true;
+    }
 	return projectionMatrix_;
 }
 
@@ -122,7 +128,11 @@ void		Camera::updateCameraVectors_() {
 	needUpdateViewMatrix_ = true;
 }
 
-Camera *Camera::focus = nullptr;
+void Camera::updateProjection() {
+    needUpdateProjectionMatrix_ = true;
+    getProjectionMatrix();
+}
+
 
 bool Camera::getDebugFrustum() const {
 	return frustum_.isDebug();
@@ -133,3 +143,28 @@ void Camera::setDebugFrustum(bool b) {
     needUpdateDebugFrustum_ = b;
 	frustum_.setDebug(b);
 }
+
+void Camera::setFov(float fov) {
+    fov_ = fov;
+    needUpdateProjectionMatrix_ = true;
+}
+void Camera::setNear(float near) {
+    near_ = near;
+    needUpdateProjectionMatrix_ = true;
+}
+void Camera::setFar(float far) {
+    far_ = far;
+    needUpdateProjectionMatrix_ = true;
+}
+
+float Camera::getFov() const {
+    return fov_;
+}
+float Camera::getNear() const {
+    return near_;
+}
+float Camera::getFar() const {
+    return far_;
+}
+
+Camera *Camera::focus = nullptr;

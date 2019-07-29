@@ -40,6 +40,8 @@ void VoxelWorld::render() {
     static Frustum frustum(camera_);
     if (DisplayWindow::Get().getKey(GLFW_KEY_M) == KeyState::kDown)
     {
+        if (!frustum.isDebug())
+            frustum.setDebug(true);
         frustum.update();
     }
 

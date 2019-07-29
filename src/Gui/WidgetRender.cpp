@@ -5,6 +5,7 @@
 #include "WidgetRender.hpp"
 #include "Engine/MainGraphic.hpp"
 #include "Gui/WidgetRender.hpp"
+#include <Gui/GuiSettings.hpp>
 
 WidgetRender::WidgetRender() :
         AWidget("Render", NTL_IMGUI_WINDOW_NO_FLAGS) {

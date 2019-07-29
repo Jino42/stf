@@ -1,5 +1,6 @@
 #include "WidgetOption.hpp"
 #include <Gui/Gui.hpp>
+#include <Gui/GuiSettings.hpp>
 
 WidgetOption::WidgetOption() :
         AWidget("Options", NTL_IMGUI_WINDOW_FLAGS_BASIC),

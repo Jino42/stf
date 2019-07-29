@@ -8,6 +8,7 @@
 #include <Engine/Time.hpp>
 #include <sstream>
 #include <Engine/Display/DisplayWindow.hpp>
+#include <Gui/GuiSettings.hpp>
 
 WidgetEditor::WidgetEditor() :
         AWidget("Editor", NTL_IMGUI_WINDOW_NO_FLAGS) {
@@ -15,59 +16,7 @@ WidgetEditor::WidgetEditor() :
 
 void WidgetEditor::beginContent_() {
 
-    if (ImGui::CollapsingHeader("Camera"))
-    {
-        ImGui::Text("PROGRAMMER GUIDE:");
-        ImGui::Separator();
-
-        ImGui::Text("USER GUIDE:");
-        ImGui::LabelText("label", "Value");
-/*
-        {
-            if (ImGui::BeginCombo("Sound", core_.univers.getSoundManager().getNextLibraryInfo().title.c_str(), 0)) {
-
-                for (unsigned long n = 0; n < SoundDynamicLibrary::libraryInfo.size(); n++) {
-                    bool is_selected = (core_.univers.getSoundManager().getNextLibraryInfo().kLibrary == SoundDynamicLibrary::libraryInfo[n].kLibrary);
-                    if (ImGui::Selectable(SoundDynamicLibrary::libraryInfo[n].title.c_str(), is_selected)) {
-                        if (sound_) {
-                            sound_ = false;
-                            sound_ = soundManagement_();
-                        }
-                        if (!sound_)
-                            core_.univers.getSoundManager().setNextKInstance(SoundDynamicLibrary::libraryInfo[n].kLibrary);
-                    }
-                    if (is_selected)
-                        ImGui::SetItemDefaultFocus();
-                }
-                ImGui::EndCombo();
-
-            }
-
-            static ImGuiComboFlags flags = 0;
-            ImGui::CheckboxFlags("ImGuiComboFlags_PopupAlignLeft", (unsigned int*)&flags, ImGuiComboFlags_PopupAlignLeft);
-            ImGui::SameLine();
-            if (ImGui::CheckboxFlags("ImGuiComboFlags_NoArrowButton", (unsigned int*)&flags, ImGuiComboFlags_NoArrowButton))
-                flags &= ~ImGuiComboFlags_NoPreview;     // Clear the other flag, as we cannot combine both
-            if (ImGui::CheckboxFlags("ImGuiComboFlags_NoPreview", (unsigned int*)&flags, ImGuiComboFlags_NoPreview))
-                flags &= ~ImGuiComboFlags_NoArrowButton; // Clear the other flag, as we cannot combine both
-
-            const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO" };
-            static const char* item_current = items[0];            // Here our selection is a single pointer stored outside the object.
-            if (ImGui::BeginCombo("combo 1", item_current, flags)) // The second parameter is the label previewed before opening the combo.
-            {
-                for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-                {
-                    bool is_selected = (item_current == items[n]);
-                    if (ImGui::Selectable(items[n], is_selected))
-                        item_current = items[n];
-                    if (is_selected)
-                        ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
-                }
-                ImGui::EndCombo();
-            }
-        }
-        */
-    }
+    editorCamera_.render();
 
     /*
     static Timer test;

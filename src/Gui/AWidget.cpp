@@ -1,5 +1,7 @@
 #include "AWidget.hpp"
-#include <gui/Gui.hpp>
+#include <Gui/Gui.hpp>
+#include <Gui/GuiSettings.hpp>
+
 
 AWidget::AWidget(std::string const &winName, ImGuiWindowFlags winFlags) :
         active_(true),

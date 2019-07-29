@@ -12,6 +12,7 @@
 #define MAX_PLANE 300.f
 
 class Camera : public IGuiEntity {
+    friend class EditorCamera;
 public:
 	enum Movement {
 		FORWARD,
@@ -39,7 +40,7 @@ public:
 	void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 
 	glm::mat4 getViewMatrix();
-	glm::mat4 getProjectionMatrix() const;
+	glm::mat4 getProjectionMatrix();
 
 	glm::vec3 getPosition() const;
 	glm::vec3 getFront() const;
@@ -49,8 +50,18 @@ public:
 
 	static Camera *focus;
 
+    void setFov(float fov);
+    void setNear(float near);
+    void setFar(float far);
+    float getFov() const;
+    float getNear() const;
+    float getFar() const;
+
+    void updateProjection();
+
 private:
-	bool needUpdateViewMatrix_ ;
+    bool needUpdateViewMatrix_;
+    bool needUpdateProjectionMatrix_;
 	glm::vec3 position_;
 	glm::vec3 front_;
 	glm::vec3 up_;
@@ -61,6 +72,10 @@ private:
 	float speed_;
 	float sensitivity_;
 	float zoom_;
+
+	float fov_;
+	float near_;
+	float far_;
 
 	glm::mat4	viewMatrix_;
 	glm::mat4	projectionMatrix_;
