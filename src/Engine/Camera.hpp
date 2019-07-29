@@ -64,7 +64,6 @@ private:
 	glm::mat4	projectionMatrix_;
 
 	Frustum		frustum_;
-	bool		debugFrustum_;
 	bool		needUpdateDebugFrustum_;
 
 	void updateCameraVectors_();

@@ -7,15 +7,14 @@
 
 #include <Engine/MainGraphic.hpp>
 
-Frustum::Frustum() {
-
+Frustum::Frustum(Camera &camera) :
+camera_(camera) {
+    setDebug();
 }
 
-void Frustum::build(glm::mat4 const &projection, glm::mat4 const &view)
+void Frustum::update()
 {
-    this->view = view;
-    this->projection = projection;
-    glm::mat4 mat = projection * view;
+    glm::mat4 mat = camera_.getProjectionMatrix() * camera_.getViewMatrix();
 
     for (int i = 4; i--; )
         planes_[FRUSTUM_PLANE_LEFT][i] = mat[i][3] + mat[i][0];
@@ -30,32 +29,7 @@ void Frustum::build(glm::mat4 const &projection, glm::mat4 const &view)
     for (int i = 4; i--; )
         planes_[FRUSTUM_PLANE_FAR][i] = mat[i][3] - mat[i][2];
 
-
-
-
-    /*
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(lines), lines, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)nullptr);
-    glEnableVertexAttribArray(0);
-    */
-
-	updateDebug();
-	setDebug(true);
-}
-
-void    Frustum::render() {
-    ShaderManager::Get().getShader("debugWireFrame").activate();
-    ShaderManager::Get().getShader("debugWireFrame").setMat4("projection", Camera::focus->getProjectionMatrix());
-    ShaderManager::Get().getShader("debugWireFrame").setMat4("view", Camera::focus->getViewMatrix());
-
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_LINES, 0, 24);
+    updateLines();
 }
 
 bool		Frustum::pointIn(float x, float y, float z) {
@@ -67,11 +41,10 @@ bool		Frustum::pointIn(float x, float y, float z) {
     return true;
 }
 
-void Frustum::init() {
-
+void Frustum::initDebug() {
 }
 
-void Frustum::updateDebug() {
+void Frustum::updateLines() {
 	float ar = 1024.f / 720.f;
 	float fov = 80.f;
 	float distNear = 0.1f;
@@ -131,7 +104,7 @@ void Frustum::updateDebug() {
 	/// ClipSpace   - > View Space  = ClipSpace   *  INV(Projection Matrix)
 	/// View Space  - > World Space = View Space  *  INV(View Matrix)
 	///
-	glm::mat4 inv = glm::inverse(view) * glm::inverse(projection);
+	glm::mat4 inv = glm::inverse(camera_.getViewMatrix()) * glm::inverse(camera_.getProjectionMatrix());
 	glm::vec4 ndc[8] =
 			{
 					// near face
@@ -175,41 +148,48 @@ void Frustum::updateDebug() {
 			v[2], v[6]
 	};
 
-	linesObject_.push_back(DebugVertex(v[0], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[1], glm::vec4(0, 1, 0, 1)));
+    linesObject_.clear();
+    linesObject_.reserve(24);
 
-	linesObject_.push_back(DebugVertex(v[0], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[2], glm::vec4(0, 1, 0, 1)));
+	linesObject_.emplace_back(v[0], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[1], glm::vec4(0, 1, 0, 1));
 
-	linesObject_.push_back(DebugVertex(v[3], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[1], glm::vec4(0, 1, 0, 1)));
+	linesObject_.emplace_back(v[0], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[2], glm::vec4(0, 1, 0, 1));
 
-	linesObject_.push_back(DebugVertex(v[3], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[2], glm::vec4(0, 1, 0, 1)));
+	linesObject_.emplace_back(v[3], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[1], glm::vec4(0, 1, 0, 1));
 
-	linesObject_.push_back(DebugVertex(v[4], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[5], glm::vec4(0, 1, 0, 1)));
+	linesObject_.emplace_back(v[3], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[2], glm::vec4(0, 1, 0, 1));
 
-	linesObject_.push_back(DebugVertex(v[4], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[6], glm::vec4(0, 1, 0, 1)));
+	linesObject_.emplace_back(v[4], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[5], glm::vec4(0, 1, 0, 1));
 
-	linesObject_.push_back(DebugVertex(v[7], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[5], glm::vec4(0, 1, 0, 1)));
+	linesObject_.emplace_back(v[4], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[6], glm::vec4(0, 1, 0, 1));
 
-	linesObject_.push_back(DebugVertex(v[7], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[6], glm::vec4(0, 1, 0, 1)));
+	linesObject_.emplace_back(v[7], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[5], glm::vec4(0, 1, 0, 1));
 
-	linesObject_.push_back(DebugVertex(v[0], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[4], glm::vec4(0, 1, 0, 1)));
+	linesObject_.emplace_back(v[7], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[6], glm::vec4(0, 1, 0, 1));
 
-	linesObject_.push_back(DebugVertex(v[1], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[5], glm::vec4(0, 1, 0, 1)));
+	linesObject_.emplace_back(v[0], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[4], glm::vec4(0, 1, 0, 1));
 
-	linesObject_.push_back(DebugVertex(v[3], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[7], glm::vec4(0, 1, 0, 1)));
+	linesObject_.emplace_back(v[1], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[5], glm::vec4(0, 1, 0, 1));
 
-	linesObject_.push_back(DebugVertex(v[2], glm::vec4(0, 1, 0, 1)));
-	linesObject_.push_back(DebugVertex(v[6], glm::vec4(0, 1, 0, 1)));
+	linesObject_.emplace_back(v[3], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[7], glm::vec4(0, 1, 0, 1));
+
+	linesObject_.emplace_back(v[2], glm::vec4(0, 1, 0, 1));
+	linesObject_.emplace_back(v[6], glm::vec4(0, 1, 0, 1));
+
+	std::cout << "IIIII " << linesObject_.size() << std::endl;
+
+    updateDebug();
 }
 
 

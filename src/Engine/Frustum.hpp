@@ -2,6 +2,8 @@
 
 #include <Engine/DebugGraphic.hpp>
 
+class Camera;
+
 enum {
     FRUSTUM_PLANE_NEAR = 0,
     FRUSTUM_PLANE_FAR,
@@ -13,20 +15,14 @@ enum {
 
 class Frustum : public ADebugObject {
 public:
-	Frustum();
-	void	init() override;
-	void	updateDebug() override;
-
-    void    build(glm::mat4 const &projection, glm::mat4 const &view);
+    Frustum() = delete;
+	Frustum(Camera &camera);
+	void	updateLines() override;
+    void    initDebug() override;
+    void    update();
     bool    pointIn(float x, float y, float z);
-    void    render();
-
-    glm::mat4 projection;
-    glm::mat4 view;
 
 private:
-
+    Camera &camera_;
     glm::vec4 planes_[6];
-    unsigned int VAO;
-    unsigned int VBO;
 };

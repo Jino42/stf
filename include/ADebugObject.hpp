@@ -2,6 +2,8 @@
 
 #include <NTL.hpp>
 
+class DebugGraphic;
+
 struct DebugVertex {
 	DebugVertex() = default;
 	DebugVertex(glm::vec3 aPosition, glm::vec4 aColor) :
@@ -19,12 +21,17 @@ public:
 
 	virtual ~ADebugObject() = default;
 
+    void	        setDebug(bool b = false);
+    bool            isDebug() const;
+
 protected:
-	void	setDebug(bool b);
-	virtual void	init() = 0;
-	virtual void	updateDebug() = 0;
+    virtual void    updateLines() = 0;
+    virtual void    initDebug() = 0;
+	void            updateDebug();
+
 
 	std::vector<DebugVertex>		linesObject_;
 private:
 	bool debug_;
+	size_t  pastSizeBufferLines_;
 };

@@ -15,8 +15,8 @@ Camera::Camera() :
 	zoom_(45.0f),
 	projectionMatrix_(1.0f),
 	viewMatrix_(1.0f),
-	debugFrustum_(false),
-	needUpdateDebugFrustum_(false) {
+	needUpdateDebugFrustum_(true),
+	frustum_(*this) {
 	
 	// Temp fix to have voxels filled at startup
 	// new edit: do not work anymore :(
@@ -30,10 +30,9 @@ Camera::Camera() :
 }
 
 void 		Camera::update() {
-	if (debugFrustum_) {
+	if (frustum_.isDebug()) {
 		if (needUpdateDebugFrustum_)
-			frustum_.build(getProjectionMatrix(), getViewMatrix());
-		frustum_.render();
+			frustum_.update();
 	}
 }
 
@@ -125,9 +124,11 @@ void		Camera::updateCameraVectors_() {
 Camera *Camera::focus = nullptr;
 
 bool Camera::getDebugFrustum() const {
-	return needUpdateDebugFrustum_;
+	return frustum_.isDebug();
 }
 
 void Camera::setDebugFrustum(bool b) {
-	debugFrustum_ = needUpdateDebugFrustum_ = b;
+    std::cout << __FUNCTION_NAME__ << std::endl;
+    needUpdateDebugFrustum_ = b;
+	frustum_.setDebug(b);
 }

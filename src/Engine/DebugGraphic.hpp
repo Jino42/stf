@@ -5,12 +5,13 @@
 #include <ADebugObject.hpp>
 #include <memory>
 
+/// \brief Fast Debug Line
 class DebugGraphic : public ALifeTimeObject {
 	friend class ADebugObject;
 public:
 
 	DebugGraphic();
-	~DebugGraphic();
+	~DebugGraphic() override;
 
 	void render() override;
 	void addDebugObject(ADebugObject &debugObject);
@@ -27,6 +28,7 @@ private:
 	std::vector< ADebugObject * >	bufferObject_;
 
 	void updateInfo_();
+    void updateDebugObject_(ADebugObject &object);
 	void updateDebugBuffer_();
 	void buildBuffers_(unsigned int newSize);
 };

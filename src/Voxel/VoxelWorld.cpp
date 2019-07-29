@@ -37,12 +37,11 @@ void VoxelWorld::update() {
 }
 
 void VoxelWorld::render() {
-    static Frustum frustum;
+    static Frustum frustum(camera_);
     if (DisplayWindow::Get().getKey(GLFW_KEY_M) == KeyState::kDown)
     {
-        frustum.build(Camera::focus->getProjectionMatrix(), Camera::focus->getViewMatrix());
+        frustum.update();
     }
-    frustum.render();
 
 
     Shader &shader = ShaderManager::Get().getShader("voxel");

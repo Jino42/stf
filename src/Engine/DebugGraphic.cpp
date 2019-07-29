@@ -54,33 +54,37 @@ void DebugGraphic::render() {
 	ShaderManager::Get().getShader("debugWireFrame").setMat4("view", Camera::focus->getViewMatrix());
 
 	glBindVertexArray(VAO);
-	// If Something change
-	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(DebugVertex) * DebugVertexBufferMax_, &debugBuffer_.get());
 	glDrawArrays(GL_LINES, 0, totalLine_);
 	glBindVertexArray(0);
 }
 
  void DebugGraphic::addDebugObject(ADebugObject &debugObject) {
-	 std::cout << __FUNCTION_NAME__ << std::endl;
+    std::cout << __FUNCTION_NAME__ << std::endl;
 	bufferObject_.push_back(&debugObject);
-	updateInfo_();
+    updateInfo_();
 }
 
 void DebugGraphic::removeDebugObject(ADebugObject &debugObject) {
-	auto it = find(bufferObject_.begin(),bufferObject_.end(), &debugObject);
+    std::cout << __FUNCTION_NAME__ << std::endl;
+    auto it = find(bufferObject_.begin(),bufferObject_.end(), &debugObject);
 
-	if ( it != bufferObject_.end() )
-		bufferObject_.erase(it);
+	if (it != bufferObject_.end()) {
+        bufferObject_.erase(it);
+    }
 	updateInfo_();
 }
+
 
 void DebugGraphic::updateInfo_() {
 	std::cout << __FUNCTION_NAME__ << std::endl;
 	totalLine_ = 0;
-	for (ADebugObject *debugObject : bufferObject_)
-		totalLine_ += debugObject->linesObject_.size();
+	for (ADebugObject *debugObject : bufferObject_) {
+        totalLine_ += debugObject->linesObject_.size();
+	}
 	if (totalLine_ > debugVertexBufferActualSize_) {
-		buildBuffers_(debugVertexBufferActualSize_ + debugVertexBufferMarge_);
+        if (totalLine_ > debugVertexBufferActualSize_)
+            totalLine_ += debugVertexBufferMarge_;
+        buildBuffers_(totalLine_);
 	}
 	updateDebugBuffer_();
 }
@@ -89,6 +93,8 @@ void DebugGraphic::updateDebugBuffer_() {
 	std::cout << __FUNCTION_NAME__ << std::endl;
 	unsigned int index = 0;
 	for (ADebugObject *debugObject : bufferObject_) {
+        std::cout << "debugVertexBufferActualSize_ [" << debugVertexBufferActualSize_ << "] | Index [" << index << "] | [" << debugObject->linesObject_.size() << "]" << std::endl;
+
 		memcpy(reinterpret_cast<void *>(&debugBuffer_[index]),
 			   reinterpret_cast<void *>(&debugObject->linesObject_.front()),
 			   sizeof(DebugVertex) * debugObject->linesObject_.size());
@@ -97,4 +103,21 @@ void DebugGraphic::updateDebugBuffer_() {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(DebugVertex) * totalLine_, debugBuffer_);
+}
+
+void DebugGraphic::updateDebugObject_(ADebugObject &object) {
+    std::cout << __FUNCTION_NAME__ << std::endl;
+    unsigned int index = 0;
+    for (ADebugObject *debugObject : bufferObject_) {
+        if (&object == debugObject) {
+            memcpy(reinterpret_cast<void *>(&debugBuffer_[index]),
+                   reinterpret_cast<void *>(&debugObject->linesObject_.front()),
+                   sizeof(DebugVertex) * debugObject->linesObject_.size());
+
+            glBindVertexArray(VAO);
+            glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            glBufferSubData(GL_ARRAY_BUFFER, sizeof(DebugVertex) * index, sizeof(DebugVertex) * debugObject->linesObject_.size(), reinterpret_cast<void *>(&debugObject->linesObject_.front()));
+        }
+        index += debugObject->linesObject_.size();
+    }
 }
