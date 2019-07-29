@@ -7,6 +7,10 @@
 
 #include <Engine/MainGraphic.hpp>
 
+Frustum::Frustum() {
+
+}
+
 void Frustum::build(glm::mat4 const &projection, glm::mat4 const &view)
 {
     this->view = view;
@@ -41,7 +45,8 @@ void Frustum::build(glm::mat4 const &projection, glm::mat4 const &view)
     glEnableVertexAttribArray(0);
     */
 
-	this->init();
+	updateDebug();
+	setDebug(true);
 }
 
 void    Frustum::render() {
@@ -51,7 +56,6 @@ void    Frustum::render() {
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_LINES, 0, 24);
-
 }
 
 bool		Frustum::pointIn(float x, float y, float z) {
@@ -64,6 +68,10 @@ bool		Frustum::pointIn(float x, float y, float z) {
 }
 
 void Frustum::init() {
+
+}
+
+void Frustum::updateDebug() {
 	float ar = 1024.f / 720.f;
 	float fov = 80.f;
 	float distNear = 0.1f;
@@ -202,11 +210,6 @@ void Frustum::init() {
 
 	linesObject_.push_back(DebugVertex(v[2], glm::vec4(0, 1, 0, 1)));
 	linesObject_.push_back(DebugVertex(v[6], glm::vec4(0, 1, 0, 1)));
-
-	MainGraphic::Get().getDebugGraphic().addDebugObject(*this);
-}
-
-void Frustum::updateLines() {
 }
 
 

@@ -1,5 +1,7 @@
 #pragma once
 
+
+#include <ALifeTimeObject.hpp>
 #include <ADebugObject.hpp>
 #include <memory>
 

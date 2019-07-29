@@ -1,8 +1,6 @@
 #pragma once
 
-#include <ALifeTimeObject.hpp>
 #include <NTL.hpp>
-#include <glad/glad.h>
 
 struct DebugVertex {
 	DebugVertex() = default;
@@ -17,10 +15,16 @@ struct DebugVertex {
 class ADebugObject {
 	friend class DebugGraphic;
 public:
+	ADebugObject();
+
 	virtual ~ADebugObject() = default;
 
 protected:
+	void	setDebug(bool b);
 	virtual void	init() = 0;
-	virtual void	updateLines() = 0;
+	virtual void	updateDebug() = 0;
+
 	std::vector<DebugVertex>		linesObject_;
+private:
+	bool debug_;
 };

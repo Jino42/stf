@@ -13,9 +13,9 @@ enum {
 
 class Frustum : public ADebugObject {
 public:
-
+	Frustum();
 	void	init() override;
-	void	updateLines() override;
+	void	updateDebug() override;
 
     void    build(glm::mat4 const &projection, glm::mat4 const &view);
     bool    pointIn(float x, float y, float z);

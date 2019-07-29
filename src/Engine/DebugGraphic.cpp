@@ -35,7 +35,7 @@ void DebugGraphic::buildBuffers_(unsigned int newSize) {
 	glGenBuffers(1, &VBO);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(DebugVertex) * debugVertexBufferActualSize_, debugBuffer_, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(DebugVertex) * debugVertexBufferActualSize_, nullptr, GL_DYNAMIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(DebugVertex), reinterpret_cast<const void *>(offsetof(DebugVertex, position)));
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(DebugVertex), reinterpret_cast<const void *>(offsetof(DebugVertex, color)));
