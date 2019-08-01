@@ -9,6 +9,8 @@ ADebugObject::ADebugObject() :
 }
 
 void	ADebugObject::setDebug(bool b) {
+    if (debug_ == b)
+        return ;
 	debug_ = b;
 	if (debug_) {
         initDebug();

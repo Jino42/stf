@@ -31,4 +31,6 @@ private:
     void updateDebugObject_(ADebugObject &object);
 	void updateDebugBuffer_();
 	void buildBuffers_(unsigned int newSize);
+
+	static bool debug_;
 };

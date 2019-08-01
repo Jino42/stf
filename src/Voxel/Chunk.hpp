@@ -22,5 +22,6 @@ private:
     int id_;
     unsigned int VBO;
     unsigned int VAO;
+    unsigned int finalSizeChunk_;
     PointVertex array_[CHUNK_TOTAL_SIZE];
 };

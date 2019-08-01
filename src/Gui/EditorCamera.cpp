@@ -15,7 +15,6 @@ void EditorCamera::render() {
     ImGui::Separator();
     ImGui::Separator();
 
-
     std::list<Camera> &cameras = CameraManager::Get().getListCameras();
 
 	ImGui::Text("Name: ");

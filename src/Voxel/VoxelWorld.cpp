@@ -5,9 +5,11 @@
 #include <Engine/MainGraphic.hpp>
 #include <Engine/Frustum.hpp>
 #include <Engine/Display/DisplayWindow.hpp>
+#include <Engine/CameraManager.hpp>
 
 VoxelWorld::VoxelWorld(Camera &camera) :
 camera_(camera) {
+    camera_.getFrustum().setDebug(true);
     boost::filesystem::path pathRoot(ROOT_PATH);
 
     ShaderManager::Get().addShader("voxel");
@@ -22,7 +24,7 @@ void VoxelWorld::start() {
 
     heightMapBuilder.SetSourceModule (VoxelWorld::Get().myModule);
     heightMapBuilder.SetDestNoiseMap (heightMap);
-    heightMapBuilder.SetDestSize (CHUNK_SIZE, CHUNK_SIZE);
+    heightMapBuilder.SetDestSize (CHUNK_SIZE * 3, CHUNK_SIZE * 3);
 
 
     for (int y = -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; y < DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; y++)
@@ -37,13 +39,10 @@ void VoxelWorld::update() {
 }
 
 void VoxelWorld::render() {
-    static Frustum frustum(camera_);
+
     if (DisplayWindow::Get().getKey(GLFW_KEY_M) == KeyState::kDown)
-    {
-        if (!frustum.isDebug())
-            frustum.setDebug(true);
-        frustum.update();
-    }
+        camera_.getFrustum().setDebug(!camera_.getFrustum().isDebug());
+   camera_.getFrustum().update();
 
 
     Shader &shader = ShaderManager::Get().getShader("voxel");
@@ -53,7 +52,7 @@ void VoxelWorld::render() {
     shader.setMat4("view", Camera::focus->getViewMatrix());
 
     for (auto &i : chunks_) {
-        if (frustum.pointIn(i.position_.x + (CHUNK_SIZE >> 1), i.position_.y + (CHUNK_SIZE >> 1), i.position_.z + (CHUNK_SIZE >> 1)))
+        if (camera_.getFrustum().pointIn(i.position_.x + (CHUNK_SIZE >> 1), i.position_.y + (CHUNK_SIZE >> 1), i.position_.z + (CHUNK_SIZE >> 1)))
             i.render();
     }
 }

@@ -9,7 +9,8 @@ DebugGraphic::DebugGraphic() :
 		totalLine_(0),
 		debugVertexBufferActualSize_(0),
 		debugBuffer_(nullptr) {
-	std::cout << __FUNCTION_NAME__ << std::endl;
+    if (debug_)
+	    std::cout << __FUNCTION_NAME__ << std::endl;
 	buildBuffers_(debugVertexBufferActualSize_ + debugVertexBufferMarge_);
 }
 
@@ -19,7 +20,8 @@ DebugGraphic::~DebugGraphic() {
 }
 
 void DebugGraphic::buildBuffers_(unsigned int newSize) {
-	std::cout << __FUNCTION_NAME__ << std::endl;
+    if (debug_)
+	    std::cout << __FUNCTION_NAME__ << std::endl;
 	if (!VBO)
 		glDeleteBuffers(1, &VBO);
 	if (!VAO)
@@ -47,8 +49,8 @@ void DebugGraphic::buildBuffers_(unsigned int newSize) {
 }
 
 void DebugGraphic::render() {
-	std::cout << __FUNCTION_NAME__ << std::endl;
-	std::cout << "totalLine_" << totalLine_ << std::endl;
+    if (debug_)
+	    std::cout << __FUNCTION_NAME__ << std::endl;
 	ShaderManager::Get().getShader("debugWireFrame").activate();
 	ShaderManager::Get().getShader("debugWireFrame").setMat4("projection", Camera::focus->getProjectionMatrix());
 	ShaderManager::Get().getShader("debugWireFrame").setMat4("view", Camera::focus->getViewMatrix());
@@ -59,13 +61,15 @@ void DebugGraphic::render() {
 }
 
  void DebugGraphic::addDebugObject(ADebugObject &debugObject) {
-    std::cout << __FUNCTION_NAME__ << std::endl;
+    if (debug_)
+        std::cout << __FUNCTION_NAME__ << std::endl;
 	bufferObject_.push_back(&debugObject);
     //updateInfo_();
 }
 
 void DebugGraphic::removeDebugObject(ADebugObject &debugObject) {
-    std::cout << __FUNCTION_NAME__ << std::endl;
+    if (debug_)
+        std::cout << __FUNCTION_NAME__ << std::endl;
     auto it = find(bufferObject_.begin(),bufferObject_.end(), &debugObject);
 
 	if (it != bufferObject_.end()) {
@@ -76,7 +80,8 @@ void DebugGraphic::removeDebugObject(ADebugObject &debugObject) {
 
 
 void DebugGraphic::updateInfo_() {
-	std::cout << __FUNCTION_NAME__ << std::endl;
+    if (debug_)
+	    std::cout << __FUNCTION_NAME__ << std::endl;
 	totalLine_ = 0;
 	for (ADebugObject *debugObject : bufferObject_) {
         totalLine_ += debugObject->linesObject_.size();
@@ -93,7 +98,8 @@ void DebugGraphic::updateDebugBuffer_() {
 	std::cout << __FUNCTION_NAME__ << std::endl;
 	unsigned int index = 0;
 	for (ADebugObject *debugObject : bufferObject_) {
-        std::cout << "debugVertexBufferActualSize_ [" << debugVertexBufferActualSize_ << "] | Index [" << index << "] | [" << debugObject->linesObject_.size() << "]" << std::endl;
+        if (debug_)
+            std::cout << "debugVertexBufferActualSize_ [" << debugVertexBufferActualSize_ << "] | Index [" << index << "] | [" << debugObject->linesObject_.size() << "]" << std::endl;
 
 		memcpy(reinterpret_cast<void *>(&debugBuffer_[index]),
 			   reinterpret_cast<void *>(&debugObject->linesObject_.front()),
@@ -106,7 +112,8 @@ void DebugGraphic::updateDebugBuffer_() {
 }
 
 void DebugGraphic::updateDebugObject_(ADebugObject &object) {
-    std::cout << __FUNCTION_NAME__ << std::endl;
+    if (debug_)
+        std::cout << __FUNCTION_NAME__ << std::endl;
     unsigned int index = 0;
     for (ADebugObject *debugObject : bufferObject_) {
         if (&object == debugObject) {
@@ -121,3 +128,5 @@ void DebugGraphic::updateDebugObject_(ADebugObject &object) {
         index += debugObject->linesObject_.size();
     }
 }
+
+bool DebugGraphic::debug_ = false;

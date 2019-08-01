@@ -7,11 +7,12 @@
 
 Chunk::Chunk(glm::vec3 position, int id) :
     id_(id),
-    position_(position) {
+    position_(position),
+    finalSizeChunk_(0) {
 
     VoxelWorld &vw = VoxelWorld::Get();
 
-    vw.heightMapBuilder.SetBounds (position.x / 16.0f, position.x / 16.0f + 1.0f, position.z / 16.0f, position.z / 16.0f + 1.0f);
+    vw.heightMapBuilder.SetBounds (position.x / 16.0f - 1, position.x / 16.0f + 2.0f, position.z / 16.0f - 1, position.z / 16.0f + 2.0f);
     vw.heightMapBuilder.Build ();
     vw.renderer.SetSourceNoiseMap (vw.heightMap);
     vw.renderer.SetDestImage (vw.image);
@@ -26,22 +27,29 @@ Chunk::Chunk(glm::vec3 position, int id) :
     for (int z = 0; z < CHUNK_SIZE; z++) {
         for (int x = 0; x < CHUNK_SIZE; x++) {
 
+            int south = vw.image.GetValue(CHUNK_SIZE + x + 1, CHUNK_SIZE + z).blue / (float)CHUNK_SIZE;
+            int north = vw.image.GetValue(CHUNK_SIZE + x - 1, CHUNK_SIZE + z).blue / (float)CHUNK_SIZE;
+            int east = vw.image.GetValue(CHUNK_SIZE + x, CHUNK_SIZE + z + 1).blue / (float)CHUNK_SIZE;
+            int west = vw.image.GetValue(CHUNK_SIZE + x, CHUNK_SIZE + z - 1).blue / (float)CHUNK_SIZE;
 
-            int south = vw.image.GetValue(x + 1, z).blue / 16.0f;
-            int north = vw.image.GetValue(x - 1, z).blue / 16.0f;
-            int east = vw.image.GetValue(x, z + 1).blue / 16.0f;
-            int west = vw.image.GetValue(x, z - 1).blue / 16.0f;
-
-            for (int y = vw.image.GetValue(x, z).blue / 16.0f; y ; y--) {
+            for (int y = vw.image.GetValue(CHUNK_SIZE + x, CHUNK_SIZE + z).blue / (float)CHUNK_SIZE; y ; y--) {
+                if (!i) {
+                    std::cout << "!i" << std::endl;
+                    std::cout << "x[" << x << "]y[" << y << "]z[" << z << "]" << std::endl;
+                    std::cout << "south[" << south << "]" << std::endl;
+                    std::cout << "north[" << north << "]" << std::endl;
+                    std::cout << "east[" << east << "]" << std::endl;
+                    std::cout << "west[" << west << "]" << std::endl;
+                }
                 array_[i].position3.x = x;
                 array_[i].position3.y = y;
                 array_[i].position3.z = z;
                 i++;
 
-                if ((!x || north >= y)
-                    && (x + 1 == CHUNK_SIZE || south >= y)
-                    && (!z || west >= y)
-                    && (z + 1 == CHUNK_SIZE || east >= y))
+                if ((north >= y)
+                    && (south >= y)
+                    && (west >= y)
+                    && (east >= y))
                 {
                     break ;
                 }
@@ -78,6 +86,7 @@ Chunk::Chunk(glm::vec3 position, int id) :
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    finalSizeChunk_ = i;
 }
 
 
@@ -89,6 +98,6 @@ void Chunk::render() {
     shader.setInt("id", id_);
 
     glBindVertexArray(VAO);
-    glDrawArrays(GL_POINTS, 0, CHUNK_TOTAL_SIZE);
+    glDrawArrays(GL_POINTS, 0, finalSizeChunk_);
     glBindVertexArray(0);
 }
