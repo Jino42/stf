@@ -5,8 +5,9 @@
 #include <memory>
 #include <noise/noise.h>
 #include <noiseutils.h>
+#include <list>
 
-#define DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE 8
+#define DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE 16
 
 class VoxelWorld {
 public:
@@ -27,7 +28,8 @@ public:
 
 private:
     Camera &camera_;
-    std::vector< Chunk > chunks_;
+    glm::ivec2 lastChucnkPosition_;
+    std::list< Chunk > chunks_;
 
     static std::unique_ptr<VoxelWorld> instance_;
 };

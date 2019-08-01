@@ -30,11 +30,14 @@ void MainGraphic::init() {
 	MainGraphicExtendModel::Get();
 	//TestParticle::Get().init();
     CameraManager::Get().addCamera("Voxel");
-    CameraManager::Get().getCamera("Voxel").setFar(100.0f);
-    CameraManager::Get().getCamera("Voxel").setFov(50.7f);
-    CameraManager::Get().getCamera("Voxel").setPosition(glm::vec3(-6.5f, 15.35f, 16.15f));
+    CameraManager::Get().getCamera("Voxel").setFar(682.0f);
+    CameraManager::Get().getCamera("Voxel").setFov(59.7f);
+    CameraManager::Get().getCamera("Voxel").setPosition(glm::vec3(-18.5f, 140.35f, 167.15f));
 	VoxelWorld::Init(CameraManager::Get().getCamera("Voxel"));
 	VoxelWorld::Get().start();
+
+    CameraManager::Get().getCamera("Default").setFar(1000.0f);
+    CameraManager::Get().getCamera("Default").setPosition(glm::vec3(82.5f, 300.35f, 226.15f));
 }
 
 void MainGraphic::render() {
@@ -56,6 +59,7 @@ void MainGraphic::render() {
 
     MainGraphicExtendModel::Get().update(0.014f);
     //TestParticle::Get().update(0.014f);
+    VoxelWorld::Get().update();
     VoxelWorld::Get().render();
 
 	debug_.render();

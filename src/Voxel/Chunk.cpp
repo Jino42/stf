@@ -5,42 +5,32 @@
 #include <noiseutils.h>
 #include <iostream>
 
-Chunk::Chunk(glm::vec3 position, int id) :
+Chunk::Chunk(glm::ivec2 chunkPosition, int id) :
     id_(id),
-    position_(position),
+    chunkPosition_(chunkPosition),
+    worldPosition_(glm::vec3(chunkPosition_.x * CHUNK_SIZE_X, 0.f, chunkPosition_.y * CHUNK_SIZE_Z)),
     finalSizeChunk_(0) {
 
     VoxelWorld &vw = VoxelWorld::Get();
 
-    vw.heightMapBuilder.SetBounds (position.x / 16.0f - 1, position.x / 16.0f + 2.0f, position.z / 16.0f - 1, position.z / 16.0f + 2.0f);
+    float f = 0.082f;
+    vw.heightMapBuilder.SetBounds ((chunkPosition.x - 1) * f, (chunkPosition.x + 2) * f, (chunkPosition.y - 1) * f, (chunkPosition.y + 2) * f);
     vw.heightMapBuilder.Build ();
     vw.renderer.SetSourceNoiseMap (vw.heightMap);
     vw.renderer.SetDestImage (vw.image);
     vw.renderer.Render ();
 
-    utils::WriterBMP writer;
-    writer.SetSourceImage (vw.image);
-    writer.SetDestFilename ("tutorial.bmp");
-    writer.WriteDestFile ();
-
     int i = 0;
-    for (int z = 0; z < CHUNK_SIZE; z++) {
-        for (int x = 0; x < CHUNK_SIZE; x++) {
 
-            int south = vw.image.GetValue(CHUNK_SIZE + x + 1, CHUNK_SIZE + z).blue / (float)CHUNK_SIZE;
-            int north = vw.image.GetValue(CHUNK_SIZE + x - 1, CHUNK_SIZE + z).blue / (float)CHUNK_SIZE;
-            int east = vw.image.GetValue(CHUNK_SIZE + x, CHUNK_SIZE + z + 1).blue / (float)CHUNK_SIZE;
-            int west = vw.image.GetValue(CHUNK_SIZE + x, CHUNK_SIZE + z - 1).blue / (float)CHUNK_SIZE;
+    for (int z = 0; z < CHUNK_SIZE_Z; z++) {
+        for (int x = 0; x < CHUNK_SIZE_X; x++) {
 
-            for (int y = vw.image.GetValue(CHUNK_SIZE + x, CHUNK_SIZE + z).blue / (float)CHUNK_SIZE; y ; y--) {
-                if (!i) {
-                    std::cout << "!i" << std::endl;
-                    std::cout << "x[" << x << "]y[" << y << "]z[" << z << "]" << std::endl;
-                    std::cout << "south[" << south << "]" << std::endl;
-                    std::cout << "north[" << north << "]" << std::endl;
-                    std::cout << "east[" << east << "]" << std::endl;
-                    std::cout << "west[" << west << "]" << std::endl;
-                }
+            int south = vw.image.GetValue(CHUNK_SIZE_X + x + 1, CHUNK_SIZE_Z + z).blue;
+            int north = vw.image.GetValue(CHUNK_SIZE_X + x - 1, CHUNK_SIZE_Z + z).blue;
+            int east = vw.image.GetValue(CHUNK_SIZE_X + x, CHUNK_SIZE_Z + z + 1).blue;
+            int west = vw.image.GetValue(CHUNK_SIZE_X + x, CHUNK_SIZE_Z + z - 1).blue;
+
+            for (int y = vw.image.GetValue(CHUNK_SIZE_X + x, CHUNK_SIZE_Z + z).blue; y ; y--) {
                 array_[i].position3.x = x;
                 array_[i].position3.y = y;
                 array_[i].position3.z = z;
@@ -56,7 +46,6 @@ Chunk::Chunk(glm::vec3 position, int id) :
             }
         }
     }
-    std::cout << i << std::endl;
 
 /*
     for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -93,8 +82,8 @@ Chunk::Chunk(glm::vec3 position, int id) :
 void Chunk::render() {
     Shader &shader = ShaderManager::Get().getShader("voxel");
 
-    shader.setInt("positionX", position_.x);
-    shader.setInt("positionZ", position_.z);
+    shader.setInt("positionX", worldPosition_.x);
+    shader.setInt("positionZ", worldPosition_.z);
     shader.setInt("id", id_);
 
     glBindVertexArray(VAO);

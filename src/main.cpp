@@ -120,6 +120,8 @@ int main(int argc, char **argv) {
 				CameraManager::Get().setFocus("Default");
 			if (DisplayWindow::Get().getKey(GLFW_KEY_X) == KeyState::kDown)
 				CameraManager::Get().setFocus("DebguFrustum");
+            if (DisplayWindow::Get().getKey(GLFW_KEY_Y) == KeyState::kDown)
+                CameraManager::Get().setFocus("Voxel");
 			if (DisplayWindow::Get().getKey(GLFW_KEY_C) == KeyState::kDown)
 				Camera::focus->getFrustum().setDebug(!Camera::focus->getFrustum().isDebug());
 

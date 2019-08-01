@@ -6,6 +6,7 @@
 #include <Engine/Frustum.hpp>
 #include <Engine/Display/DisplayWindow.hpp>
 #include <Engine/CameraManager.hpp>
+#include <Engine/Time.hpp>
 
 VoxelWorld::VoxelWorld(Camera &camera) :
 camera_(camera) {
@@ -16,26 +17,74 @@ camera_(camera) {
     ShaderManager::Get().getShader("voxel").attach((pathRoot / "shader" / "voxel.vert").generic_string());
     ShaderManager::Get().getShader("voxel").attach((pathRoot / "shader" / "voxel.geom").generic_string());
     ShaderManager::Get().getShader("voxel").attach((pathRoot / "shader" / "voxel.frag").generic_string());
-    //ShaderManager::Get().getShader("voxel").attach()
     ShaderManager::Get().getShader("voxel").link();
 }
 
 void VoxelWorld::start() {
 
+    lastChucnkPosition_.x = camera_.getPosition().x / CHUNK_SIZE_X;
+    lastChucnkPosition_.y = camera_.getPosition().z / CHUNK_SIZE_Z;
+
+
+
     heightMapBuilder.SetSourceModule (VoxelWorld::Get().myModule);
     heightMapBuilder.SetDestNoiseMap (heightMap);
-    heightMapBuilder.SetDestSize (CHUNK_SIZE * 3, CHUNK_SIZE * 3);
+    heightMapBuilder.SetDestSize (CHUNK_SIZE_X * 3, CHUNK_SIZE_Z * 3);
 
 
-    for (int y = -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; y < DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; y++)
+    for (int z = -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; z < DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; z++)
         for (int x = -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; x < DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; x++)
-            chunks_.emplace_back(glm::vec3(x * CHUNK_SIZE, 0.0f, y * CHUNK_SIZE),
-                                 (x + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) + (y + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) * DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE);
-
+            chunks_.emplace_back(
+                    glm::vec2(lastChucnkPosition_.x + x , lastChucnkPosition_.y + z),
+                    (x + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) + (z + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) * DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE);
 }
 
 void VoxelWorld::update() {
+    glm::ivec2 newChunkPosition;
 
+    newChunkPosition.x = camera_.getPosition().x / CHUNK_SIZE_X;
+    newChunkPosition.y = camera_.getPosition().z / CHUNK_SIZE_Z;
+
+    //std::cout << "newChunkPosition" << std::endl;
+    //std::cout << "x[" << newChunkPosition.x << "]y[" << newChunkPosition.y << "]" << std::endl;
+
+    std::list< Chunk > newChunk;
+    if (lastChucnkPosition_ != newChunkPosition) {
+
+        glm::ivec2 test = lastChucnkPosition_ - newChunkPosition;
+        //std::cout << "newChunkPosition" << std::endl;
+        //std::cout << "x[" << test.x << "]y[" << test.y << "]" << std::endl;
+        for(auto it = chunks_.begin(); it != chunks_.end();)
+        {
+            glm::ivec2 test2 = newChunkPosition - it->chunkPosition_;
+            //std::cout << "test" << std::endl;
+            //std::cout << "x[" << test2.x << "]y[" << test2.y << "]" << std::endl;
+            if (test2.x < -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE
+                || test2.x > DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE
+                || test2.y < -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE
+                || test2.y > DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE)
+            {
+                it = chunks_.erase(it);
+            }
+            else
+                ++it;
+        }
+        for (int z = -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; z < DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; z++) {
+            for (int x = -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; x < DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; x++) {
+                auto it = std::find_if(chunks_.begin(), chunks_.end(), [x, z, newChunkPosition](Chunk const &chunk)->bool {
+                    return (chunk.chunkPosition_.x == newChunkPosition.x + x
+                    && chunk.chunkPosition_.y == newChunkPosition.y + z);
+                });
+                if (it == chunks_.end()) {
+                    chunks_.emplace_back(
+                            glm::vec2(newChunkPosition.x + x , newChunkPosition.y + z),
+                            (x + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) + (z + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) * DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE);
+                }
+            }
+        }
+        std::cout << "Size lst [" << chunks_.size() << "]" << std::endl;
+        lastChucnkPosition_ = newChunkPosition;
+    }
 }
 
 void VoxelWorld::render() {
@@ -52,7 +101,7 @@ void VoxelWorld::render() {
     shader.setMat4("view", Camera::focus->getViewMatrix());
 
     for (auto &i : chunks_) {
-        if (camera_.getFrustum().pointIn(i.position_.x + (CHUNK_SIZE >> 1), i.position_.y + (CHUNK_SIZE >> 1), i.position_.z + (CHUNK_SIZE >> 1)))
+        if (!camera_.getFrustum().isDebug() || camera_.getFrustum().pointIn(i.worldPosition_.x + (CHUNK_SIZE_X >> 1), i.worldPosition_.y + (CHUNK_SIZE_Y >> 1), i.worldPosition_.z + (CHUNK_SIZE_Z >> 1)))
             i.render();
     }
 }
