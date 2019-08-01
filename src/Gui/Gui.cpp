@@ -102,3 +102,14 @@ ImVec2   Gui::positionByPercent(ImVec2 const &percent) const {
     return (ImVec2(DisplayWindow::Get().getWidthWindow() * percent.x / 100.0f,
             DisplayWindow::Get().getHeightWindow() * percent.y / 100.0f));
 }
+void Gui::HelpMarker(std::string const &desc) {
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc.c_str());
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}

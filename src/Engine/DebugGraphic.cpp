@@ -61,7 +61,7 @@ void DebugGraphic::render() {
  void DebugGraphic::addDebugObject(ADebugObject &debugObject) {
     std::cout << __FUNCTION_NAME__ << std::endl;
 	bufferObject_.push_back(&debugObject);
-    updateInfo_();
+    //updateInfo_();
 }
 
 void DebugGraphic::removeDebugObject(ADebugObject &debugObject) {

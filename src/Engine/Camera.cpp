@@ -133,6 +133,10 @@ void Camera::updateProjection() {
     getProjectionMatrix();
 }
 
+void Camera::updateView() {
+	needUpdateViewMatrix_ = true;
+	getViewMatrix();
+}
 
 bool Camera::getDebugFrustum() const {
 	return frustum_.isDebug();
@@ -148,12 +152,12 @@ void Camera::setFov(float fov) {
     fov_ = fov;
     needUpdateProjectionMatrix_ = true;
 }
-void Camera::setNear(float near) {
-    near_ = near;
+void Camera::setNear(float anear) {
+    near_ = anear;
     needUpdateProjectionMatrix_ = true;
 }
-void Camera::setFar(float far) {
-    far_ = far;
+void Camera::setFar(float afar) {
+    far_ = afar;
     needUpdateProjectionMatrix_ = true;
 }
 

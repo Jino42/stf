@@ -16,7 +16,7 @@ public:
     void render();
     void setDemo(bool b);
     ImVec2   positionByPercent(ImVec2 const &percent) const;
-
+	static void HelpMarker(std::string const &desc);
 private:
     bool show_demo_window;
     bool show_another_window;

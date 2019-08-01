@@ -4,8 +4,8 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <Engine/Camera.hpp>
-
 #include <Engine/MainGraphic.hpp>
+#include <NTL.hpp>
 
 Frustum::Frustum(Camera &camera) :
 camera_(camera) {
@@ -46,16 +46,13 @@ void Frustum::initDebug() {
 
 void Frustum::updateLines() {
 	float ar = 1024.f / 720.f;
-	float fov = 80.f;
-	float distNear = 0.1f;
-	float distFar = 300.f;
-	float halfHeight = tanf((3.14159265358979323846f / 180.f) * (fov / 2.f));
+	float halfHeight = tanf((3.1415926f / 180.f) * (camera_.fov_ / 2.f));
 	float halfWidth = halfHeight * ar;
 
-	float xn = halfWidth * distNear;
-	float xf = halfWidth * distFar;
-	float yn = halfHeight * distNear;
-	float yf = halfHeight * distFar;
+	float xn = halfWidth * camera_.near_;
+	float xf = halfWidth * camera_.far_;
+	float yn = halfHeight * camera_.near_;
+	float yf = halfHeight * camera_.far_;
 
 /*
     glm::mat4 inverse = glm::inverse(view);
@@ -63,16 +60,16 @@ void Frustum::updateLines() {
     glm::vec4 f[8u] =
             {
                     // near face
-                    {xn, yn, -distNear, 1.f},
-                    {-xn, yn, -distNear, 1.f},
-                    {xn, -yn, -distNear, 1.f},
-                    {-xn, -yn, -distNear , 1.f},
+                    {xn, yn, -camera_.near_, 1.f},
+                    {-xn, yn, -camera_.near_, 1.f},
+                    {xn, -yn, -camera_.near_, 1.f},
+                    {-xn, -yn, -camera_.near_ , 1.f},
 
                     // far face
-                    {xf, yf, -distFar, 1.f},
-                    {-xf, yf, -distFar , 1.f},
-                    {xf, -yf, -distFar , 1.f},
-                    {-xf, -yf, -distFar, 1.f},
+                    {xf, yf, -camera_.far_, 1.f},
+                    {-xf, yf, -camera_.far_ , 1.f},
+                    {xf, -yf, -camera_.far_ , 1.f},
+                    {-xf, -yf, -camera_.far_, 1.f},
             };
 
     glm::vec3 v[8];

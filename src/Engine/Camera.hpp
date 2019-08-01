@@ -13,6 +13,7 @@
 
 class Camera : public IGuiEntity {
     friend class EditorCamera;
+	friend class Frustum;
 public:
 	enum Movement {
 		FORWARD,
@@ -51,13 +52,14 @@ public:
 	static Camera *focus;
 
     void setFov(float fov);
-    void setNear(float near);
-    void setFar(float far);
+    void setNear(float anear);
+    void setFar(float afar);
     float getFov() const;
     float getNear() const;
     float getFar() const;
 
     void updateProjection();
+	void updateView();
 
 private:
     bool needUpdateViewMatrix_;

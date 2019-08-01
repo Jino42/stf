@@ -1,5 +1,6 @@
 #include "CameraManager.hpp"
 #include <iostream>
+#include <algorithm>
 
 CameraManager::CameraManager() :
         focus_(nullptr){
