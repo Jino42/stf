@@ -128,61 +128,33 @@ void Frustum::updateLines() {
 		v[i].z = wc.z / wc.w;
 	}
 
-	glm::vec3 lines[] = {
-			v[0], v[1],
-			v[0], v[2],
-
-			v[3], v[1],
-			v[3], v[2],
-
-			v[4], v[5],
-			v[4], v[6],
-			v[7], v[5],
-			v[7], v[6],
-			v[0], v[4],
-			v[1], v[5],
-			v[3], v[7],
-			v[2], v[6]
-	};
-
     linesObject_.clear();
     linesObject_.reserve(24);
+	linesObject_.emplace_back(v[0], color);
+	linesObject_.emplace_back(v[1], color);
+	linesObject_.emplace_back(v[0], color);
+	linesObject_.emplace_back(v[2], color);
+	linesObject_.emplace_back(v[3], color);
+	linesObject_.emplace_back(v[1], color);
+	linesObject_.emplace_back(v[3], color);
+	linesObject_.emplace_back(v[2], color);
+	linesObject_.emplace_back(v[4], color);
+	linesObject_.emplace_back(v[5], color);
+	linesObject_.emplace_back(v[4], color);
+	linesObject_.emplace_back(v[6], color);
+	linesObject_.emplace_back(v[7], color);
+	linesObject_.emplace_back(v[5], color);
+	linesObject_.emplace_back(v[7], color);
+	linesObject_.emplace_back(v[6], color);
+	linesObject_.emplace_back(v[0], color);
+	linesObject_.emplace_back(v[4], color);
+	linesObject_.emplace_back(v[1], color);
+	linesObject_.emplace_back(v[5], color);
+	linesObject_.emplace_back(v[3], color);
+	linesObject_.emplace_back(v[7], color);
+	linesObject_.emplace_back(v[2], color);
+	linesObject_.emplace_back(v[6], color);
 
-	linesObject_.emplace_back(v[0], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[1], glm::vec4(0, 1, 0, 1));
-
-	linesObject_.emplace_back(v[0], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[2], glm::vec4(0, 1, 0, 1));
-
-	linesObject_.emplace_back(v[3], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[1], glm::vec4(0, 1, 0, 1));
-
-	linesObject_.emplace_back(v[3], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[2], glm::vec4(0, 1, 0, 1));
-
-	linesObject_.emplace_back(v[4], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[5], glm::vec4(0, 1, 0, 1));
-
-	linesObject_.emplace_back(v[4], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[6], glm::vec4(0, 1, 0, 1));
-
-	linesObject_.emplace_back(v[7], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[5], glm::vec4(0, 1, 0, 1));
-
-	linesObject_.emplace_back(v[7], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[6], glm::vec4(0, 1, 0, 1));
-
-	linesObject_.emplace_back(v[0], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[4], glm::vec4(0, 1, 0, 1));
-
-	linesObject_.emplace_back(v[1], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[5], glm::vec4(0, 1, 0, 1));
-
-	linesObject_.emplace_back(v[3], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[7], glm::vec4(0, 1, 0, 1));
-
-	linesObject_.emplace_back(v[2], glm::vec4(0, 1, 0, 1));
-	linesObject_.emplace_back(v[6], glm::vec4(0, 1, 0, 1));
 
     updateDebug();
 }

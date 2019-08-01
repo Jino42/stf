@@ -11,4 +11,5 @@ public:
 
 private:
     Camera *itemCurrent;
+    char inputCameraName_[20];
 };

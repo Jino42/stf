@@ -3,7 +3,8 @@
 
 ADebugObject::ADebugObject() :
 	debug_(false),
-    pastSizeBufferLines_(0) {
+    pastSizeBufferLines_(0),
+    color(glm::vec4(0.f, 9.f, 0.f, 1.f)) {
 
 }
 
@@ -29,4 +30,8 @@ void ADebugObject::updateDebug() {
 
 bool ADebugObject::isDebug() const {
     return debug_;
+}
+
+void ADebugObject::setColor(glm::vec4 const &acolor) {
+    color = acolor;
 }

@@ -6,6 +6,7 @@
 
 /// \breid Permit to Manage all Cameras
 /// \details You can Add, Remove Cameras, associated with StringName
+/// \todo Right THROW
 class CameraManager {
 public:
 
@@ -36,6 +37,9 @@ public:
     Camera &getFocus();
 
     void	addCamera(std::string const &name);
+
+    void	removeCamera(std::string const &name);
+    void	removeCamera(Camera const &camera);
 
     /// \throw It throws out_of_range if "Name" is not the key of an element in the Cameras map.
     Camera	&getCamera(std::string const &name);

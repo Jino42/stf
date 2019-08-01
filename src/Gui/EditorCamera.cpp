@@ -1,12 +1,12 @@
 #include "EditorCamera.hpp"
 #include <Engine/CameraManager.hpp>
-#include <Engine/CameraManager.hpp>
 #include <Gui/GuiSettings.hpp>
 #include <iostream>
 #include <Gui/Gui.hpp>
 
 EditorCamera::EditorCamera() :
-itemCurrent(nullptr) {
+itemCurrent(nullptr),
+inputCameraName_("Name") {
 }
 
 void EditorCamera::render() {
@@ -20,11 +20,10 @@ void EditorCamera::render() {
 
 	ImGui::Text("Name: ");
 	ImGui::SameLine();
-	static char str0[128] = "Hello, world!";
-	ImGui::InputText("input text", str0, IM_ARRAYSIZE(str0));
+	ImGui::InputText("Camera :", inputCameraName_, IM_ARRAYSIZE(inputCameraName_));
 	ImGui::SameLine();
-	if (ImGui::Button("Button"))
-		std::cout << "Click" << std::endl;
+	if (ImGui::Button("Add"))
+        CameraManager::Get().addCamera(inputCameraName_);
 
     if (ImGui::BeginCombo("Cameras", (itemCurrent ? itemCurrent->name.c_str() : ""), NTL_IMGUI_COMBO_FLAGS))
     {
@@ -38,14 +37,20 @@ void EditorCamera::render() {
         ImGui::EndCombo();
     }
     if (itemCurrent) {
-		bool boolGuiDebugCamera = itemCurrent->getDebugFrustum();
-        //Button Delete Camera
-        //Checkbox Debug
+		bool boolGuiDebugCamera = itemCurrent->getFrustum().isDebug();
+        if (ImGui::Button("Delete Camera")) {
+            CameraManager::Get().removeCamera(itemCurrent->name);
+            itemCurrent = nullptr;
+            return ;
+        }
 		if (ImGui::Checkbox("checkbox", &boolGuiDebugCamera)) {
-			itemCurrent->setDebugFrustum(boolGuiDebugCamera);
+			itemCurrent->getFrustum().setDebug(boolGuiDebugCamera);
 		}
-		//if isdebug
-		//Color Debug
+		if (itemCurrent->getFrustum().isDebug()) {
+            ImGui::Text("Color Debug :");
+            ImGui::SameLine();
+            ImGui::ColorEdit4("Color Frustum", (float*)&itemCurrent->frustum_.color, NTL_IMGUI_COLOR_PICKER_FLAGS);
+		}
 
 		if (ImGui::DragFloat("Fov", &itemCurrent->fov_, 0.1f)
             || ImGui::DragFloat("Near", &itemCurrent->near_, 0.1f)

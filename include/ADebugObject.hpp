@@ -22,7 +22,10 @@ public:
 	virtual ~ADebugObject() = default;
 
     void	        setDebug(bool b = false);
+    void            setColor(glm::vec4 const &color);
     bool            isDebug() const;
+
+    glm::vec4 color;
 
 protected:
     virtual void    updateLines() = 0;

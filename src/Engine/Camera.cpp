@@ -138,14 +138,8 @@ void Camera::updateView() {
 	getViewMatrix();
 }
 
-bool Camera::getDebugFrustum() const {
-	return frustum_.isDebug();
-}
-
-void Camera::setDebugFrustum(bool b) {
-    std::cout << __FUNCTION_NAME__ << std::endl;
-    needUpdateDebugFrustum_ = b;
-	frustum_.setDebug(b);
+Frustum &Camera::getFrustum() {
+    return frustum_;
 }
 
 void Camera::setFov(float fov) {

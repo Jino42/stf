@@ -46,10 +46,7 @@ public:
 	glm::vec3 getPosition() const;
 	glm::vec3 getFront() const;
 
-	void	setDebugFrustum(bool b);
-	bool	getDebugFrustum() const;
-
-	static Camera *focus;
+    static Camera *focus;
 
     void setFov(float fov);
     void setNear(float anear);
@@ -60,6 +57,8 @@ public:
 
     void updateProjection();
 	void updateView();
+
+    Frustum &getFrustum();
 
 private:
     bool needUpdateViewMatrix_;

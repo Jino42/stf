@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
 			if (DisplayWindow::Get().getKey(GLFW_KEY_X) == KeyState::kDown)
 				CameraManager::Get().setFocus("DebguFrustum");
 			if (DisplayWindow::Get().getKey(GLFW_KEY_C) == KeyState::kDown)
-				Camera::focus->setDebugFrustum(!Camera::focus->getDebugFrustum());
+				Camera::focus->getFrustum().setDebug(!Camera::focus->getFrustum().isDebug());
 
 			//Logical Loop
 			while (Time::Get().shouldUpdateLogic()) {
