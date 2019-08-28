@@ -166,16 +166,6 @@ option(BUILD_LIBNOISE_UTILS ON)
 option(BUILD_LIBNOISE_EXAMPLES ON)
 add_subdirectory(extern/libnoise)
 
-
-message("EXTERN : lua cloning...")
-if (GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-    execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init extern/lua
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            RESULT_VARIABLE GIT_SUBMOD_RESULT)
-    if (NOT GIT_SUBMOD_RESULT EQUAL "0")
-        message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
-    endif ()
-endif ()
 add_subdirectory(extern/lua)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIMGUI_USER_CONFIG=\"<../imconfig-sfml.h>\"")
@@ -241,6 +231,7 @@ add_definitions(-DGLFW_INCLUDE_NONE
         -DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 
 
+target_link_libraries(${NAME} PRIVATE lua_static)
 target_link_libraries(${NAME} PRIVATE Boost::filesystem)
 target_link_libraries(${NAME} PRIVATE Boost::program_options)
 target_link_libraries(${NAME} PRIVATE assimp)

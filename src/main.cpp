@@ -14,6 +14,15 @@
 #include <noise/noise.h>
 #include "noiseutils.h"
 #include <Engine/CameraManager.hpp>
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <Lua\lua.h>
+#include <Lua\lauxlib.h>
+#include <Lua\lualib.h>
+#ifdef __cplusplus
+}
+#endif
 
 void demoGui() {
     Gui gui;
