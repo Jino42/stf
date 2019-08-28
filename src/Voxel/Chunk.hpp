@@ -16,13 +16,17 @@ class Chunk {
 public:
     Chunk(glm::ivec2 chunkPosition, int id);
 
+    void reload(glm::ivec2 chunkPosition, int id);
     void render();
+    void setRender(bool b);
+    bool getRender() const;
 
     glm::ivec2 chunkPosition_;
     glm::vec3 worldPosition_;
 
 private:
     int id_;
+    bool render_;
     unsigned int VBO;
     unsigned int VAO;
     unsigned int finalSizeChunk_;

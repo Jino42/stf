@@ -40,6 +40,10 @@ void VoxelWorld::start() {
 }
 
 void VoxelWorld::update() {
+    std::cout << "Update" << std::endl;
+    Timer timer;
+    timer.start();
+
     glm::ivec2 newChunkPosition;
 
     newChunkPosition.x = camera_.getPosition().x / CHUNK_SIZE_X;
@@ -50,6 +54,17 @@ void VoxelWorld::update() {
 
     std::list< Chunk > newChunk;
     if (lastChucnkPosition_ != newChunkPosition) {
+
+
+        float f = 0.082f;
+        heightMapBuilder.SetBounds ((newChunkPosition.x - DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE - 1) * f,
+                (newChunkPosition.x + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE + 2) * f,
+                (newChunkPosition.y - DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE - 1) * f,
+                (newChunkPosition.y + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE + 2) * f);
+        heightMapBuilder.Build ();
+        renderer.SetSourceNoiseMap (heightMap);
+        renderer.SetDestImage (image);
+        renderer.Render ();
 
         glm::ivec2 test = lastChucnkPosition_ - newChunkPosition;
         //std::cout << "newChunkPosition" << std::endl;
@@ -64,9 +79,8 @@ void VoxelWorld::update() {
                 || test2.y < -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE
                 || test2.y > DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE)
             {
-                it = chunks_.erase(it);
+                it->setRender(false);
             }
-            else
                 ++it;
         }
         for (int z = -DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; z < DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE; z++) {
@@ -76,15 +90,29 @@ void VoxelWorld::update() {
                     && chunk.chunkPosition_.y == newChunkPosition.y + z);
                 });
                 if (it == chunks_.end()) {
-                    chunks_.emplace_back(
-                            glm::vec2(newChunkPosition.x + x , newChunkPosition.y + z),
-                            (x + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) + (z + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) * DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE);
+
+                    auto voided = std::find_if(chunks_.begin(), chunks_.end(), [x, z, newChunkPosition](Chunk const &chunk)->bool {
+                        return (!chunk.getRender());
+                    });
+
+                    if (voided != chunks_.end()) {
+                        voided->reload(glm::vec2(newChunkPosition.x + x , newChunkPosition.y + z),
+                                        (x + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) + (z + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) * DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE);
+                        voided->setRender(true);
+                    }
+
+                    //chunks_.emplace_back(
+                    //        glm::vec2(newChunkPosition.x + x , newChunkPosition.y + z),
+                    //        (x + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) + (z + DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE) * DEFAULT_VOXEL_RADIUS_RENDER_DISTANCE);
                 }
             }
         }
         std::cout << "Size lst [" << chunks_.size() << "]" << std::endl;
         lastChucnkPosition_ = newChunkPosition;
     }
+    timer.stop();
+
+    std::cout << "Elapsed time : " << timer.count() << "ms" << std::endl;
 }
 
 void VoxelWorld::render() {
