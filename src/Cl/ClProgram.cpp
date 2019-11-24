@@ -1,4 +1,5 @@
 #include "ClProgram.hpp"
+//#include <CL/opencl.h>
 
 ClProgram::ClProgram() :
 	bBuilded_(false) {
@@ -24,9 +25,9 @@ void ClProgram::buildProgram() {
 	bool first = true;
 	for (auto &path : pathBuffer_) {
         std::cout << "path :: [" << path << "]" << std::endl;
-        //if (path != "D:/Base\\src\\Kernel\\RequiredModule.cl")
-        //if (path != "/Users/ntoniolo/NTL/src/Kernel/RequiredModule.cl")
-        //  continue;
+        if (path != "D:/ft_vox\\src\\Particle\\Kernel\\RequiredModule.cl")
+        //if (path != "/Users/ntoniolo/NTL/src/Particle/Kernel/RequiredModule.cl")
+          continue;
         std::cout << "path :: [" << path << "]" << std::endl;
         std::fstream f{path.generic_string()};
 
@@ -52,22 +53,51 @@ void ClProgram::buildProgram() {
 //		std::cout << s << std::endl;
 //	}
 
-	std::string include("-I ");
+	std::string compilationOptions("-I ");
 
-	//cl::Program newProgram(ClContext::Get().context, sources_, &err.err);
+//	cl::Program newProgram(ClContext::Get().context, sources_, &err.err);
 	cl::Program newProgram(ClContext::Get().context, temp, false, &err.err);
 	err.clCheckError();
 
-	include += (boost::filesystem::path(ROOT_PATH) / "src" / "Kernel/").generic_string();
+	compilationOptions += (boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel/").generic_string();
+
+#ifdef WIN32
+	compilationOptions += " -DWIN32";
+#endif
 
 	try {
-		if (newProgram.build({ClContext::Get().deviceDefault}, include.c_str()) != CL_SUCCESS) {
+		if (newProgram.build({ClContext::Get().deviceDefault}, compilationOptions.c_str()) != CL_SUCCESS) {
+			cl_build_status buildStatus = newProgram.getBuildInfo<CL_PROGRAM_BUILD_STATUS>(ClContext::Get().deviceDefault, &err.err);
+			err.clCheckError();
 			std::string failLog = newProgram.getBuildInfo<CL_PROGRAM_BUILD_LOG>(ClContext::Get().deviceDefault, &err.err);
 			err.clCheckError();
 			throw BuildException(std::string("OpenCL:: Error during building program : ") + failLog);
+
 		}
 	} catch (cl::Error &e) {
-		std::string failLog = newProgram.getBuildInfo<CL_PROGRAM_BUILD_LOG>(ClContext::Get().deviceDefault, &err.err);
+		std::cerr << e.what() << std::endl;
+/*
+		size_t logSize;
+		clGetProgramBuildInfo(newProgram(), ClContext::Get().deviceDefault(), CL_PROGRAM_BUILD_LOG,0, NULL, &logSize);
+
+		char* buildLog = new char[logSize];
+		clGetProgramBuildInfo(newProgram(), ClContext::Get().deviceDefault(), CL_PROGRAM_BUILD_LOG, sizeof(buildLog), buildLog, NULL);
+
+		std::cerr << "Error in kernel: " << std::endl;
+		std::cerr << buildLog;
+*/
+
+
+		std::string failLog;
+
+		failLog = newProgram.getBuildInfo<CL_PROGRAM_BUILD_STATUS>(ClContext::Get().deviceDefault, &err.err);
+		std::cerr << "1 : " << failLog << std::endl;
+
+		failLog = newProgram.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS>(ClContext::Get().deviceDefault, &err.err);
+		std::cerr << "2 : " << failLog << std::endl;
+
+		failLog = newProgram.getBuildInfo<CL_PROGRAM_BUILD_LOG>(ClContext::Get().deviceDefault, &err.err);
+		std::cerr << "3 : " << failLog.c_str() << std::endl;
 		err.clCheckError();
 		throw BuildException(std::string("OpenCL:: Error during building program : ") + failLog);
 	}

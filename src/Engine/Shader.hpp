@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 /// \brief Shader class
 /// \section HowToUse

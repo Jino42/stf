@@ -17,9 +17,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <Lua\lua.h>
-#include <Lua\lauxlib.h>
-#include <Lua\lualib.h>
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 #ifdef __cplusplus
 }
 #endif
@@ -46,7 +46,29 @@ void demoGui() {
 
 }
 
+int displaySum(lua_State *L)
+{
+	int sum = (int) lua_tonumber(L, 1) + (int) lua_tonumber(L, 2);
+	printf("La somme est egale a : %d", sum);
+	return 0 ;
+}
+
+void Lua() {
+	lua_State *lua = luaL_newstate();
+	luaL_openlibs(lua);
+	luaL_dofile(lua, (std::string(ROOT_PATH) + "/script.lua").c_str());
+	lua_getglobal(lua, "display_sum");
+// Enregistrement dans la fonction dans Lua
+	lua_register(lua, "displaySum", displaySum);
+	lua_call(lua, 0, 0);
+	lua_close(lua);
+	return ;
+}
+
+
 int main(int argc, char **argv) {
+//	Lua();
+//	return 0;
     noise::module::Perlin myModule;
 /*
     utils::NoiseMap heightMap;

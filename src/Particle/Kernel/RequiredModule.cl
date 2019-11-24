@@ -1,4 +1,10 @@
-typedef struct  s_ParticleData {
+#ifdef WIN32
+#define ALIGN __attribute__((packed))
+#else
+#define ALIGN
+#endif
+
+typedef struct ALIGN s_ParticleData {
     float3          position; 	// Center point of particle
     float3          velocity; 	// Current particle velocity
     float4          color;    	// Particle color
@@ -9,7 +15,7 @@ typedef struct  s_ParticleData {
     int             index;
 } ParticleData;
 
-typedef struct  s_ParticleSpriteData {
+typedef struct ALIGN s_ParticleSpriteData {
     float2      offset1;
     float2      offset2;
     float       blend;
@@ -58,13 +64,13 @@ float randomMinMax(uint seed, float min, float max)
     return min + ((float)(seed % SEED_MAX) / (float)SEED_MAX) * (max - min);
 }
 
-typedef struct  sRangef {
+typedef struct ALIGN sRangef {
     int isRange;
     float min;
     float max;
 } Rangef;
 
-typedef struct  sRangei {
+typedef struct ALIGN sRangei {
     int isRange;
     int min;
     int max;
@@ -77,38 +83,38 @@ float getRandomRangef(__global Rangef *range, int seed)
     return range->max;
 }
 
-typedef struct  sModuleRequiredParams {
+typedef struct ALIGN sModuleRequiredParams {
     float gravityModifier;
     float simulationSpeed;
 } ModuleRequiredParams;
 
-typedef struct  sModuleSpawnParams {
+typedef struct ALIGN sModuleSpawnParams {
     Rangef startLifeTime;
     Rangef startSpeed;
     Rangef startSize;
     Rangef startRotation;
 } ModuleSpawnParams;
 
-typedef struct  sModuleSizeOverLifetimeParams {
+typedef struct ALIGN sModuleSizeOverLifetimeParams {
     Rangef size;
 } ModuleSizeOverLifetimeParams;
 
 #define offsetof(st, m) ((size_t)&(((st *)0)->m))
 
-typedef struct  s_ParticleMovementModuleData {
+typedef struct ALIGN s_ParticleMovementModuleData {
 	float3  acceleration;
 	float3  velocity;
 	float   masse;
 } ParticleMovementModuleData;
 
 ////COLOR
-typedef struct {
+typedef struct ALIGN {
 	float r;       // a fraction between 0 and 1
 	float g;       // a fraction between 0 and 1
 	float b;       // a fraction between 0 and 1
 } rgb;
 
-typedef struct {
+typedef struct ALIGN {
 	float h;       // angle in degrees
 	float s;       // a fraction between 0 and 1
 	float v;       // a fraction between 0 and 1
@@ -181,6 +187,7 @@ void kernel do_nothing(__global ParticleData *data) {
 
 void kernel printStructSize(__global ParticleData *dataParticle) {
 	printf(">>> GPU SIZE STRUCT <<<\n");
+	printf("%f\n", dataParticle->rotate);
 	printf("[%5li] ParticleData\n", sizeof(ParticleData));
 	printf("[%5li] ModuleRequiredParams\n", sizeof(ModuleRequiredParams));
 	printf("[%5li] ModuleSpawnParams\n", sizeof(ModuleSpawnParams));
@@ -295,15 +302,15 @@ int nbParticleMax)
 int id = get_global_id(0);
 __global ParticleData const *particle = &data[id];
 
-int i = 0;
-int s = 0;
-while (i < nbParticleMax)
-{
-if (particleIsActive(&data[i]))
-s++;
-i++;
-}
-*nbParticleActive = s;
+    int i = 0;
+    int s = 0;
+    while (i < nbParticleMax)
+    {
+        if (particleIsActive(&data[i]))
+            s++;
+        i++;
+    }
+    *nbParticleActive = s;
 }
 
 __kernel void calculateDistanceBetweenParticleAndCamera(
@@ -325,20 +332,20 @@ __kernel void ParallelSelection(
         __global float *bufferDist,
         float3 cameraPosition)
 {
-int i = get_global_id(0); // current thread
-int n = get_global_size(0); // input size
-ParticleData iDataParticle = data[i];
-ParticleSpriteData iDataSprite = spriteData[i];
+    int i = get_global_id(0); // current thread
+    int n = get_global_size(0); // input size
+    ParticleData iDataParticle = data[i];
+    ParticleSpriteData iDataSprite = spriteData[i];
 
-float iKey = bufferDist[i];
-int pos = 0;
-for (int j = 0; j < n; j++)
-{
-if ((bufferDist[j] > iKey) || (bufferDist[j] == iKey && j < i))
-pos += 1;
-}
-data[pos] = iDataParticle;
-spriteData[pos] = iDataSprite;
+    float iKey = bufferDist[i];
+    int pos = 0;
+    for (int j = 0; j < n; j++)
+    {
+        if ((bufferDist[j] > iKey) || (bufferDist[j] == iKey && j < i))
+            pos += 1;
+    }
+    data[pos] = iDataParticle;
+    spriteData[pos] = iDataSprite;
 }
 
 
@@ -392,14 +399,15 @@ void updateSpriteCoordInfo(
         __global ParticleData *particle,
         __global ParticleSpriteData *spriteData,
         unsigned int numberRows) {
-float lifeFactor = fmod(particle->age / particle->lifeTime, 1.f);
-int stageCount = numberRows * numberRows;
-float atlasProgression = lifeFactor * stageCount;
-int index1 = (int)floor(atlasProgression);
-int index2 = index1 < stageCount -1 ? index1 + 1 : index1;
-spriteData->blend = fmod(atlasProgression, 1);
-spriteData->offset1 = setSpriteOffset(numberRows, index1);
-spriteData->offset2 = setSpriteOffset(numberRows, index2);
+    float lifeFactor = fmod(particle->age / particle->lifeTime, 1.f);
+    int stageCount = numberRows * numberRows;
+    float atlasProgression = lifeFactor * stageCount;
+    int index1 = (int)floor(atlasProgression);
+    int index2 = index1 < stageCount -1 ? index1 + 1 : index1;
+
+    spriteData->blend = fmod(atlasProgression, 1);
+    spriteData->offset1 = setSpriteOffset(numberRows, index1);
+    spriteData->offset2 = setSpriteOffset(numberRows, index2);
 }
 
 __kernel void sprite(__global ParticleData *data,
@@ -432,7 +440,7 @@ __kernel void sprite(__global ParticleData *data,
 }
 */
 
-void printStructSizeFunc() {
+void kernel printStructSizeFunc() {
     printf(">>> GPU SIZE STRUCT <<< \n");
     printf("[%5li] ModuleRequiredParams \n", sizeof(ModuleRequiredParams));
     printf("[%5li] ModuleSpawnParams \n", sizeof(ModuleSpawnParams));
@@ -599,82 +607,3 @@ void kernel color_radius_from_position(__global ParticleData *data,
 	position.z = particle->position.z;
 	particle->color = lerpColorVec4(start, end, clamp(fabs(length(from - position)) / radius, 0.f, 1.f));
 }
-
-
-/*
-#include "ParticleData.hl"
-#include "ModuleStruct.hl"
-
-void kernel RequiredInitialisation(
-        __global ModuleRequiredParams *moduleParams,
-        __global ParticleData *data,
-        float3 particleSystemPosition,
-        int seed)
-{
-    size_t id = get_global_id(0);
-    __global ParticleData *particle = &data[id];
-
-    unsigned int i = 0;
-    while (i < sizeof(ParticleData)) {
-        ((__global char *)particle)[i] = 0;
-        i++;
-    }
-    particle->index = id;
-
-
-//    particle->position.x = 0.f;
-//    particle->position.y = 0.f;
-//    particle->position.z = id * 0.1f;
-//    particle->color.w = 1.f;
-//    particle->color.x = 1.f;
-//    particle->color.y = 1.f;
-//    particle->color.z = 1.f;
-//
-//    int gs = get_global_size(0);
-//    int cubicParticle = (int)cbrt((float)gs);
-//    float3 index;
-//    index.x = id % cubicParticle;
-//    index.y = (id / cubicParticle) % cubicParticle;
-//    index.z = (id / (cubicParticle * cubicParticle)) % cubicParticle;
-//
-//    particle->position.x = index.x - cubicParticle / 2;
-//    particle->position.y = index.y * -1 + cubicParticle / 2;
-//    particle->position.z = (-index.z / 8) + index.z;
-//
-//    particle->position.x += particleSystemPosition.x;
-//    particle->position.y += particleSystemPosition.y;
-//    particle->position.z += particleSystemPosition.z;
-//
-//    particle->lifeTime = 5.f;
-
-    particle->age = 5.f;
-    particle->lifeTime = 5.f;
-
-    //particle->lifeTime = getRandomRangef(&moduleParams->startLifeTime, seed + id);
-    //particle->age = particle->lifeTime;
-}
-
-void kernel RequiredUpdate(__global ParticleData *data, float deltaTime) {
-    size_t id = get_global_id(0);
-    __global ParticleData *particle = &data[id];
-
-    particle->age += deltaTime;
-}
-
-void kernel do_nothing(__global ParticleData *data) {
-    (void)data;
-}
-
-void kernel printStructSize(__global ParticleData *data) {
-	printf("[%5li] ParticleData\n", sizeof(ParticleData));
-	printf(">>> GPU SIZE STRUCT <<<\n");
-	printf("[%5li] ModuleRequiredParams\n", sizeof(ModuleRequiredParams));
-	printf("[%5li] ModuleSpawnParams\n", sizeof(ModuleSpawnParams));
-	printf("[%5li] ModuleSizeOverLifetimeParams\n", sizeof(ModuleSizeOverLifetimeParams));
-	printf("[%5li] Rangef\n", sizeof(Rangef));
-	printf("[%5li] Rangei\n", sizeof(Rangei));
-	printf("[%5li] ParticleData\n", sizeof(ParticleData));
-	printf("[%5li] ParticleSpriteData\n", sizeof(ParticleSpriteData));
-	//printf("[%5li] ParticleMovementModuleData\n", sizeof(ParticleMovementModuleData));
-}
-*/

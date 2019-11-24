@@ -24,6 +24,7 @@ private:
 	float							deltaTime_;
 	RenderBuffer                    renderBuffer_;
 	DebugGraphic					debug_;
+	bool 							doParticle_;
 
 	static std::unique_ptr<MainGraphic> instance_;
 };

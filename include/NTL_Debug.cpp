@@ -15,17 +15,43 @@ void printStructSizeCPU() {
 }
 
 void printStructSizeGPU(AParticleEmitter &emitter, cl::CommandQueue &queue) {
+
+	printf("CPU SIDE DEBUG >>> GPU SIZE STRUCT <<< \n");
+	ClError err;
+
+
+/*
 	cl::Kernel &kernel = ClProgram::Get().getKernel("printStructSize");
 
-	ClError err;
-	printf(">>> GPU SIZE STRUCT <<< \n");
 
 
     kernel.setArg(0, emitter.getDeviceBuffer().mem);
     OpenCGL::RunKernelWithMem(queue, kernel, emitter.getDeviceBuffer().mem, cl::NullRange, cl::NDRange(1));
-
-    /*err.err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(1), cl::NullRange);
+	queue.finish();
+*/
+    cl::Kernel &kernel = ClProgram::Get().getKernel("printStructSizeFunc");
+    err.err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(1), cl::NullRange);
     err.clCheckError();
     queue.finish();
-     */
+}
+
+void printStructSizeGPUBase(cl::CommandQueue &queue) {
+
+	printf("CPU SIDE DEBUG >>> GPU SIZE STRUCT <<< \n");
+	ClError err;
+
+
+/*
+	cl::Kernel &kernel = ClProgram::Get().getKernel("printStructSize");
+
+
+
+    kernel.setArg(0, emitter.getDeviceBuffer().mem);
+    OpenCGL::RunKernelWithMem(queue, kernel, emitter.getDeviceBuffer().mem, cl::NullRange, cl::NDRange(1));
+	queue.finish();
+*/
+	cl::Kernel &kernel = ClProgram::Get().getKernel("printStructSizeFunc");
+	err.err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(1), cl::NullRange);
+	err.clCheckError();
+	queue.finish();
 }

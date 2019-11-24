@@ -9,6 +9,7 @@
 
 #include <Engine/Shader.hpp>
 #include <map>
+#include <memory>
 
 /// \brief Singleton
 class ShaderManager {

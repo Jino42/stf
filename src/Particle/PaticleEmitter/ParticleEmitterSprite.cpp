@@ -22,8 +22,8 @@ ParticleEmitterSprite::ParticleEmitterSprite(ParticleSystem &system, ClQueue &qu
 	modules_.emplace_back(std::make_unique<ParticleSpawnModule>(*this));
 
 	ClProgram &program = ClProgram::Get();
-	program.addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Kernel" / "Sort.cl");
-	program.addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Kernel" / "Sprite.cl");
+	program.addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel" / "Sort.cl");
+	program.addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel" / "Sprite.cl");
 
 	shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleSprite.vert").generic_string());
 	shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleSprite.frag").generic_string());
@@ -138,10 +138,13 @@ void	ParticleEmitterSprite::updateSpriteData() {
 
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
-
+#include "NTL_Debug.hpp"
 void ParticleEmitterSprite::update(float deltaTime) {
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
+
+	printStructSizeGPUBase(this->queue_.getQueue());
+
     checkReload();
     updateSpriteData();
     getNbParticleActive_();
@@ -185,7 +188,6 @@ void ParticleEmitterSprite::getNbParticleActive_() {
 
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, deviceBuffer_.mem, cl::NullRange, cl::NDRange(1));
     queue_.getQueue().enqueueReadBuffer(nbParticleActiveOutpourBuffer_, CL_TRUE, 0, sizeof(int), &nbParticleActive_);
-
 }
 
 void ParticleEmitterSprite::sortDeviceBufferCalculateDistanceParticle_() {
@@ -199,6 +201,7 @@ void ParticleEmitterSprite::sortDeviceBufferCalculateDistanceParticle_() {
 	kernel.setArg(2, glmVec3toClFloat3(cameraPosition));
 
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, deviceBuffer_.mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+    std::cout << "nbParticleMax_ [" << nbParticleMax_ << "]" << std::endl;
 }
 
 void ParticleEmitterSprite::sortDeviceBuffer_() {

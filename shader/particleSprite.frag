@@ -20,5 +20,5 @@ void main()
 {
     vec4 color1 = texture(sprite, SpriteOffset1);
     vec4 color2 = texture(sprite, SpriteOffset2);
-    FragColor = mix(color1, color2, SpriteBlend);
+        FragColor = mix(color1, color2, SpriteBlend);
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AWidget.hpp"
+#include <memory>
 
 class WidgetRender : public AWidget {
 public:

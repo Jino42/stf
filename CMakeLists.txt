@@ -144,6 +144,7 @@ endif()
 find_package(OpenCL REQUIRED)
 set(OPENCL_INCLUDE_DIR "${OpenCL_INCLUDE_DIR}/Headers/")
 set(OPENCL_LIB_DIR "${OpenCL_LIBRARY}/Libraries/")
+message("OPENCL  : ${OpenCL_LIBRARY}")
 option(BUILD_DOCS OFF)
 option(BUILD_EXAMPLES OFF)
 option(BUILD_TESTS OFF)
@@ -186,6 +187,7 @@ include_directories(SYSTEM
         ${CMAKE_BINARY_DIR}/extern/OpenCL-CLHPP/include/
         ${CMAKE_SOURCE_DIR}/extern/imgui/
         ${CMAKE_SOURCE_DIR}/extern/imgui/examples/
+        ${CMAKE_SOURCE_DIR}/extern/lua/src/
 )
 
 

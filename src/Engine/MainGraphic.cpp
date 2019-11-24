@@ -6,9 +6,14 @@
 #include <Engine/TestParticle.hpp>
 #include <Engine/ModelEngine/MainGraphicExtendModel.hpp>
 
+/// Rmove
+#include "Cl/ClProgram.hpp"
+
+
 MainGraphic::MainGraphic() :
         renderBuffer_(DisplayWindow::Get().getWidthWindow() / 2, DisplayWindow::Get().getHeightWindow()),
-		deltaTime_(0.014f) {
+		deltaTime_(0.014f),
+		doParticle_(true) {
 	glEnable(GL_DEPTH_TEST);
 	glPointSize(1.0f);
 	glLineWidth(5.0f);
@@ -28,16 +33,22 @@ void MainGraphic::init() {
 	CameraManager::Get().getFocus().setPosition(glm::vec3(2.7f, 38.f, 55.f));
 
 	MainGraphicExtendModel::Get();
-	//TestParticle::Get().init();
+	if (doParticle_)
+		TestParticle::Get().init();
     CameraManager::Get().addCamera("Voxel");
     CameraManager::Get().getCamera("Voxel").setFar(682.0f);
     CameraManager::Get().getCamera("Voxel").setFov(59.7f);
     CameraManager::Get().getCamera("Voxel").setPosition(glm::vec3(-18.5f, 140.35f, 167.15f));
-	VoxelWorld::Init(CameraManager::Get().getCamera("Voxel"));
-	VoxelWorld::Get().start();
+	//VoxelWorld::Init(CameraManager::Get().getCamera("Voxel"));
+	//VoxelWorld::Get().start();
 
     CameraManager::Get().getCamera("Default").setFar(1000.0f);
     CameraManager::Get().getCamera("Default").setPosition(glm::vec3(82.5f, 300.35f, 226.15f));
+
+
+    /// REMOVE
+	ClProgram &program = ClProgram::Get();
+	program.addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel" / "Test.cl");
 }
 
 void MainGraphic::render() {
@@ -58,9 +69,21 @@ void MainGraphic::render() {
     renderBuffer_.clear();
 
     MainGraphicExtendModel::Get().update(0.014f);
-    //TestParticle::Get().update(0.014f);
-    VoxelWorld::Get().update();
-    VoxelWorld::Get().render();
+	if (doParticle_)
+    	TestParticle::Get().update(0.014f);
+    //VoxelWorld::Get().update();
+    //VoxelWorld::Get().render();
+
+    /// REMOVE
+    /*
+	static ClQueue queue;
+	ClError err;
+	cl::Kernel &kernel = ClProgram::Get().getKernel("Test");
+	err.err = queue.getQueue().enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(1), cl::NullRange);
+	err.clCheckError();
+	queue.getQueue().finish();
+    */
+	///
 
 	debug_.render();
 

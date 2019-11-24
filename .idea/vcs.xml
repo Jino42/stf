@@ -14,5 +14,15 @@
     <mapping directory="$PROJECT_DIR$/extern/libnoise" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/extern/lua" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/extern/stb" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/suppr" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/suppr/extern/OpenCL-CLHPP" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/suppr/extern/OpenCL-CLHPP/external/CMock" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/suppr/extern/OpenCL-CLHPP/external/Unity" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/suppr/extern/assimp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/suppr/extern/boost-cmake" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/suppr/extern/glad" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/suppr/extern/glfw" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/suppr/extern/glm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/suppr/extern/stb" vcs="Git" />
   </component>
 </project>

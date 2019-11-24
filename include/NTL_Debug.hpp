@@ -11,3 +11,4 @@
 
 void printStructSizeCPU();
 void printStructSizeGPU(AParticleEmitter &emitter, cl::CommandQueue &queue);
+void printStructSizeGPUBase(cl::CommandQueue &queue);
