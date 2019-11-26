@@ -10,6 +10,8 @@
 #include "ParticleRequiredModule.hpp"
 #include "Engine/Random.hpp"
 #include "cl_type.hpp"
+#include "Engine/TimerOnConstructOffDestruct.hpp"
+#include "NTL_Debug.hpp"
 
 
 ParticleSpawnModule::ParticleSpawnModule(AParticleEmitter &emitter) :
@@ -33,50 +35,89 @@ ParticleSpawnModule::ParticleSpawnModule(AParticleEmitter &emitter) :
 
 
 void	ParticleSpawnModule::init() {
-    if (debug_)
-        printf("%s\n", __FUNCTION_NAME__);
+		TimerOnConstructOffDestruct timer(__FUNCTION_NAME__);
 }
 void	ParticleSpawnModule::update(float deltaTime) {
+		TimerOnConstructOffDestruct timer(__FUNCTION_NAME__);
+
     int shouldBeAlreadySpawn = (int)(emitter_.getTimer().count() / (1000.f / nbParticlePerSec_));
 
-    std::cout << shouldBeAlreadySpawn << " >=" << spwaned_ << std::endl;
+    if (debug_)
+        std::cout << shouldBeAlreadySpawn << " >=" << spwaned_ << std::endl;
     if (shouldBeAlreadySpawn < 0 || shouldBeAlreadySpawn < spwaned_)
         return ;
     int shouldBeSpawn = shouldBeAlreadySpawn - spwaned_;
-    std::cout << "ShouldBeSpawned at this frame ||| " << shouldBeSpawn << std::endl;
-    std::cout << "getNbParticleActive : " << emitter_.getNbParticleActive_() << std::endl;
+
+    if (debug_) {
+        std::cout << "ShouldBeSpawned at this frame ||| " << shouldBeSpawn << std::endl;
+        std::cout << "getNbParticleActive : " << emitter_.getNbParticleActive_() << std::endl;
+    }
+
     if (shouldBeSpawn <= 0 || emitter_.getNbParticleActive_() >= nbParticleMax_)
         return ;
     if (shouldBeSpawn + emitter_.getNbParticleActive_() > nbParticleMax_)
         shouldBeSpawn = nbParticleMax_ - emitter_.getNbParticleActive_();
-    std::cout << "ShouldBeSpawned at this frame ||| " << shouldBeSpawn << std::endl;
+    if (debug_)
+        std::cout << "ShouldBeSpawned at this frame ||| " << shouldBeSpawn << std::endl;
     emitter_.setShouldBeToSpawn(shouldBeSpawn, emitter_.getNbParticleActive_());
 }
 
 void	ParticleSpawnModule::spawn(unsigned int nbToSpawn, unsigned int at) {
-    if (debug_)
-        printf("%s\n", __FUNCTION_NAME__);
+		TimerOnConstructOffDestruct timer(__FUNCTION_NAME__);
 
     //std::cout << "BEFORE SPAWN" << std::endl;
     //printParticleArray();
 
     cl::Kernel &kernel = ClProgram::Get().getKernel("spawnParticle");
 
-    std::cout << "emitter_.getNbParticleActive_() : " << emitter_.getNbParticleActive_() << std::endl;
-    queue_.getQueue().enqueueWriteBuffer(bufferModuleParams_, CL_TRUE, 0, sizeof(ModuleSpawnParams), &moduleSpawnParams_);
-    kernel.setArg(0, bufferModuleParams_);
-    kernel.setArg(1, emitter_.getDeviceBuffer().mem);
-    kernel.setArg(2, glmVec3toClFloat3(emitter_.getSystem().getPosition()));
-    kernel.setArg(3, Random::Get().getRandomSeed());
-    std::cout << "SPPPAAWWNNN : at : " << at << " nb " << nbToSpawn << std::endl;
-    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getDeviceBuffer().mem, cl::NDRange(at), cl::NDRange(nbToSpawn));
-    spwaned_ += nbToSpawn;
+    if (debug_)
+        std::cout << "emitter_.getNbParticleActive_() : " << emitter_.getNbParticleActive_() << std::endl;
+
+	queue_.getQueue().enqueueWriteBuffer(bufferModuleParams_, CL_TRUE, 0, sizeof(ModuleSpawnParams),
+										 &moduleSpawnParams_);
+	kernel.setArg(0, bufferModuleParams_);
+	kernel.setArg(1, emitter_.getDeviceBuffer().mem);
+
+	kernel.setArg(2, emitter_.deviceBufferAlive_.mem);
+	kernel.setArg(3, emitter_.deviceBufferAlive2_.mem);
+	kernel.setArg(4, emitter_.deviceBufferDeath_.mem);
+	kernel.setArg(5, emitter_.deviceBufferLengthSub_);
+
+	kernel.setArg(6, glmVec3toClFloat3(emitter_.getSystem().getPosition()));
+
+
+	std::vector<cl::Memory> cl_vbos;
+	cl_vbos.push_back(emitter_.getDeviceBuffer().mem);
+	cl_vbos.push_back(emitter_.deviceBufferAlive_.mem);
+	cl_vbos.push_back(emitter_.deviceBufferAlive2_.mem);
+	cl_vbos.push_back(emitter_.deviceBufferDeath_.mem);
+
+	{
+		TimerOnConstructOffDestruct *timerD = new TimerOnConstructOffDestruct("----------During ALEA");
+		kernel.setArg(7, Random::Get().getRandomSeed());
+		delete timerD;
+	}
+
+	{
+		TimerOnConstructOffDestruct timerE("----------During");
+
+
+		queue_.getQueue().enqueueWriteBuffer(emitter_.deviceBufferLengthSub_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+		OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbToSpawn));
+		queue_.getQueue().enqueueReadBuffer(emitter_.deviceBufferLengthSub_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+		spwaned_ += nbToSpawn;
+	}
+
+	std::cout << "-------- spawnParticle" << std::endl;
+	printSubArrayParticle(emitter_, queue_.getQueue());
+	std::cout << "xxxxxxxx spawnParticle" << std::endl;
+
+
 }
 
 void    ParticleSpawnModule::reload()
 {
-    if (debug_)
-        printf("%s\n", __FUNCTION_NAME__);
+		TimerOnConstructOffDestruct timer(__FUNCTION_NAME__);
     bufferModuleParams_ = cl::Buffer(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleSpawnParams));
     init();
     spwaned_ = 0;

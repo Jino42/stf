@@ -42,10 +42,15 @@ void	ParticleMovementModule::spawn(unsigned int nbToSpawn, unsigned int at) {
 	cl::Kernel &kernel = ClProgram::Get().getKernel("spawnMovementRandom");
 
 	kernel.setArg(0, emitter_.getDeviceBuffer().mem);
-	kernel.setArg(1, buffer_);
-	kernel.setArg(2, Random::Get().getRandomSeed());
+	kernel.setArg(1, emitter_.deviceBufferAlive2_.mem);
+	kernel.setArg(2, buffer_);
+	kernel.setArg(3, Random::Get().getRandomSeed());
 
-    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getDeviceBuffer().mem, cl::NDRange(at), cl::NDRange(nbToSpawn));
+	std::vector<cl::Memory> cl_vbos;
+	cl_vbos.push_back(emitter_.getDeviceBuffer().mem);
+	cl_vbos.push_back(emitter_.deviceBufferAlive2_.mem);
+
+    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbToSpawn));
 }
 
 void    ParticleMovementModule::reload()

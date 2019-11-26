@@ -13,6 +13,10 @@ AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::
         nbParticlePerSec_(nbParticlePerSec),
 		nbParticleActive_(0),
 		deviceBuffer_(nbParticle * sizeof(ParticleData)),
+		deviceBufferAlive_(nbParticle * sizeof(int)),
+		deviceBufferAlive2_(nbParticle * sizeof(int)),
+		deviceBufferDeath_(nbParticle * sizeof(int)),
+		deviceBufferLengthSub_(ClContext::Get().context, CL_MEM_READ_WRITE, 3 * sizeof(int)),
 		shouldBeSpawn_(0),
 		at_(0),
         needReload_(false)
@@ -64,4 +68,4 @@ void AParticleEmitter::printParticleArray() {
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, getDeviceBuffer().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
-bool AParticleEmitter::debug_ = true;
+bool AParticleEmitter::debug_ = false;

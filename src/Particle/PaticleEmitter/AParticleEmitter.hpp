@@ -106,6 +106,13 @@ protected:
 	unsigned int									nbParticleActive_;
 	std::vector<std::shared_ptr<AParticleModule>>	modules_;
 	DeviceBuffer									deviceBuffer_;
+public:
+	DeviceBuffer									deviceBufferAlive_;
+	DeviceBuffer									deviceBufferAlive2_;
+	DeviceBuffer									deviceBufferDeath_;
+	cl::Buffer										deviceBufferLengthSub_;
+	int 											indexSub_[3];
+protected:
 	Shader											shader_;
 	unsigned int									shouldBeSpawn_;
 	unsigned int									at_;

@@ -13,6 +13,7 @@ struct ParticleData {
 			size(0.f),
 			age(0.f),
 			lifeTime(0.f),
+			isAlive(0),
 			index(0)
 	{}
 
@@ -23,5 +24,6 @@ struct ParticleData {
 	cl_float       size;    	// Size of the particle
 	cl_float       age;
 	cl_float       lifeTime;	//If < 0 = Inifite lifeTime
+	cl_int			isAlive;
 	cl_int			index;
 };

@@ -24,22 +24,32 @@ void TestParticle::init() {
 
 //Sprite Emitter
 
-	particleSystem_.addEmitter<ParticleEmitterSprite>("Lol", 10240.f / 8 * 0.9f, 7050);
-    //particleSystem_.addEmitter<ParticleEmitterSprite>("Lol", 50.0f / 5.0f * 0.9f, 50);
-	particleSystem_.setPosition(glm::vec3(0.0f, 258.0f, -30.0f));
-	AParticleEmitter &emitter = particleSystem_.getEmitter<ParticleEmitterSprite>("Lol");
-	//emitter.addModule<ParticleAttractorModule>();
-	emitter.addModule<ParticleMovementModule>();
-    emitter.addModule<ModuleSizeOverLifetime>();
-	//emitter.addModule<ParticleAttractorModule>();
+	int i = 0;
+	for (auto &system : particleSystem_) {
+		//system.addEmitter<ParticleEmitterSprite>("Lol", 30.f / 8.f * 0.9f, 30);
+		system.addEmitter<ParticleEmitterSprite>("Lol", 120000.f / 8.f * 0.9f, 7050);
+		//system.addEmitter<ParticleEmitterSprite>("Lol", 100.f / 8.f * 0.9f, 1000000);
+		//system.addEmitter<ParticleEmitterSprite>("Lol", 50.0f / 5.0f * 0.9f, 50);
+		system.setPosition(glm::vec3(60 * i, 258.0f, -30.0f));
+		AParticleEmitter &emitter = system.getEmitter<ParticleEmitterSprite>("Lol");
+		//emitter.addModule<ParticleAttractorModule>();
+		emitter.addModule<ParticleMovementModule>();
+		emitter.addModule<ModuleSizeOverLifetime>();
+		//emitter.addModule<ParticleAttractorModule>();
 
-    particleSystem_.init();
+		system.init();
+		i++;
+	}
+
+
 
 }
 
 void TestParticle::update(float deltaTime) {
-    particleSystem_.update(deltaTime);
-    particleSystem_.render();
+	for (auto &system : particleSystem_) {
+		system.update(deltaTime);
+		system.render();
+	}
 }
 
 TestParticle &TestParticle::Get() {

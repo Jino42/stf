@@ -1,8 +1,13 @@
+
 #ifdef WIN32
 #define ALIGN __attribute__((packed))
 #else
 #define ALIGN
 #endif
+
+#define SUB_LENGTH_ALIVE 0
+#define SUB_LENGTH_ALIVE2 1
+#define SUB_LENGTH_DEATH 2
 
 typedef struct ALIGN s_ParticleData {
     float3          position; 	// Center point of particle
@@ -12,6 +17,8 @@ typedef struct ALIGN s_ParticleData {
     float           size;    	// Size of the particle
     float           age;
     float           lifeTime;	//If < 0 = Inifite lifeTime
+    int             isAlive;
+
     int             index;
 } ParticleData;
 
@@ -34,6 +41,7 @@ void resetParticleData(__global ParticleData *particle)
     particle->color = (float4)(0.f, 0.f, 0.f, 1.f);
     particle->rotate = 0.f;
     particle->size = 1.f;
+    particle->isAlive = 0;
     particle->age = 0.f;
     //particle->lifeTime = 5.f;
 }
@@ -122,20 +130,55 @@ typedef struct ALIGN {
 
 ////////////////////////////////////////
 
+void kernel PrintSubArrayParticle(
+        __global int *arrayParticlesAlive,
+        __global int *arrayParticlesAlive2,
+        __global int *arrayParticlesDeath,
+        __global int *arrayParticlesLengthSub,
+        int nbMaxParticles)
+{
+    printf("STTT : [ALIV][ALI2][DEAT]\n");
+    for (int i = 0; i < nbMaxParticles; i++) {
+        printf("%4d : [%4d][%4d][%4d]\n",
+                            i,
+                            arrayParticlesAlive[i],
+                            arrayParticlesAlive2[i],
+                            arrayParticlesDeath[i]
+                            );
+    }
+
+    printf("INDEX : [%4d][%4d][%4d]\n",
+        arrayParticlesLengthSub[SUB_LENGTH_ALIVE],
+        arrayParticlesLengthSub[SUB_LENGTH_ALIVE2],
+        arrayParticlesLengthSub[SUB_LENGTH_DEATH]
+    );
+}
+
 void kernel RequiredInitialisation(
         __global ModuleRequiredParams *moduleParams,
+
         __global ParticleData *data,
+        __global int *arrayParticlesAlive,
+        __global int *arrayParticlesAlive2,
+        __global int *arrayParticlesDeath,
+        __global int *arrayParticlesLengthSub,
+
         float4 particleSystemPosition,
-        int seed){
+        int seed,
+        int nbMaxParticles){
 	size_t id = get_global_id(0);
     __global ParticleData *particle = &data[id];
 
+    arrayParticlesAlive[id] = -1;
+    arrayParticlesAlive2[id] = -1;
+    arrayParticlesDeath[id] = id;
 
     unsigned int i = 0;
     while (i < sizeof(ParticleData)) {
         ((__global char *)particle)[i] = 0;
         i++;
     }
+
     particle->index = id;
 
 ///////////
@@ -172,11 +215,94 @@ void kernel RequiredInitialisation(
     //particle->age = particle->lifeTime;
 }
 
-void kernel RequiredUpdate(__global ParticleData *data, float deltaTime) {
+
+
+void addDeathToArray(
+                     __global int *arrayParticlesDeath,
+                     __global int *arrayParticlesLengthSub,
+                     size_t id)
+{
+    int szDeath = atomic_add(&(arrayParticlesLengthSub[SUB_LENGTH_DEATH]), 1) + 1;
+
+    //check §
+
+    if (szDeath - 1 >= 0)
+        arrayParticlesDeath[szDeath - 1] = id;
+}
+
+void addAliveToArray(
+                     __global int *arrayParticlesAlive,
+                     __global int *arrayParticlesLengthSub,
+                     size_t id)
+{
+    int szAlive = atomic_add(&(arrayParticlesLengthSub[SUB_LENGTH_ALIVE]), 1) + 1;
+
+    //check §
+
+    if (szAlive - 1 >= 0)
+        arrayParticlesAlive[szAlive - 1] = id;
+}
+
+void addAlive2222222ToArray(
+                     __global int *arrayParticlesAlive2,
+                     __global int *arrayParticlesLengthSub,
+                     size_t id)
+{
+    int szAlive2 = atomic_add(&(arrayParticlesLengthSub[SUB_LENGTH_ALIVE2]), 1) + 1;
+
+    //check §
+
+    if (szAlive2 - 1 >= 0)
+        arrayParticlesAlive2[szAlive2 - 1] = id;
+}
+
+int removeDeath(    __global int *arrayParticlesDeath,
+                     __global int *arrayParticlesLengthSub,
+                     size_t id)
+{
+    int szDeath = atomic_sub(&(arrayParticlesLengthSub[SUB_LENGTH_DEATH]), 1);
+
+    if (szDeath - 1 < 0)
+        printf("-----XXXX-----------XXXxXConnard [%i]\n", szDeath);
+
+    int ret = arrayParticlesDeath[szDeath - 1];
+    arrayParticlesDeath[szDeath - 1] = -1;
+    //check §
+
+    return ret;
+}
+
+void kernel CleanAlive(__global int *arrayParticlesAlive,
+                        __global int *arrayParticlesAlive2,
+                        __global int *arrayParticlesLengthSub) {
+    arrayParticlesAlive[get_global_id(0)] = -1;
+    arrayParticlesAlive2[get_global_id(0)] = -1;
+    if (!get_global_id(0)) {
+        arrayParticlesLengthSub[SUB_LENGTH_ALIVE] = 0;
+        arrayParticlesLengthSub[SUB_LENGTH_ALIVE2] = 0;
+    }
+}
+
+void kernel RequiredUpdate(__global ParticleData *data,
+                            __global int *arrayParticlesAlive,
+                            __global int *arrayParticlesAlive2,
+                            __global int *arrayParticlesDeath,
+                            __global int *arrayParticlesLengthSub,
+                                float deltaTime) {
     size_t id = get_global_id(0);
     __global ParticleData *particle = &data[id];
 
     particle->age += deltaTime;
+
+    if (particle->isAlive && !particleIsActive(particle))
+    {
+        particle->isAlive = 0;
+        addDeathToArray(arrayParticlesDeath, arrayParticlesLengthSub, id);
+    }
+    else if (particle->isAlive)
+    {
+        addAliveToArray(arrayParticlesAlive, arrayParticlesLengthSub, id);
+    }
 }
 
 void kernel do_nothing(__global ParticleData *data) {
@@ -200,65 +326,68 @@ void kernel printStructSize(__global ParticleData *dataParticle) {
 }
 
 void kernel spawnMovementRandom(__global ParticleData *dataParticle,
-        __global ParticleMovementModuleData *dataMovement,
-int seed) {
-size_t id = get_global_id(0);
-__global ParticleMovementModuleData *movement = &dataMovement[dataParticle[id].index];
+                                __global int *arrayParticlesAlive2,
+                                __global ParticleMovementModuleData *dataMovement,
+                                int seed) {
+    size_t id = arrayParticlesAlive2[get_global_id(0)];
 
-movement->acceleration = (float3)(0.f, 0.f, 0.f);
-movement->velocity = (float3)(0.f, 0.f, 0.f);
-movement->masse = 10.f;
 
-float3 force = normalize((float3) (randomMinMax(seed + id, -1.f, 1.f), randomMinMax((seed >> 1) + id, -1.f, 1.f), randomMinMax((seed << 2) + id, -1.f, 1.f))) * 3.f;
-movement->acceleration += force / movement->masse;
-force = normalize((float3) (0.f, -0.1f * movement->masse, 0.f));
-movement->acceleration += force / movement->masse;
+    __global ParticleMovementModuleData *movement = &dataMovement[dataParticle[id].index];
+
+    movement->acceleration = (float3)(0.f, 0.f, 0.f);
+    movement->velocity = (float3)(0.f, 0.f, 0.f);
+    movement->masse = 10.f;
+
+    float3 force = normalize((float3) (randomMinMax(seed + id, -1.f, 1.f), randomMinMax((seed >> 1) + id, -1.f, 1.f), randomMinMax((seed << 2) + id, -1.f, 1.f))) * 3.f;
+    movement->acceleration += force / movement->masse;
+    force = normalize((float3) (0.f, -0.1f * movement->masse, 0.f));
+    movement->acceleration += force / movement->masse;
 }
 
 void kernel movement(__global ParticleData *dataParticle,
         __global ParticleMovementModuleData *dataMovement,
-float deltaTime,
+        float deltaTime,
         float3 attractor) {
-size_t id = get_global_id(0);
-__global ParticleData *particle = &dataParticle[id];
-__global ParticleMovementModuleData *movement = &dataMovement[particle->index];
+    size_t id = get_global_id(0);
+    __global ParticleData *particle = &dataParticle[id];
+    __global ParticleMovementModuleData *movement = &dataMovement[particle->index];
 
-//FRICTION
-float3 friction = normalize(movement->velocity) * -1;
-float frictionCoef = 0.01f;
-float magnitudeNormal = 1.f;
+    //FRICTION
+    float3 friction = normalize(movement->velocity) * -1;
+    float frictionCoef = 0.01f;
+    float magnitudeNormal = 1.f;
 
-friction *= (frictionCoef * magnitudeNormal);
-movement->acceleration += friction / movement->masse;
-
-
-//ATTRACTOR
-float3 dist = attractor - particle->position;
-float distForce = clamp(length(dist), 5.f, 30.f);
-float m = (0.4f * 1.f * 10.f) / (distForce * distForce);
-dist = normalize(dist) * m;
-movement->acceleration += dist / movement->masse;
+    friction *= (frictionCoef * magnitudeNormal);
+    movement->acceleration += friction / movement->masse;
 
 
-movement->velocity += movement->acceleration;
-particle->position += movement->velocity;
+    //ATTRACTOR
+    float3 dist = attractor - particle->position;
+    float distForce = clamp(length(dist), 5.f, 30.f);
+    float m = (0.4f * 1.f * 10.f) / (distForce * distForce);
+    dist = normalize(dist) * m;
+    movement->acceleration += dist / movement->masse;
 
-movement->acceleration = (float3)(0.f, 0.f, 0.f);
 
-//if (fabs(particle->position.x) > 30)
-//    movement->velocity.x *= -1;
-//if (fabs(particle->position.y) > 30)
-//        movement->velocity.y *= -1;
-//if (fabs(particle->position.z) > 30)
-//        movement->velocity.z *= -1;
+    movement->velocity += movement->acceleration;
+    particle->position += movement->velocity;
+
+    movement->acceleration = (float3)(0.f, 0.f, 0.f);
+
+    //if (fabs(particle->position.x) > 30)
+    //    movement->velocity.x *= -1;
+    //if (fabs(particle->position.y) > 30)
+    //        movement->velocity.y *= -1;
+    //if (fabs(particle->position.z) > 30)
+    //        movement->velocity.z *= -1;
 }
 
 void kernel sizeUpdate(__global ParticleData *data,
         __global ModuleSizeOverLifetimeParams *moduleParams) {
-size_t id = get_global_id(0);
-__global ParticleData *particle = &data[id];
+    size_t id = get_global_id(0);
+    __global ParticleData *particle = &data[id];
 
-particle->size = moduleParams->size.min + moduleParams->size.max * (particle->age / particle->lifeTime);
+    particle->size = moduleParams->size.min + moduleParams->size.max * (particle->age / particle->lifeTime);
 }
 
 __kernel void getNbParticleActiveSafe(
@@ -350,28 +479,46 @@ __kernel void ParallelSelection(
 
 
 
-__kernel void spawnParticle(__global ModuleSpawnParams *moduleParams,
-        __global ParticleData *data,
-        float3 particleSystemPosition,
-int seed) {
-size_t id = get_global_id(0);
-__global ParticleData *particle = &data[id];
+__kernel void spawnParticle(
+                        __global ModuleSpawnParams *moduleParams,
+                        __global ParticleData *data,
 
-resetParticleData(particle);
+                        __global int *arrayParticlesAlive,
+                        __global int *arrayParticlesAlive2,
+                        __global int *arrayParticlesDeath,
+                        __global int *arrayParticlesLengthSub,
 
-particle->color.w = 1.f;
-particle->color.x = 1.f;
-particle->color.y = 1.f;
-particle->color.z = 1.f;
+                        float3 particleSystemPosition,
+                        int seed) {
 
-particle->position.x += particleSystemPosition.x;
-particle->position.y += particleSystemPosition.y;
-particle->position.z += particleSystemPosition.z;
 
-particle->age = 0.f;
-particle->lifeTime = getRandomRangef(&moduleParams->startLifeTime, seed + id);
-particle->size = getRandomRangef(&moduleParams->startSize, seed + id);
-particle->rotate = getRandomRangef(&moduleParams->startRotation, seed + id);
+
+
+    size_t id = get_global_id(0);
+    int res = removeDeath(
+                      arrayParticlesDeath,
+                      arrayParticlesLengthSub,
+                      id
+                  );
+    addAlive2222222ToArray(arrayParticlesAlive2, arrayParticlesLengthSub, res);
+    __global ParticleData *particle = &data[res];
+
+    resetParticleData(particle);
+
+    particle->color.w = 1.f;
+    particle->color.x = 1.f;
+    particle->color.y = 1.f;
+    particle->color.z = 1.f;
+
+    particle->position.x += particleSystemPosition.x;
+    particle->position.y += particleSystemPosition.y;
+    particle->position.z += particleSystemPosition.z;
+
+    particle->isAlive = 1;
+    particle->age = 0.f;
+    particle->lifeTime = getRandomRangef(&moduleParams->startLifeTime, seed + id);
+    particle->size = getRandomRangef(&moduleParams->startSize, seed + id);
+    particle->rotate = getRandomRangef(&moduleParams->startRotation, seed + id);
 }
 
 

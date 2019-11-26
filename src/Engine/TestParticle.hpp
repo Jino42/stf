@@ -14,7 +14,7 @@ public:
 
     static TestParticle &Get();
 private:
-    ParticleSystem					particleSystem_;
+    ParticleSystem					particleSystem_[1];
 
     static std::unique_ptr<TestParticle> instance_;
 

@@ -1,24 +1,23 @@
 #version 330 core
 out vec4 FragColor;
 
-smooth in   vec2 TexCoords;
-smooth in   vec3 Normal;
-flat in     vec3 Position;
-flat in     vec3 Velocity;
-flat in     vec4 Color;
-flat in     float Rotate;
-flat in     float Size;
-flat in     float Age;
-flat in     float LifeTime;
-smooth in vec2 SpriteOffset1;
-smooth in vec2 SpriteOffset2;
-flat in float SpriteBlend;
+
+smooth in   vec2 fTexCoords;
+smooth in   vec3 fNormal;
+flat in     vec3 fPosition;
+flat in     vec3 fVelocity;
+flat in     vec4 fColor;
+flat in     int fIsAlive;
+smooth in vec2 fSpriteOffset1;
+smooth in vec2 fSpriteOffset2;
+flat in float fSpriteBlend;
 
 uniform sampler2D sprite;
 
 void main()
 {
-    vec4 color1 = texture(sprite, SpriteOffset1);
-    vec4 color2 = texture(sprite, SpriteOffset2);
-        FragColor = mix(color1, color2, SpriteBlend);
+    vec4 color1 = texture(sprite, fSpriteOffset1);
+    vec4 color2 = texture(sprite, fSpriteOffset2);
+        FragColor = mix(color1, color2, fSpriteBlend);
+        //FragColor = vec4(1.f);
 }

@@ -9,12 +9,12 @@
 #include "OpenCGL_Tools.hpp"
 #include "cl_type.hpp"
 #include <Engine/Camera.hpp>
-
+#include <Engine/ShaderManager.hpp>
 
 ParticleEmitterSprite::ParticleEmitterSprite(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax) :
 		AParticleEmitter(system, queue, name, nbParticleMax, nbParticlePerSec),
 		deviceBufferSpriteData_(nbParticleMax * sizeof(ParticleSpriteData)),
-		atlas_("bloup.png", boost::filesystem::path(ROOT_PATH) / "resources" / "atlas/", 4),
+		atlas_("test.jpg", boost::filesystem::path(ROOT_PATH) / "resources" / "atlas/", 4),
 		distBuffer_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax * sizeof(CL_FLOAT)),
 		nbParticleActiveOutpourBuffer_(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int))
 {
@@ -25,9 +25,13 @@ ParticleEmitterSprite::ParticleEmitterSprite(ParticleSystem &system, ClQueue &qu
 	program.addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel" / "Sort.cl");
 	program.addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel" / "Sprite.cl");
 
-	shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleSprite.vert").generic_string());
-	shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleSprite.frag").generic_string());
-	shader_.link();
+
+
+	ShaderManager::Get().addShader("particleSprite");
+	ShaderManager::Get().getShader("particleSprite").attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleSprite.vert").generic_string());
+	ShaderManager::Get().getShader("particleSprite").attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleSprite.geom").generic_string());
+	ShaderManager::Get().getShader("particleSprite").attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleSprite.frag").generic_string());
+	ShaderManager::Get().getShader("particleSprite").link();
 
 	float data[] = {
 			// positions          // normal           // texture coords
@@ -84,6 +88,8 @@ void ParticleEmitterSprite::reload() {
     glVertexAttribPointer(8, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, age)));
     glEnableVertexAttribArray(9); //LifeTime
     glVertexAttribPointer(9, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, lifeTime)));
+	glEnableVertexAttribArray(10); //IsAlive
+	glVertexAttribPointer(10, 1, GL_INT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, isAlive)));
 
     glVertexAttribDivisor(3, 1);
     glVertexAttribDivisor(4, 1);
@@ -92,21 +98,22 @@ void ParticleEmitterSprite::reload() {
     glVertexAttribDivisor(7, 1);
     glVertexAttribDivisor(8, 1);
     glVertexAttribDivisor(9, 1);
+	glVertexAttribDivisor(10, 1);
 
 
     deviceBufferSpriteData_ = DeviceBuffer(nbParticleMax_ * sizeof(ParticleSpriteData));
     glBindBuffer(GL_ARRAY_BUFFER, deviceBufferSpriteData_.vbo);
 
-    glEnableVertexAttribArray(10); //Offset1
-    glVertexAttribPointer(10, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleSpriteData), reinterpret_cast<const void *>(offsetof(ParticleSpriteData, offset1)));
-    glEnableVertexAttribArray(11); //Offset2
-    glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleSpriteData), reinterpret_cast<const void *>(offsetof(ParticleSpriteData, offset2)));
-    glEnableVertexAttribArray(12); //Blend
-    glVertexAttribPointer(12, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSpriteData), reinterpret_cast<const void *>(offsetof(ParticleSpriteData, blend)));
+    glEnableVertexAttribArray(11); //Offset1
+    glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleSpriteData), reinterpret_cast<const void *>(offsetof(ParticleSpriteData, offset1)));
+    glEnableVertexAttribArray(12); //Offset2
+    glVertexAttribPointer(12, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleSpriteData), reinterpret_cast<const void *>(offsetof(ParticleSpriteData, offset2)));
+    glEnableVertexAttribArray(13); //Blend
+    glVertexAttribPointer(13, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSpriteData), reinterpret_cast<const void *>(offsetof(ParticleSpriteData, blend)));
 
-    glVertexAttribDivisor(10, 1);
     glVertexAttribDivisor(11, 1);
     glVertexAttribDivisor(12, 1);
+    glVertexAttribDivisor(13, 1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -138,12 +145,10 @@ void	ParticleEmitterSprite::updateSpriteData() {
 
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
-#include "NTL_Debug.hpp"
+
 void ParticleEmitterSprite::update(float deltaTime) {
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
-
-	printStructSizeGPUBase(this->queue_.getQueue());
 
     checkReload();
     updateSpriteData();
@@ -151,6 +156,9 @@ void ParticleEmitterSprite::update(float deltaTime) {
     for (auto &module : modules_) {
         module->update(deltaTime);
     }
+
+    return ;
+    /// OLD
     sortDeviceBuffer_();
     getNbParticleActive_();
 }
@@ -160,15 +168,17 @@ void ParticleEmitterSprite::render() {
 		printf("%s\n", __FUNCTION_NAME__);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glDepthMask(GL_FALSE);
-	shader_.activate();
-	shader_.setMat4("projection", Camera::focus->getProjectionMatrix());
-	shader_.setMat4("view", Camera::focus->getViewMatrix());
-	shader_.setUInt("numberOfRows", atlas_.getNumberOfRows());
+	ShaderManager::Get().getShader("particleSprite").activate();
+	ShaderManager::Get().getShader("particleSprite").setMat4("projection", Camera::focus->getProjectionMatrix());
+	ShaderManager::Get().getShader("particleSprite").setMat4("view", Camera::focus->getViewMatrix());
+	//shader_.setUInt("numberOfRows", atlas_.getNumberOfRows());
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, atlas_.getAtlasId());
 
 	glBindVertexArray(VAO);
-	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, nbParticleActive_);
+
+	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, nbParticleMax_);
+	//glDrawElementsInstanced(GL_POINTS, 6, GL_UNSIGNED_INT, 0, nbParticleMax_);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_TRUE);
@@ -177,6 +187,10 @@ void ParticleEmitterSprite::render() {
 
 //Need sorted GPU Buffer for get NbParticleActive
 void ParticleEmitterSprite::getNbParticleActive_() {
+
+
+	nbParticleActive_ = (nbParticleMax_) - indexSub_[2];
+	return ;
 
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
@@ -201,7 +215,8 @@ void ParticleEmitterSprite::sortDeviceBufferCalculateDistanceParticle_() {
 	kernel.setArg(2, glmVec3toClFloat3(cameraPosition));
 
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, deviceBuffer_.mem, cl::NullRange, cl::NDRange(nbParticleMax_));
-    std::cout << "nbParticleMax_ [" << nbParticleMax_ << "]" << std::endl;
+	if (debug_)
+		std::cout << "nbParticleMax_ [" << nbParticleMax_ << "]" << std::endl;
 }
 
 void ParticleEmitterSprite::sortDeviceBuffer_() {
@@ -214,22 +229,18 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 	//cl::Kernel &kernel = programSort_.getKernel("ParallelMerge_Local");
 
 	kernel.setArg(0, deviceBuffer_.mem);
-	std::cout << "6" << std::endl;
 	kernel.setArg(1, deviceBufferSpriteData_.mem);
-	std::cout << "7" << std::endl;
 	//size_t localWorkGroupeSize;
 	//kernel.getWorkGroupInfo(ClContext::Get().deviceDefault, CL_KERNEL_WORK_GROUP_SIZE, &localWorkGroupeSize);
 	//localWorkGroupeSize /= 2;
 	//int blockFactor = 2;
 	glm::vec3 cameraPosition = Camera::focus->getPosition();
 	kernel.setArg(2, distBuffer_);
-	std::cout << "8" << std::endl;
 	cl_float3 temp;
 	temp.x = cameraPosition.x;
 	temp.y = cameraPosition.y;
 	temp.z = cameraPosition.z;
 	kernel.setArg(3, temp);
-	std::cout << "9" << std::endl;
 	//kernel.setArg(1, sizeof(ParticleData) * localWorkGroupeSize /** blockFactor*/, nullptr);
 	//kernel.setArg(2, cameraPosition);
 	//kernel.setArg(3, blockFactor);
