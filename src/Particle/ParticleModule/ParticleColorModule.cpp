@@ -27,12 +27,12 @@ void	ParticleColorModule::update(float deltaTime) {
 	ClKernel kernel("color_radius_from_position");
 
 	float radius = 200.f;
-	kernel.setArgs(emitter_.getDeviceBuffer().mem,
+	kernel.setArgs(emitter_.getParticleOCGL_BufferData().mem,
 			glmVec3toClFloat3(MainGraphicExtendModel::Get().attractorPoint),
 			radius,
 			deltaTime);
 
-	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getDeviceBuffer().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
 void    ParticleColorModule::reload()

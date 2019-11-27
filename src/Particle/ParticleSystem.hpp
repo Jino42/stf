@@ -15,9 +15,7 @@ public:
 	//...
 
 	//bOrientZAxisTowardCamera
-	ParticleSystem() :
-	position_(glm::vec3(0))
-	{}
+	ParticleSystem();
 
 	template < typename T , typename ... Args>
 	void addEmitter(std::string const &name, Args ... args) {
@@ -61,4 +59,5 @@ private:
 	ClQueue							queue_;
 	glm::vec3						position_;
 
+	static bool firstSystem_;
 };

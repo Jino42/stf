@@ -2,7 +2,7 @@
 
 #include "AParticleModule.hpp"
 #include "Cl/ClQueue.hpp"
-#include "DeviceBuffer.hpp"
+#include "OCGL_Buffer.hpp"
 #include "Range.hpp"
 
 class AParticleEmitter;

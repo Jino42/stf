@@ -1,0 +1,14 @@
+#ifndef NTL_HL
+# define NTL_HL
+
+    #define SUB_LENGTH_ALIVE 0
+    #define SUB_LENGTH_ALIVE2 1
+    #define SUB_LENGTH_DEATH 2
+
+    #include "Base_NTL.hl"
+    #include "ParticleData.hl"
+    #include "ModuleStruct.hl"
+
+
+
+#endif

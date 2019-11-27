@@ -29,12 +29,12 @@ void	ParticleAttractorModule::update(float deltaTime) {
 	glm::vec3 attractorPosition = MainGraphicExtendModel::Get().attractorPoint;
 	unsigned int flag = KeyStateManager::Get().getKey(GLFW_KEY_N) ? 1 : 0;
 
-	kernel.setArgs(emitter_.getDeviceBuffer().mem,
+	kernel.setArgs(emitter_.getParticleOCGL_BufferData().mem,
 			flag,
 			glmVec3toClFloat3(attractorPosition),
 			deltaTime);
 
-    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getDeviceBuffer().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
 void    ParticleAttractorModule::reload()

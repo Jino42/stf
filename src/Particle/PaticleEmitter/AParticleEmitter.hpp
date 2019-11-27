@@ -6,35 +6,11 @@
 #include <vector>
 #include <memory>
 #include "Cl/ClQueue.hpp"
-#include "DeviceBuffer.hpp"
+#include "OCGL_Buffer.hpp"
 #include "Particle/ParticleModule/AParticleModule.hpp"
 #include "Engine/Shader.hpp"
 #include "NTL.hpp"
 #include <Engine/Time.hpp>
-
-enum class eParticlesBuffers {
-	kParticlesData = 1 << 1,
-	kParticlesAlive = 1 << 2,
-	kParticlesUpdate = 1 << 3,
-	kParticlesDeath = 1 << 4,
-	kSubBuffersIndex = 1 << 5,
-
-	kMaskSubBuffer = kParticlesAlive | kParticlesUpdate | kParticlesDeath,
-};
-
-inline eParticlesBuffers operator|(eParticlesBuffers const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) | static_cast<int>(rhs)); }
-inline eParticlesBuffers const &operator|=(eParticlesBuffers &lhs, eParticlesBuffers const &rhs) {
-	lhs = static_cast<eParticlesBuffers> (static_cast<int>(lhs) | static_cast<int>(rhs));
-	return (lhs);
-}
-inline eParticlesBuffers operator&(eParticlesBuffers const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) &  static_cast<int>(rhs)); }
-inline eParticlesBuffers operator&(int const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (lhs &  static_cast<int>(rhs)); }
-inline eParticlesBuffers operator&(eParticlesBuffers const lhs, int const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) & rhs); }
-inline eParticlesBuffers operator^(int const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (lhs ^  static_cast<int>(rhs)); }
-inline eParticlesBuffers operator^(eParticlesBuffers const lhs, int const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) ^ rhs); }
-inline eParticlesBuffers operator<<(eParticlesBuffers const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) << static_cast<int>(rhs)); }
-inline eParticlesBuffers operator>>(eParticlesBuffers const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) >> static_cast<int>(rhs)); }
-	
 	
 class ParticleSystem;
 
@@ -51,7 +27,12 @@ public:
 	void spawn();
 
 	std::string const &getName() const;
-	DeviceBuffer &getDeviceBuffer();
+	OCGL_Buffer &getParticleOCGL_BufferData();
+	cl::Buffer &getParticleBufferAlive();
+	cl::Buffer &getParticleBufferSpawned();
+	cl::Buffer &getParticleBufferDeath();
+	cl::Buffer &getParticleSubBuffersLength();
+
 	ParticleSystem &getSystem() const;
 	template < typename T >
     std::shared_ptr<T> getModule() const {
@@ -129,12 +110,12 @@ protected:
     unsigned int 									nbParticlePerSec_;
 	unsigned int									nbParticleActive_;
 	std::vector<std::shared_ptr<AParticleModule>>	modules_;
-	DeviceBuffer									deviceBuffer_;
+	OCGL_Buffer										particleOCGL_BufferData_;
 public:
-	cl::Buffer										deviceBufferAlive_;
-	cl::Buffer										deviceBufferAlive2_;
-	cl::Buffer										deviceBufferDeath_;
-	cl::Buffer										deviceBufferLengthSub_;
+	cl::Buffer										particleBufferAlive_;
+	cl::Buffer										particleBufferSpawned_;
+	cl::Buffer										particleBufferDeath_;
+	cl::Buffer										particleSubBuffersLength_;
 	int 											indexSub_[3];
 protected:
 	Shader											shader_;

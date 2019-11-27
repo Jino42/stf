@@ -26,10 +26,10 @@ void	ModuleSizeOverLifetime::update(float deltaTime) {
 	ClKernel kernel("sizeUpdate");
 
     queue_.getQueue().enqueueWriteBuffer(bufferModule_, CL_TRUE, 0, sizeof(ModuleSizeOverLifetimeParams), &moduleSizeOverLifetimeParams_);
-    kernel.setArgs(emitter_.getDeviceBuffer().mem,
+    kernel.setArgs(emitter_.getParticleOCGL_BufferData().mem,
     		bufferModule_);
 
-    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getDeviceBuffer().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
 void    ModuleSizeOverLifetime::reload()

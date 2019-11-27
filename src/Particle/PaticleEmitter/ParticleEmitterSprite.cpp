@@ -73,7 +73,7 @@ void ParticleEmitterSprite::reload() {
     AParticleEmitter::reload();
 
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, deviceBuffer_.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, particleOCGL_BufferData_.vbo);
 
     glEnableVertexAttribArray(3); //Position
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, position)));
@@ -102,7 +102,7 @@ void ParticleEmitterSprite::reload() {
 	glVertexAttribDivisor(10, 1);
 
 
-    deviceBufferSpriteData_ = DeviceBuffer(nbParticleMax_ * sizeof(ParticleSpriteData));
+    deviceBufferSpriteData_ = OCGL_Buffer(nbParticleMax_ * sizeof(ParticleSpriteData));
     glBindBuffer(GL_ARRAY_BUFFER, deviceBufferSpriteData_.vbo);
 
     glEnableVertexAttribArray(11); //Offset1
@@ -137,10 +137,10 @@ void	ParticleEmitterSprite::updateSpriteData() {
 	std::vector<cl::Memory> cl_vbos;
 	ClKernel kernel("sprite");
 
-	cl_vbos.push_back(deviceBuffer_.mem);
+	cl_vbos.push_back(particleOCGL_BufferData_.mem);
 	cl_vbos.push_back(deviceBufferSpriteData_.mem);
 
-	kernel.setArgs(deviceBuffer_.mem,
+	kernel.setArgs(particleOCGL_BufferData_.mem,
 			deviceBufferSpriteData_.mem,
 			atlas_.getNumberOfRows());
 
@@ -212,11 +212,11 @@ void ParticleEmitterSprite::sortDeviceBufferCalculateDistanceParticle_() {
 	ClKernel kernel("calculateDistanceBetweenParticleAndCamera");
 
 	glm::vec3 cameraPosition = Camera::focus->getPosition();
-	kernel.setArgs(deviceBuffer_.mem,
+	kernel.setArgs(particleOCGL_BufferData_.mem,
 			distBuffer_,
 			glmVec3toClFloat3(cameraPosition));
 
-    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, deviceBuffer_.mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, particleOCGL_BufferData_.mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 	if (debug_)
 		std::cout << "nbParticleMax_ [" << nbParticleMax_ << "]" << std::endl;
 }
@@ -245,7 +245,7 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 	temp.z = cameraPosition.z;
 	//kernel.setArg(3, temp);
 
-	kernel.setArgs(deviceBuffer_.mem,
+	kernel.setArgs(particleOCGL_BufferData_.mem,
 					  deviceBufferSpriteData_.mem,
 					  distBuffer_,
 					  temp);
@@ -257,7 +257,7 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 	ClError err;
 	std::vector<cl::Memory> cl_vbos;
 
-	cl_vbos.push_back(deviceBuffer_.mem);
+	cl_vbos.push_back(particleOCGL_BufferData_.mem);
 	cl_vbos.push_back(deviceBufferSpriteData_.mem);
 
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));

@@ -26,7 +26,7 @@ public:
 
 
 private:
-	DeviceBuffer deviceBufferSpriteData_;
+	OCGL_Buffer deviceBufferSpriteData_;
 	unsigned int VBO, VAO, EBO;
 
 	ParticleSpriteAtlas atlas_;

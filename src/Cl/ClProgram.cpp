@@ -6,6 +6,15 @@ ClProgram::ClProgram() :
 
 };
 
+void ClProgram::addInclude(boost::filesystem::path const &path) {
+	bBuilded_ = false;
+	std::cout << path << std::endl;
+	if (std::find_if_not (pathBuffer_.begin(), pathBuffer_.end(), [path](boost::filesystem::path const &s){ return s != path;} ) == pathBuffer_.cend())
+		pathBuffer_.push_back(path);
+	else
+		std::cerr << path << " IS NOT FIND" << std::endl;
+}
+
 void ClProgram::addProgram(boost::filesystem::path const &path) {
 	bBuilded_ = false;
 	std::cout << path << std::endl;
@@ -25,9 +34,9 @@ void ClProgram::buildProgram() {
 	bool first = true;
 	for (auto &path : pathBuffer_) {
         std::cout << "path :: [" << path << "]" << std::endl;
-        if (path != "D:/ft_vox\\src\\Particle\\Kernel\\RequiredModule.cl")
+        //if (path != "D:/ft_vox\\src\\Particle\\Kernel\\RequiredModule.cl")
         //if (path != "/Users/ntoniolo/NTL/src/Particle/Kernel/RequiredModule.cl")
-          continue;
+//          continue;
         std::cout << "path :: [" << path << "]" << std::endl;
         std::fstream f{path.generic_string()};
 
@@ -40,26 +49,25 @@ void ClProgram::buildProgram() {
         rawSources_.push_back(content);
         sources_.emplace_back(rawSources_.back().data(), rawSources_.back().size());
 
-        if (first) {
-            first = false;
-            temp += content;
-        }
+        temp += content;
 	}
 	std::cout << "KAPPA" << std::endl;
 	std::cout << temp << std::endl;
+
+	std::cout << "Kappa end" << std::endl;
 
 //	for (std::string &s : rawSources_) {
 //		std::cout << "-----------------" << std::endl;
 //		std::cout << s << std::endl;
 //	}
 
-	std::string compilationOptions("-I ");
 
-//	cl::Program newProgram(ClContext::Get().context, sources_, &err.err);
-	cl::Program newProgram(ClContext::Get().context, temp, false, &err.err);
+	cl::Program newProgram(ClContext::Get().context, sources_, &err.err);
+	//cl::Program newProgram(ClContext::Get().context, temp, false, &err.err);
 	err.clCheckError();
 
-	compilationOptions += (boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel/").generic_string();
+	std::string compilationOptions("-I ");
+	compilationOptions += (boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel/" / "include").generic_string();
 
 #ifdef WIN32
 	compilationOptions += " -DWIN32";
@@ -129,6 +137,7 @@ cl::Program const ClProgram::getProgram() const {
 }
 
 std::unique_ptr<ClProgram> ClProgram::instance_ = nullptr;
+
 
 
 ClProgram::BuildException::BuildException(std::string const &s) noexcept : std::runtime_error(s), error_(s) {}

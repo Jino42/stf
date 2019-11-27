@@ -27,6 +27,7 @@ public:
 
 	ClProgram();
 
+	void addInclude(boost::filesystem::path const &path);
 	void addProgram(boost::filesystem::path const &path);
 	void buildProgram();
 	cl::Kernel &getKernel(std::string const &name);

@@ -29,12 +29,12 @@ void	ParticleMovementModule::update(float deltaTime) {
 	ClKernel kernel("movement");
 
 	glm::vec3 attractorPosition = MainGraphicExtendModel::Get().attractorPoint;
-	kernel.setArgs(emitter_.getDeviceBuffer().mem,
+	kernel.setArgs(emitter_.getParticleOCGL_BufferData().mem,
 			buffer_,
 			deltaTime,
 			glmVec3toClFloat3(MainGraphicExtendModel::Get().attractorPoint));
 
-    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getDeviceBuffer().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
 void	ParticleMovementModule::spawn(unsigned int nbToSpawn, unsigned int at) {
@@ -42,13 +42,13 @@ void	ParticleMovementModule::spawn(unsigned int nbToSpawn, unsigned int at) {
 		printf("%s\n", __FUNCTION_NAME__);
 	ClKernel kernel("spawnMovementRandom");
 
-	kernel.setArgs(emitter_.getDeviceBuffer().mem,
-			emitter_.deviceBufferAlive2_,
+	kernel.setArgs(emitter_.getParticleOCGL_BufferData().mem,
+			emitter_.particleBufferSpawned_,
 			buffer_,
 			Random::Get().getRandomSeed());
 
 	std::vector<cl::Memory> cl_vbos;
-	cl_vbos.push_back(emitter_.getDeviceBuffer().mem);
+	cl_vbos.push_back(emitter_.getParticleOCGL_BufferData().mem);
 
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbToSpawn));
 }

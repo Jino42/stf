@@ -1,9 +1,7 @@
-#include "ParticleData.hl"
-#include "ModuleStruct.hl"
-
+#include "NTL.hl"
 
 void kernel sizeUpdate(__global ParticleData *data,
-                        __global ModuleSizeOverLifetimeParams *moduleParams) {
+        __global ModuleSizeOverLifetimeParams *moduleParams) {
     size_t id = get_global_id(0);
     __global ParticleData *particle = &data[id];
 

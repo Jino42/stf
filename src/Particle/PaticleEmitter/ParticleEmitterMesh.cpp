@@ -15,7 +15,7 @@ ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue,
 
 	model_.setModel((boost::filesystem::path(ROOT_PATH) / "resources" / "objects" / "nanosuit" / "nanosuit.obj").generic_string());
 
-	glBindBuffer(GL_ARRAY_BUFFER, deviceBuffer_.vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, particleOCGL_BufferData_.vbo);
 	for (const auto &mesh : model_.getMeshes()) {
 		unsigned int VAO = mesh.getVAO();
 		glBindVertexArray(VAO);

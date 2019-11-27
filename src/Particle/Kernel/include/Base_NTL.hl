@@ -1,0 +1,13 @@
+#ifndef BASE_NTL_HL
+# define BASE_NTL_HL
+
+
+    #ifdef WIN32
+    #define ALIGN __attribute__((packed))
+    #else
+    #define ALIGN
+    #endif
+
+    #define offsetof(st, m) ((size_t)&(((st *)0)->m))
+
+#endif

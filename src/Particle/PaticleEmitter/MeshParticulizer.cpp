@@ -27,7 +27,7 @@ void MeshParticulizer::reload() {
         printf("%s\n", __FUNCTION_NAME__);
     glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, deviceBuffer_.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, particleOCGL_BufferData_.vbo);
 
     glEnableVertexAttribArray(3); //Position
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, position)));
@@ -44,7 +44,7 @@ void MeshParticulizer::reload() {
     glEnableVertexAttribArray(9); //LifeTime
     glVertexAttribPointer(9, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, lifeTime)));
 
-    deviceBufferVertexBasic_ = DeviceBuffer(nbParticleMax_ * sizeof(PointVertexData));
+    deviceBufferVertexBasic_ = OCGL_Buffer(nbParticleMax_ * sizeof(PointVertexData));
     glBindBuffer(GL_ARRAY_BUFFER, deviceBufferVertexBasic_.vbo);
 
     glEnableVertexAttribArray(10); //Offset1

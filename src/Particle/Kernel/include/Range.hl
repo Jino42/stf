@@ -1,0 +1,21 @@
+#ifndef RANGE_HL
+# define RANGE_HL
+
+#include "Base_NTL.hl"
+#include "Random.hl"
+
+typedef struct ALIGN sRangef {
+        int isRange;
+        float min;
+        float max;
+} Rangef;
+
+typedef struct ALIGN sRangei {
+        int isRange;
+        int min;
+        int max;
+} Rangei;
+
+float getRandomRangef(__global Rangef *range, int seed);
+
+#endif

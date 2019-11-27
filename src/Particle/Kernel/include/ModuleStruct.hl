@@ -1,0 +1,29 @@
+#ifndef MODULE_STRUCT_HL
+# define MODULE_STRUCT_HL
+
+#include "Base_NTL.hl"
+#include "Range.hl"
+
+typedef struct ALIGN sModuleRequiredParams {
+		float gravityModifier;
+		float simulationSpeed;
+} ModuleRequiredParams;
+
+typedef struct ALIGN sModuleSpawnParams {
+		Rangef startLifeTime;
+		Rangef startSpeed;
+		Rangef startSize;
+		Rangef startRotation;
+} ModuleSpawnParams;
+
+typedef struct ALIGN sModuleSizeOverLifetimeParams {
+		Rangef size;
+} ModuleSizeOverLifetimeParams;
+
+typedef struct ALIGN s_ParticleMovementModuleData {
+	float3  acceleration;
+	float3  velocity;
+	float   masse;
+} ParticleMovementModuleData;
+
+#endif

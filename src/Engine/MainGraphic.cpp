@@ -44,11 +44,6 @@ void MainGraphic::init() {
 
     CameraManager::Get().getCamera("Default").setFar(1000.0f);
     CameraManager::Get().getCamera("Default").setPosition(glm::vec3(82.5f, 300.35f, 226.15f));
-
-
-    /// REMOVE
-	ClProgram &program = ClProgram::Get();
-	program.addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel" / "Test.cl");
 }
 
 void MainGraphic::render() {
@@ -73,17 +68,6 @@ void MainGraphic::render() {
     	TestParticle::Get().update(0.014f);
     //VoxelWorld::Get().update();
     //VoxelWorld::Get().render();
-
-    /// REMOVE
-    /*
-	static ClQueue queue;
-	ClError err;
-	cl::Kernel &kernel = ClProgram::Get().getKernel("Test");
-	err.err = queue.getQueue().enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(1), cl::NullRange);
-	err.clCheckError();
-	queue.getQueue().finish();
-    */
-	///
 
 	debug_.render();
 

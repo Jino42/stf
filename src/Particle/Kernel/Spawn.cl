@@ -1,13 +1,28 @@
-#include "ParticleData.hl"
-#include "ModuleStruct.hl"
+#include "NTL.hl"
+
+__kernel void spawnParticle(
+                        __global ModuleSpawnParams *moduleParams,
+                        __global ParticleData *data,
+
+                        __global int *arrayParticlesAlive,
+                        __global int *arrayParticlesAlive2,
+                        __global int *arrayParticlesDeath,
+                        __global int *arrayParticlesLengthSub,
+
+                        float3 particleSystemPosition,
+                        int seed) {
 
 
-void kernel spawnParticle(__global ModuleSpawnParams *moduleParams,
-                            __global ParticleData *data,
-                            float3 particleSystemPosition,
-                            int seed) {
+
+
     size_t id = get_global_id(0);
-    __global ParticleData *particle = &data[id];
+    int res = removeDeath(
+                      arrayParticlesDeath,
+                      arrayParticlesLengthSub,
+                      id
+                  );
+    addAlive2222222ToArray(arrayParticlesAlive2, arrayParticlesLengthSub, res);
+    __global ParticleData *particle = &data[res];
 
     resetParticleData(particle);
 
@@ -20,6 +35,7 @@ void kernel spawnParticle(__global ModuleSpawnParams *moduleParams,
     particle->position.y += particleSystemPosition.y;
     particle->position.z += particleSystemPosition.z;
 
+    particle->isAlive = 1;
     particle->age = 0.f;
     particle->lifeTime = getRandomRangef(&moduleParams->startLifeTime, seed + id);
     particle->size = getRandomRangef(&moduleParams->startSize, seed + id);

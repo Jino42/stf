@@ -1,0 +1,12 @@
+#ifndef RANDOM_HL
+# define RANDOM_HL
+
+#include "Base_NTL.hl"
+
+#define SEED_MAX 2147483647
+
+float random(uint seed);
+
+float randomMinMax(uint seed, float min, float max);
+
+#endif

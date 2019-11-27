@@ -15,7 +15,7 @@ ParticleEmitterPoint::ParticleEmitterPoint(ParticleSystem &system, ClQueue &queu
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, deviceBuffer_.vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, particleOCGL_BufferData_.vbo);
 
 	glEnableVertexAttribArray(3); //Position
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, position)));

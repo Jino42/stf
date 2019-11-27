@@ -1,4 +1,4 @@
-#include "ParticleData.hl"
+#include "NTL.hl"
 
 __kernel void PrintParticle(
     __global ParticleData const *data)

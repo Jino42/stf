@@ -13,11 +13,11 @@ AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::
 		nbParticleMax_(nbParticle),
         nbParticlePerSec_(nbParticlePerSec),
 		nbParticleActive_(0),
-		deviceBuffer_(nbParticle * sizeof(ParticleData)),
-		deviceBufferAlive_(ClContext::Get().context, CL_MEM_READ_WRITE, nbParticle * sizeof(int)),
-		deviceBufferAlive2_(ClContext::Get().context, CL_MEM_READ_WRITE, nbParticle * sizeof(int)),
-		deviceBufferDeath_(ClContext::Get().context, CL_MEM_READ_WRITE, nbParticle * sizeof(int)),
-		deviceBufferLengthSub_(ClContext::Get().context, CL_MEM_READ_WRITE, 3 * sizeof(int)),
+		particleOCGL_BufferData_(nbParticle * sizeof(ParticleData)),
+		particleBufferAlive_(ClContext::Get().context, CL_MEM_READ_WRITE, nbParticle * sizeof(int)),
+		particleBufferSpawned_(ClContext::Get().context, CL_MEM_READ_WRITE, nbParticle * sizeof(int)),
+		particleBufferDeath_(ClContext::Get().context, CL_MEM_READ_WRITE, nbParticle * sizeof(int)),
+		particleSubBuffersLength_(ClContext::Get().context, CL_MEM_READ_WRITE, 3 * sizeof(int)),
 		shouldBeSpawn_(0),
 		at_(0),
         needReload_(false)
@@ -27,24 +27,17 @@ AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::
 }
 
 void AParticleEmitter::reload() {
-    deviceBuffer_ = DeviceBuffer(nbParticleMax_ * sizeof(ParticleData));
+    particleOCGL_BufferData_ = OCGL_Buffer(nbParticleMax_ * sizeof(ParticleData));
 }
 
-std::string const &AParticleEmitter::getName() const {
-	return name_;
-}
-
-DeviceBuffer &AParticleEmitter::getDeviceBuffer() {
-	return deviceBuffer_;
-}
-
-ParticleSystem &AParticleEmitter::getSystem() const {
-	return system_;
-}
-
-size_t AParticleEmitter::getNbParticleActive_() const {
-	return nbParticleActive_;
-}
+std::string const &AParticleEmitter::getName() const { return name_; }
+OCGL_Buffer &AParticleEmitter::getParticleOCGL_BufferData() { return particleOCGL_BufferData_; }
+cl::Buffer &AParticleEmitter::getParticleBufferAlive() { return particleBufferAlive_; }
+cl::Buffer &AParticleEmitter::getParticleBufferSpawned() { return particleBufferSpawned_; }
+cl::Buffer &AParticleEmitter::getParticleBufferDeath() { return particleBufferDeath_; }
+cl::Buffer &AParticleEmitter::getParticleSubBuffersLength() { return particleSubBuffersLength_; }
+ParticleSystem &AParticleEmitter::getSystem() const { return system_; }
+size_t AParticleEmitter::getNbParticleActive_() const { return nbParticleActive_; }
 
 void AParticleEmitter::setShouldBeToSpawn(unsigned int nb, unsigned int at) {
 	shouldBeSpawn_ = nb;
@@ -64,9 +57,11 @@ void AParticleEmitter::spawn() {
 void AParticleEmitter::printParticleArray() {
     ClKernel kernel("PrintParticle");
 
-    kernel.setArgs(getDeviceBuffer().mem);
+    kernel.setArgs(getParticleOCGL_BufferData().mem);
     std::cout << "printParticleArray : at : " << at_ <<  "for [" << nbParticleMax_ << "] particles" << std::endl;
-    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, getDeviceBuffer().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
 bool AParticleEmitter::debug_ = false;
+
+

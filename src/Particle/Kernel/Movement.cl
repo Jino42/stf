@@ -1,17 +1,12 @@
-#include "ParticleData.hl"
-#include "Random.hl"
-
-typedef struct s_ParticleMovementModuleData {
-    float3  acceleration;
-    float3  velocity;
-    float   masse;
-} ParticleMovementModuleData;
-
+#include "NTL.hl"
 
 void kernel spawnMovementRandom(__global ParticleData *dataParticle,
+                                __global int *arrayParticlesAlive2,
                                 __global ParticleMovementModuleData *dataMovement,
                                 int seed) {
-    size_t id = get_global_id(0);
+    size_t id = arrayParticlesAlive2[get_global_id(0)];
+
+
     __global ParticleMovementModuleData *movement = &dataMovement[dataParticle[id].index];
 
     movement->acceleration = (float3)(0.f, 0.f, 0.f);
@@ -25,9 +20,9 @@ void kernel spawnMovementRandom(__global ParticleData *dataParticle,
 }
 
 void kernel movement(__global ParticleData *dataParticle,
-                    __global ParticleMovementModuleData *dataMovement,
-                    float deltaTime,
-                    float3 attractor) {
+        __global ParticleMovementModuleData *dataMovement,
+        float deltaTime,
+        float3 attractor) {
     size_t id = get_global_id(0);
     __global ParticleData *particle = &dataParticle[id];
     __global ParticleMovementModuleData *movement = &dataMovement[particle->index];

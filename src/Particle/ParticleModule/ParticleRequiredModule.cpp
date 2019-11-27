@@ -10,6 +10,7 @@
 #include "NTL_Debug.hpp"
 #include "cl_type.hpp"
 #include "Cl/ClKernel.hpp"
+#include "Enum/eParticleBuffer.hpp"
 
 ParticleRequiredModule::ParticleRequiredModule(AParticleEmitter &emitter) :
 AParticleModule(emitter),
@@ -26,13 +27,16 @@ void	ParticleRequiredModule::init() {
 
     queue_.getQueue().enqueueWriteBuffer(bufferModuleParams_, CL_TRUE, 0, sizeof(ModuleRequiredParams), &moduleRequiredParams_);
 
+	kernel.setArgs(bufferModuleParams_);
+    kernel.setArgsGPUBuffers(emitter_,
+    		eParticleBuffer::kData | eParticleBuffer::kAlive | eParticleBuffer::kSpawned | eParticleBuffer::kDeath | eParticleBuffer::kSubIndex);
 	kernel.setArgs(
-			bufferModuleParams_,
-			emitter_.getDeviceBuffer().mem,
-			emitter_.deviceBufferAlive_,
-			emitter_.deviceBufferAlive2_,
-			emitter_.deviceBufferDeath_,
-			emitter_.deviceBufferLengthSub_,
+			//bufferModuleParams_,
+			/*emitter_.getParticleOCGL_BufferData().mem,
+			emitter_.particleBufferAlive_,
+			emitter_.particleBufferSpawned_,
+			emitter_.particleBufferDeath_,
+			emitter_.particleSubBuffersLength_,*/
 
 			glmVec3toClFloat3(emitter_.getSystem().getPosition()),
 			Random::Get().getRandomSeed(),
@@ -40,15 +44,15 @@ void	ParticleRequiredModule::init() {
 			);
 
 	std::vector<cl::Memory> cl_vbos;
-	cl_vbos.push_back(emitter_.getDeviceBuffer().mem);
+	cl_vbos.push_back(emitter_.getParticleOCGL_BufferData().mem);
 
 	emitter_.indexSub_[0] = 0;
 	emitter_.indexSub_[1] = 0;
 	emitter_.indexSub_[2] = nbParticleMax_;
 
-	queue_.getQueue().enqueueWriteBuffer(emitter_.deviceBufferLengthSub_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+	queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
-	queue_.getQueue().enqueueReadBuffer(emitter_.deviceBufferLengthSub_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+	queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 
 	std::cout << emitter_.getNbParticleMax() << std::endl;
 
@@ -71,29 +75,29 @@ void	ParticleRequiredModule::update(float deltaTime) {
 
 	{
 		ClKernel kernelClean("CleanAlive");
-		kernelClean.setArgs(emitter_.deviceBufferAlive_, emitter_.deviceBufferAlive2_, emitter_.deviceBufferLengthSub_);
+		kernelClean.setArgs(emitter_.particleBufferAlive_, emitter_.particleBufferSpawned_, emitter_.particleSubBuffersLength_);
 		std::vector<cl::Memory> cl_vbos;
-		queue_.getQueue().enqueueWriteBuffer(emitter_.deviceBufferLengthSub_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+		queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 		OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelClean, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
-		queue_.getQueue().enqueueReadBuffer(emitter_.deviceBufferLengthSub_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+		queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 	}
 	std::cout << "-------- Clean Alive" << std::endl;
 	printSubArrayParticle(emitter_, queue_.getQueue());
 	std::cout << "xxxxxxxx Clean Alive" << std::endl;
 
-	kernel.setArgs(emitter_.getDeviceBuffer().mem,
-			emitter_.deviceBufferAlive_,
-			emitter_.deviceBufferAlive2_,
-			emitter_.deviceBufferDeath_,
-			emitter_.deviceBufferLengthSub_,
+	kernel.setArgs(emitter_.getParticleOCGL_BufferData().mem,
+			emitter_.particleBufferAlive_,
+			emitter_.particleBufferSpawned_,
+			emitter_.particleBufferDeath_,
+			emitter_.particleSubBuffersLength_,
 			deltaTime);
 
 	std::vector<cl::Memory> cl_vbos;
-	cl_vbos.push_back(emitter_.getDeviceBuffer().mem);
+	cl_vbos.push_back(emitter_.getParticleOCGL_BufferData().mem);
 
-	queue_.getQueue().enqueueWriteBuffer(emitter_.deviceBufferLengthSub_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+	queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
-	queue_.getQueue().enqueueReadBuffer(emitter_.deviceBufferLengthSub_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+	queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 
 	std::cout << "-------- RequiredUpdate" << std::endl;
 	printSubArrayParticle(emitter_, queue_.getQueue());

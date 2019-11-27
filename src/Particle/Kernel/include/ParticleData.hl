@@ -1,0 +1,30 @@
+#ifndef PARTICLE_DATA_HL
+# define PARTICLE_DATA_HL
+
+#include "Base_NTL.hl"
+
+typedef struct ALIGN s_ParticleData {
+		float3          position; 	// Center point of particle
+		float3          velocity; 	// Current particle velocity
+		float4          color;    	// Particle color
+		float           rotate;  	// Rotate the particle center
+		float           size;    	// Size of the particle
+		float           age;
+		float           lifeTime;	//If < 0 = Inifite lifeTime
+		int             isAlive;
+
+		int             index;
+} ParticleData;
+
+typedef struct ALIGN s_ParticleSpriteData {
+		float2      offset1;
+		float2      offset2;
+		float       blend;
+} ParticleSpriteData;
+
+
+bool particleIsActive(__global ParticleData const *particle);
+
+void resetParticleData(__global ParticleData *particle);
+
+#endif

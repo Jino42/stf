@@ -1,6 +1,9 @@
 #pragma once
 
 #include "NTL.hpp"
+#include "Enum/eParticleBuffer.hpp"
+
+class AParticleEmitter;
 
 class ClKernel {
 public:
@@ -21,6 +24,8 @@ public:
 			return r;
 		}, args...);
 	}
+
+	cl_int setArgsGPUBuffers(AParticleEmitter &emitter, eParticleBuffer buffers);
 
 private:
 	cl::Kernel	&kernel_;

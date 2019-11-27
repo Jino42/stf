@@ -20,5 +20,5 @@ public:
 private:
     unsigned int	VAO;
     Mesh &mesh_;
-    DeviceBuffer deviceBufferVertexBasic_;
+    OCGL_Buffer deviceBufferVertexBasic_;
 };
