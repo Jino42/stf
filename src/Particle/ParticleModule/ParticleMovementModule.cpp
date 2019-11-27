@@ -8,6 +8,7 @@
 #include "OpenCGL_Tools.hpp"
 #include "Engine/Random.hpp"
 #include "cl_type.hpp"
+#include "Cl/ClKernel.hpp"
 
 ParticleMovementModule::ParticleMovementModule(AParticleEmitter &emitter) :
 		AParticleModule(emitter),
@@ -25,13 +26,13 @@ void	ParticleMovementModule::init() {
 void	ParticleMovementModule::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	cl::Kernel &kernel = ClProgram::Get().getKernel("movement");
+	ClKernel kernel("movement");
 
-	kernel.setArg(0, emitter_.getDeviceBuffer().mem);
-	kernel.setArg(1, buffer_);
-	kernel.setArg(2, deltaTime);
 	glm::vec3 attractorPosition = MainGraphicExtendModel::Get().attractorPoint;
-	kernel.setArg(3, glmVec3toClFloat3(MainGraphicExtendModel::Get().attractorPoint));
+	kernel.setArgs(emitter_.getDeviceBuffer().mem,
+			buffer_,
+			deltaTime,
+			glmVec3toClFloat3(MainGraphicExtendModel::Get().attractorPoint));
 
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getDeviceBuffer().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
@@ -39,16 +40,15 @@ void	ParticleMovementModule::update(float deltaTime) {
 void	ParticleMovementModule::spawn(unsigned int nbToSpawn, unsigned int at) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	cl::Kernel &kernel = ClProgram::Get().getKernel("spawnMovementRandom");
+	ClKernel kernel("spawnMovementRandom");
 
-	kernel.setArg(0, emitter_.getDeviceBuffer().mem);
-	kernel.setArg(1, emitter_.deviceBufferAlive2_.mem);
-	kernel.setArg(2, buffer_);
-	kernel.setArg(3, Random::Get().getRandomSeed());
+	kernel.setArgs(emitter_.getDeviceBuffer().mem,
+			emitter_.deviceBufferAlive2_,
+			buffer_,
+			Random::Get().getRandomSeed());
 
 	std::vector<cl::Memory> cl_vbos;
 	cl_vbos.push_back(emitter_.getDeviceBuffer().mem);
-	cl_vbos.push_back(emitter_.deviceBufferAlive2_.mem);
 
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbToSpawn));
 }

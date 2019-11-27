@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Cl/ClProgram.hpp"
 #include "OpenCGL_Tools.hpp"
+#include "Cl/ClKernel.hpp"
 
 ModuleSizeOverLifetime::ModuleSizeOverLifetime(AParticleEmitter &emitter) :
         AParticleModule(emitter),
@@ -22,11 +23,11 @@ void	ModuleSizeOverLifetime::init() {
 void	ModuleSizeOverLifetime::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-    cl::Kernel &kernel = ClProgram::Get().getKernel("sizeUpdate");
+	ClKernel kernel("sizeUpdate");
 
     queue_.getQueue().enqueueWriteBuffer(bufferModule_, CL_TRUE, 0, sizeof(ModuleSizeOverLifetimeParams), &moduleSizeOverLifetimeParams_);
-    kernel.setArg(0, emitter_.getDeviceBuffer().mem);
-    kernel.setArg(1, bufferModule_);
+    kernel.setArgs(emitter_.getDeviceBuffer().mem,
+    		bufferModule_);
 
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getDeviceBuffer().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }

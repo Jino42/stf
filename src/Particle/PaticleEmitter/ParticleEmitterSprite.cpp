@@ -10,6 +10,7 @@
 #include "cl_type.hpp"
 #include <Engine/Camera.hpp>
 #include <Engine/ShaderManager.hpp>
+#include "Cl/ClKernel.hpp"
 
 ParticleEmitterSprite::ParticleEmitterSprite(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax) :
 		AParticleEmitter(system, queue, name, nbParticleMax, nbParticlePerSec),
@@ -134,14 +135,14 @@ void	ParticleEmitterSprite::updateSpriteData() {
 		printf("%s\n", __FUNCTION_NAME__);
 	ClError err;
 	std::vector<cl::Memory> cl_vbos;
-	cl::Kernel &kernel = ClProgram::Get().getKernel("sprite");
+	ClKernel kernel("sprite");
 
 	cl_vbos.push_back(deviceBuffer_.mem);
 	cl_vbos.push_back(deviceBufferSpriteData_.mem);
 
-	kernel.setArg(0, deviceBuffer_.mem);
-	kernel.setArg(1, deviceBufferSpriteData_.mem);
-	kernel.setArg(2, atlas_.getNumberOfRows());
+	kernel.setArgs(deviceBuffer_.mem,
+			deviceBufferSpriteData_.mem,
+			atlas_.getNumberOfRows());
 
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
@@ -191,7 +192,7 @@ void ParticleEmitterSprite::getNbParticleActive_() {
 
 	nbParticleActive_ = (nbParticleMax_) - indexSub_[2];
 	return ;
-
+/*
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 	cl::Kernel &kernel = ClProgram::Get().getKernel("getNbParticleActiveSafe");
@@ -202,17 +203,18 @@ void ParticleEmitterSprite::getNbParticleActive_() {
 
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, deviceBuffer_.mem, cl::NullRange, cl::NDRange(1));
     queue_.getQueue().enqueueReadBuffer(nbParticleActiveOutpourBuffer_, CL_TRUE, 0, sizeof(int), &nbParticleActive_);
+    */
 }
 
 void ParticleEmitterSprite::sortDeviceBufferCalculateDistanceParticle_() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	cl::Kernel &kernel = ClProgram::Get().getKernel("calculateDistanceBetweenParticleAndCamera");
+	ClKernel kernel("calculateDistanceBetweenParticleAndCamera");
 
-	kernel.setArg(0, deviceBuffer_.mem);
 	glm::vec3 cameraPosition = Camera::focus->getPosition();
-	kernel.setArg(1, distBuffer_);
-	kernel.setArg(2, glmVec3toClFloat3(cameraPosition));
+	kernel.setArgs(deviceBuffer_.mem,
+			distBuffer_,
+			glmVec3toClFloat3(cameraPosition));
 
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, deviceBuffer_.mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 	if (debug_)
@@ -224,23 +226,30 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 
-	cl::Kernel &kernel = ClProgram::Get().getKernel("ParallelSelection");
+	ClKernel kernel("ParallelSelection");
 	//cl::Kernel &kernel = programSort_.getKernel("ParallelSelection_Blocks");
 	//cl::Kernel &kernel = programSort_.getKernel("ParallelMerge_Local");
 
-	kernel.setArg(0, deviceBuffer_.mem);
-	kernel.setArg(1, deviceBufferSpriteData_.mem);
+
+	//kernel.setArg(0, deviceBuffer_.mem);
+	//kernel.setArg(1, deviceBufferSpriteData_.mem);
 	//size_t localWorkGroupeSize;
 	//kernel.getWorkGroupInfo(ClContext::Get().deviceDefault, CL_KERNEL_WORK_GROUP_SIZE, &localWorkGroupeSize);
 	//localWorkGroupeSize /= 2;
 	//int blockFactor = 2;
 	glm::vec3 cameraPosition = Camera::focus->getPosition();
-	kernel.setArg(2, distBuffer_);
+	//kernel.setArg(2, distBuffer_);
 	cl_float3 temp;
 	temp.x = cameraPosition.x;
 	temp.y = cameraPosition.y;
 	temp.z = cameraPosition.z;
-	kernel.setArg(3, temp);
+	//kernel.setArg(3, temp);
+
+	kernel.setArgs(deviceBuffer_.mem,
+					  deviceBufferSpriteData_.mem,
+					  distBuffer_,
+					  temp);
+
 	//kernel.setArg(1, sizeof(ParticleData) * localWorkGroupeSize /** blockFactor*/, nullptr);
 	//kernel.setArg(2, cameraPosition);
 	//kernel.setArg(3, blockFactor);

@@ -12,6 +12,30 @@
 #include "NTL.hpp"
 #include <Engine/Time.hpp>
 
+enum class eParticlesBuffers {
+	kParticlesData = 1 << 1,
+	kParticlesAlive = 1 << 2,
+	kParticlesUpdate = 1 << 3,
+	kParticlesDeath = 1 << 4,
+	kSubBuffersIndex = 1 << 5,
+
+	kMaskSubBuffer = kParticlesAlive | kParticlesUpdate | kParticlesDeath,
+};
+
+inline eParticlesBuffers operator|(eParticlesBuffers const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) | static_cast<int>(rhs)); }
+inline eParticlesBuffers const &operator|=(eParticlesBuffers &lhs, eParticlesBuffers const &rhs) {
+	lhs = static_cast<eParticlesBuffers> (static_cast<int>(lhs) | static_cast<int>(rhs));
+	return (lhs);
+}
+inline eParticlesBuffers operator&(eParticlesBuffers const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) &  static_cast<int>(rhs)); }
+inline eParticlesBuffers operator&(int const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (lhs &  static_cast<int>(rhs)); }
+inline eParticlesBuffers operator&(eParticlesBuffers const lhs, int const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) & rhs); }
+inline eParticlesBuffers operator^(int const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (lhs ^  static_cast<int>(rhs)); }
+inline eParticlesBuffers operator^(eParticlesBuffers const lhs, int const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) ^ rhs); }
+inline eParticlesBuffers operator<<(eParticlesBuffers const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) << static_cast<int>(rhs)); }
+inline eParticlesBuffers operator>>(eParticlesBuffers const lhs, eParticlesBuffers const rhs) { return static_cast<eParticlesBuffers> (static_cast<int>(lhs) >> static_cast<int>(rhs)); }
+	
+	
 class ParticleSystem;
 
 class AParticleEmitter {
@@ -107,9 +131,9 @@ protected:
 	std::vector<std::shared_ptr<AParticleModule>>	modules_;
 	DeviceBuffer									deviceBuffer_;
 public:
-	DeviceBuffer									deviceBufferAlive_;
-	DeviceBuffer									deviceBufferAlive2_;
-	DeviceBuffer									deviceBufferDeath_;
+	cl::Buffer										deviceBufferAlive_;
+	cl::Buffer										deviceBufferAlive2_;
+	cl::Buffer										deviceBufferDeath_;
 	cl::Buffer										deviceBufferLengthSub_;
 	int 											indexSub_[3];
 protected:

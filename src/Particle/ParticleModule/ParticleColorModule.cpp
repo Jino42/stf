@@ -5,6 +5,7 @@
 #include "Cl/ClProgram.hpp"
 #include "OpenCGL_Tools.hpp"
 #include "cl_type.hpp"
+#include "Cl/ClKernel.hpp"
 
 ParticleColorModule::ParticleColorModule(AParticleEmitter &emitter) :
 		AParticleModule(emitter),
@@ -23,13 +24,13 @@ void	ParticleColorModule::init() {
 void	ParticleColorModule::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	cl::Kernel &kernel = ClProgram::Get().getKernel("color_radius_from_position");
+	ClKernel kernel("color_radius_from_position");
 
-	kernel.setArg(0, emitter_.getDeviceBuffer().mem);
-	kernel.setArg(1, glmVec3toClFloat3(MainGraphicExtendModel::Get().attractorPoint));
 	float radius = 200.f;
-	kernel.setArg(2, radius);
-	kernel.setArg(3, deltaTime);
+	kernel.setArgs(emitter_.getDeviceBuffer().mem,
+			glmVec3toClFloat3(MainGraphicExtendModel::Get().attractorPoint),
+			radius,
+			deltaTime);
 
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getDeviceBuffer().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }

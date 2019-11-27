@@ -12,7 +12,7 @@
 #include "cl_type.hpp"
 #include "Engine/TimerOnConstructOffDestruct.hpp"
 #include "NTL_Debug.hpp"
-
+#include "Cl/ClKernel.hpp"
 
 ParticleSpawnModule::ParticleSpawnModule(AParticleEmitter &emitter) :
         AParticleModule(emitter),
@@ -68,33 +68,28 @@ void	ParticleSpawnModule::spawn(unsigned int nbToSpawn, unsigned int at) {
     //std::cout << "BEFORE SPAWN" << std::endl;
     //printParticleArray();
 
-    cl::Kernel &kernel = ClProgram::Get().getKernel("spawnParticle");
+    ClKernel kernel("spawnParticle");
 
     if (debug_)
         std::cout << "emitter_.getNbParticleActive_() : " << emitter_.getNbParticleActive_() << std::endl;
 
 	queue_.getQueue().enqueueWriteBuffer(bufferModuleParams_, CL_TRUE, 0, sizeof(ModuleSpawnParams),
 										 &moduleSpawnParams_);
-	kernel.setArg(0, bufferModuleParams_);
-	kernel.setArg(1, emitter_.getDeviceBuffer().mem);
-
-	kernel.setArg(2, emitter_.deviceBufferAlive_.mem);
-	kernel.setArg(3, emitter_.deviceBufferAlive2_.mem);
-	kernel.setArg(4, emitter_.deviceBufferDeath_.mem);
-	kernel.setArg(5, emitter_.deviceBufferLengthSub_);
-
-	kernel.setArg(6, glmVec3toClFloat3(emitter_.getSystem().getPosition()));
+	kernel.setArgs(bufferModuleParams_,
+			emitter_.getDeviceBuffer().mem,
+			emitter_.deviceBufferAlive_,
+			emitter_.deviceBufferAlive2_,
+			emitter_.deviceBufferDeath_,
+			emitter_.deviceBufferLengthSub_,
+			glmVec3toClFloat3(emitter_.getSystem().getPosition()));
 
 
 	std::vector<cl::Memory> cl_vbos;
 	cl_vbos.push_back(emitter_.getDeviceBuffer().mem);
-	cl_vbos.push_back(emitter_.deviceBufferAlive_.mem);
-	cl_vbos.push_back(emitter_.deviceBufferAlive2_.mem);
-	cl_vbos.push_back(emitter_.deviceBufferDeath_.mem);
 
 	{
 		TimerOnConstructOffDestruct *timerD = new TimerOnConstructOffDestruct("----------During ALEA");
-		kernel.setArg(7, Random::Get().getRandomSeed());
+		kernel.setArgs(Random::Get().getRandomSeed());
 		delete timerD;
 	}
 
