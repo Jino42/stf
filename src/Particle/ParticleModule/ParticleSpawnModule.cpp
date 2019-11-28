@@ -20,6 +20,10 @@ ParticleSpawnModule::ParticleSpawnModule(AParticleEmitter &emitter) :
         spwaned_(0)
 {
     ClProgram::Get().addProgram(pathKernel_ / "Spawn.cl");
+
+	kernelSpawn_.setKernel(emitter_, "spawnParticle");
+	kernelSpawn_.setArgsGPUBuffers(eParticleBuffer::kAllBuffers);
+
     moduleSpawnParams_.startLifeTime.isRange = true;
     moduleSpawnParams_.startLifeTime.rangeMin = 1.0f;
     moduleSpawnParams_.startLifeTime.rangeMax = 10.0f;
@@ -37,6 +41,7 @@ ParticleSpawnModule::ParticleSpawnModule(AParticleEmitter &emitter) :
 void	ParticleSpawnModule::init() {
 		TimerOnConstructOffDestruct timer(__FUNCTION_NAME__);
 }
+
 void	ParticleSpawnModule::update(float deltaTime) {
 		TimerOnConstructOffDestruct timer(__FUNCTION_NAME__);
 
@@ -68,37 +73,25 @@ void	ParticleSpawnModule::spawn(unsigned int nbToSpawn, unsigned int at) {
     //std::cout << "BEFORE SPAWN" << std::endl;
     //printParticleArray();
 
-    ClKernel kernel("spawnParticle");
-
     if (debug_)
         std::cout << "emitter_.getNbParticleActive_() : " << emitter_.getNbParticleActive_() << std::endl;
 
 	queue_.getQueue().enqueueWriteBuffer(bufferModuleParams_, CL_TRUE, 0, sizeof(ModuleSpawnParams),
 										 &moduleSpawnParams_);
-	kernel.setArgs(bufferModuleParams_,
-				   emitter_.getParticleOCGL_BufferData().mem,
-			emitter_.particleBufferAlive_,
-			emitter_.particleBufferSpawned_,
-			emitter_.particleBufferDeath_,
-			emitter_.particleSubBuffersLength_,
-			glmVec3toClFloat3(emitter_.getSystem().getPosition()));
+	kernelSpawn_.beginAndSetUpdatedArgs(bufferModuleParams_,
+			glmVec3toClFloat3(emitter_.getSystem().getPosition()),
+			Random::Get().getRandomSeed());
 
 
 	std::vector<cl::Memory> cl_vbos;
 	cl_vbos.push_back(emitter_.getParticleOCGL_BufferData().mem);
 
 	{
-		TimerOnConstructOffDestruct *timerD = new TimerOnConstructOffDestruct("----------During ALEA");
-		kernel.setArgs(Random::Get().getRandomSeed());
-		delete timerD;
-	}
-
-	{
 		TimerOnConstructOffDestruct timerE("----------During");
 
 
 		queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
-		OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbToSpawn));
+		OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelSpawn_, cl_vbos, cl::NullRange, cl::NDRange(nbToSpawn));
 		queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 		spwaned_ += nbToSpawn;
 	}

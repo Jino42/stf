@@ -1,13 +1,13 @@
 #include "NTL.hl"
 
 __kernel void spawnParticle(
-                        __global ModuleSpawnParams *moduleParams,
                         __global ParticleData *data,
-
                         __global int *arrayParticlesAlive,
                         __global int *arrayParticlesAlive2,
                         __global int *arrayParticlesDeath,
                         __global int *arrayParticlesLengthSub,
+
+                        __global ModuleSpawnParams *moduleParams,
 
                         float3 particleSystemPosition,
                         int seed) {

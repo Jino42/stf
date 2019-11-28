@@ -55,9 +55,10 @@ void AParticleEmitter::spawn() {
 }
 
 void AParticleEmitter::printParticleArray() {
-    ClKernel kernel("PrintParticle");
+    ClKernel kernel;
+    kernel.setKernel(*this, "PrintParticle");
 
-    kernel.setArgs(getParticleOCGL_BufferData().mem);
+    kernel.beginAndSetUpdatedArgs(getParticleOCGL_BufferData().mem);
     std::cout << "printParticleArray : at : " << at_ <<  "for [" << nbParticleMax_ << "] particles" << std::endl;
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }

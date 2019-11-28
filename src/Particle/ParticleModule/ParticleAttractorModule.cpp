@@ -14,6 +14,9 @@ ParticleAttractorModule::ParticleAttractorModule(AParticleEmitter &emitter) :
 		buffer_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ParticleAttractorModuleData))
 {
 	ClProgram::Get().addProgram(pathKernel_ / "Attractor.cl");
+
+	kernelUpdate_.setKernel(emitter_, "attractor");
+	kernelUpdate_.setArgsGPUBuffers(eParticleBuffer::kData);
 }
 
 void	ParticleAttractorModule::init() {
@@ -24,17 +27,15 @@ void	ParticleAttractorModule::init() {
 void	ParticleAttractorModule::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	ClKernel kernel("attractor");
 
 	glm::vec3 attractorPosition = MainGraphicExtendModel::Get().attractorPoint;
 	unsigned int flag = KeyStateManager::Get().getKey(GLFW_KEY_N) ? 1 : 0;
 
-	kernel.setArgs(emitter_.getParticleOCGL_BufferData().mem,
-			flag,
+	kernelUpdate_.beginAndSetUpdatedArgs(flag,
 			glmVec3toClFloat3(attractorPosition),
 			deltaTime);
 
-    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelUpdate_, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
 void    ParticleAttractorModule::reload()

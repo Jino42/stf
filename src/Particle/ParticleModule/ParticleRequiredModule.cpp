@@ -17,31 +17,31 @@ AParticleModule(emitter),
 bufferModuleParams_(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleRequiredParams))
 {
 	ClProgram::Get().addProgram(pathKernel_ / "RequiredModule.cl");
+
+
+	kernelInit_.setKernel(emitter_, "RequiredInitialisation");
+	kernelInit_.setArgsGPUBuffers(eParticleBuffer::kAllBuffers);
+
+	kernelUpdate_.setKernel(emitter_, "RequiredUpdate");
+	kernelUpdate_.setArgsGPUBuffers(eParticleBuffer::kAllBuffers);
+
+	kernelClean_.setKernel(emitter_, "CleanAlive");
+	kernelClean_.setArgsGPUBuffers(eParticleBuffer::kAlive | eParticleBuffer::kSpawned | eParticleBuffer::kSubIndex);
 }
 
 
 void	ParticleRequiredModule::init() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	ClKernel kernel("RequiredInitialisation");
 
     queue_.getQueue().enqueueWriteBuffer(bufferModuleParams_, CL_TRUE, 0, sizeof(ModuleRequiredParams), &moduleRequiredParams_);
 
-	kernel.setArgs(bufferModuleParams_);
-    kernel.setArgsGPUBuffers(emitter_,
-    		eParticleBuffer::kData | eParticleBuffer::kAlive | eParticleBuffer::kSpawned | eParticleBuffer::kDeath | eParticleBuffer::kSubIndex);
-	kernel.setArgs(
-			//bufferModuleParams_,
-			/*emitter_.getParticleOCGL_BufferData().mem,
-			emitter_.particleBufferAlive_,
-			emitter_.particleBufferSpawned_,
-			emitter_.particleBufferDeath_,
-			emitter_.particleSubBuffersLength_,*/
-
+	assert(!kernelInit_.beginAndSetUpdatedArgs(
+			bufferModuleParams_,
 			glmVec3toClFloat3(emitter_.getSystem().getPosition()),
 			Random::Get().getRandomSeed(),
 			emitter_.getNbParticleMax()
-			);
+			));
 
 	std::vector<cl::Memory> cl_vbos;
 	cl_vbos.push_back(emitter_.getParticleOCGL_BufferData().mem);
@@ -51,9 +51,8 @@ void	ParticleRequiredModule::init() {
 	emitter_.indexSub_[2] = nbParticleMax_;
 
 	queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
-	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
+	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelInit_, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
 	queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
-
 	std::cout << emitter_.getNbParticleMax() << std::endl;
 
 	printStructSizeCPU();
@@ -66,7 +65,6 @@ void	ParticleRequiredModule::init() {
 void	ParticleRequiredModule::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	ClKernel kernel("RequiredUpdate");
 
 	unsigned int flag = KeyStateManager::Get().getKey(GLFW_KEY_M) == KeyState::kDown ? 1 : 0;
 	if (flag) {
@@ -74,41 +72,28 @@ void	ParticleRequiredModule::update(float deltaTime) {
 	}
 
 	{
-		ClKernel kernelClean("CleanAlive");
-		kernelClean.setArgs(emitter_.particleBufferAlive_, emitter_.particleBufferSpawned_, emitter_.particleSubBuffersLength_);
+		kernelClean_.beginAndSetUpdatedArgs();
 		std::vector<cl::Memory> cl_vbos;
 		queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
-		OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelClean, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
+		OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelClean_, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
 		queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 	}
 	std::cout << "-------- Clean Alive" << std::endl;
 	printSubArrayParticle(emitter_, queue_.getQueue());
 	std::cout << "xxxxxxxx Clean Alive" << std::endl;
 
-	kernel.setArgs(emitter_.getParticleOCGL_BufferData().mem,
-			emitter_.particleBufferAlive_,
-			emitter_.particleBufferSpawned_,
-			emitter_.particleBufferDeath_,
-			emitter_.particleSubBuffersLength_,
-			deltaTime);
+	assert(!kernelUpdate_.beginAndSetUpdatedArgs(deltaTime));
 
 	std::vector<cl::Memory> cl_vbos;
 	cl_vbos.push_back(emitter_.getParticleOCGL_BufferData().mem);
 
 	queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
-	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
+	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelUpdate_, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
 	queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 
 	std::cout << "-------- RequiredUpdate" << std::endl;
 	printSubArrayParticle(emitter_, queue_.getQueue());
 	std::cout << "xxxxxxxx RequiredUpdate" << std::endl;
-
-	/*
-	static int count = 0;
-	count++;
-	if (count == 5)
-		exit(0);
-	*/
 }
 
 void    ParticleRequiredModule::reload()

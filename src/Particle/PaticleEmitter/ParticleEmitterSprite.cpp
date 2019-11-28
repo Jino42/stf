@@ -135,12 +135,13 @@ void	ParticleEmitterSprite::updateSpriteData() {
 		printf("%s\n", __FUNCTION_NAME__);
 	ClError err;
 	std::vector<cl::Memory> cl_vbos;
-	ClKernel kernel("sprite");
+	ClKernel kernel;
+	kernel.setKernel(*this, "sprite");
 
 	cl_vbos.push_back(particleOCGL_BufferData_.mem);
 	cl_vbos.push_back(deviceBufferSpriteData_.mem);
 
-	kernel.setArgs(particleOCGL_BufferData_.mem,
+	kernel.beginAndSetUpdatedArgs(particleOCGL_BufferData_.mem,
 			deviceBufferSpriteData_.mem,
 			atlas_.getNumberOfRows());
 
@@ -209,10 +210,11 @@ void ParticleEmitterSprite::getNbParticleActive_() {
 void ParticleEmitterSprite::sortDeviceBufferCalculateDistanceParticle_() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	ClKernel kernel("calculateDistanceBetweenParticleAndCamera");
+	ClKernel kernel;
+	kernel.setKernel(*this, "calculateDistanceBetweenParticleAndCamera");
 
 	glm::vec3 cameraPosition = Camera::focus->getPosition();
-	kernel.setArgs(particleOCGL_BufferData_.mem,
+	kernel.beginAndSetUpdatedArgs(particleOCGL_BufferData_.mem,
 			distBuffer_,
 			glmVec3toClFloat3(cameraPosition));
 
@@ -226,8 +228,9 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 
-	ClKernel kernel("ParallelSelection");
-	//cl::Kernel &kernel = programSort_.getKernel("ParallelSelection_Blocks");
+	ClKernel kernel;
+	kernel.setKernel(*this, "ParallelSelection");
+			//cl::Kernel &kernel = programSort_.getKernel("ParallelSelection_Blocks");
 	//cl::Kernel &kernel = programSort_.getKernel("ParallelMerge_Local");
 
 
@@ -245,7 +248,7 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 	temp.z = cameraPosition.z;
 	//kernel.setArg(3, temp);
 
-	kernel.setArgs(particleOCGL_BufferData_.mem,
+	kernel.beginAndSetUpdatedArgs(particleOCGL_BufferData_.mem,
 					  deviceBufferSpriteData_.mem,
 					  distBuffer_,
 					  temp);

@@ -12,6 +12,9 @@ ModuleSizeOverLifetime::ModuleSizeOverLifetime(AParticleEmitter &emitter) :
     ClProgram::Get().addProgram(pathKernel_ / "Size.cl");
     moduleSizeOverLifetimeParams_.size.rangeMin = 0.0f;
     moduleSizeOverLifetimeParams_.size.rangeMax = 10.0f;
+
+    kernelUpdate_.setKernel(emitter_, "sizeUpdate");
+    kernelUpdate_.setArgsGPUBuffers(eParticleBuffer::kData);
 }
 
 void	ModuleSizeOverLifetime::init() {
@@ -23,13 +26,11 @@ void	ModuleSizeOverLifetime::init() {
 void	ModuleSizeOverLifetime::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	ClKernel kernel("sizeUpdate");
 
-    queue_.getQueue().enqueueWriteBuffer(bufferModule_, CL_TRUE, 0, sizeof(ModuleSizeOverLifetimeParams), &moduleSizeOverLifetimeParams_);
-    kernel.setArgs(emitter_.getParticleOCGL_BufferData().mem,
-    		bufferModule_);
+	queue_.getQueue().enqueueWriteBuffer(bufferModule_, CL_TRUE, 0, sizeof(ModuleSizeOverLifetimeParams), &moduleSizeOverLifetimeParams_);
+	kernelUpdate_.beginAndSetUpdatedArgs(bufferModule_);
 
-    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelUpdate_, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
 void    ModuleSizeOverLifetime::reload()

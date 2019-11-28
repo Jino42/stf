@@ -13,6 +13,9 @@ ParticleColorModule::ParticleColorModule(AParticleEmitter &emitter) :
 		buffer_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ParticleColorModuleData))
 {
 	ClProgram::Get().addProgram(pathKernel_ / "Color.cl");
+
+	kernelUpdate_.setKernel(emitter_, "color_radius_from_position");
+	kernelUpdate_.setArgsGPUBuffers(eParticleBuffer::kData);
 }
 
 
@@ -24,15 +27,13 @@ void	ParticleColorModule::init() {
 void	ParticleColorModule::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	ClKernel kernel("color_radius_from_position");
 
 	float radius = 200.f;
-	kernel.setArgs(emitter_.getParticleOCGL_BufferData().mem,
-			glmVec3toClFloat3(MainGraphicExtendModel::Get().attractorPoint),
+	kernelUpdate_.beginAndSetUpdatedArgs(glmVec3toClFloat3(MainGraphicExtendModel::Get().attractorPoint),
 			radius,
 			deltaTime);
 
-	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelUpdate_, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
 void    ParticleColorModule::reload()

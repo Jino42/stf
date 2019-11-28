@@ -28,13 +28,15 @@ void kernel PrintSubArrayParticle(
 }
 
 void kernel RequiredInitialisation(
-        __global ModuleRequiredParams *moduleParams,
 
         __global ParticleData *data,
         __global int *arrayParticlesAlive,
         __global int *arrayParticlesAlive2,
         __global int *arrayParticlesDeath,
         __global int *arrayParticlesLengthSub,
+
+        __global ModuleRequiredParams *moduleParams,
+
 
         float4 particleSystemPosition,
         int seed,

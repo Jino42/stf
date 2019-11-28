@@ -1,6 +1,7 @@
 #pragma once
 
 enum class eParticleBuffer {
+	kNone = 1 << 0,
 	kData = 1 << 1,
 	kAlive = 1 << 2,
 	kSpawned = 1 << 3,
@@ -8,6 +9,7 @@ enum class eParticleBuffer {
 	kSubIndex = 1 << 5,
 
 	kMaskSubBuffer = kAlive | kSpawned | kDeath,
+	kAllBuffers = kData | kAlive | kSpawned | kDeath | kSubIndex,
 };
 
 inline eParticleBuffer operator|(eParticleBuffer const lhs, eParticleBuffer const rhs) { return static_cast<eParticleBuffer> (static_cast<int>(lhs) | static_cast<int>(rhs)); }

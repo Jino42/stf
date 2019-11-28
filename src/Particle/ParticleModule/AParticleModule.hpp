@@ -2,6 +2,7 @@
 
 #include <boost/filesystem.hpp>
 #include <NTL.hpp>
+#include "Cl/ClKernel.hpp"
 
 class AParticleEmitter;
 class ClQueue;
@@ -22,6 +23,10 @@ protected:
     unsigned int 			&nbParticlePerSec_;
     unsigned int			&nbParticleActive_;
 	boost::filesystem::path	pathKernel_;
+
+	ClKernel				kernelInit_;
+	ClKernel				kernelUpdate_;
+	ClKernel				kernelSpawn_;
 
 	static bool debug_;
 };
