@@ -33,6 +33,8 @@ ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue,
 		glVertexAttribPointer(8, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, age)));
 		glEnableVertexAttribArray(9); //LifeTime
 		glVertexAttribPointer(9, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, lifeTime)));
+		glEnableVertexAttribArray(10); //IsAlive
+		glVertexAttribPointer(10, 1, GL_INT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, isAlive)));
 
 		glVertexAttribDivisor(3, 1);
 		glVertexAttribDivisor(4, 1);
@@ -41,6 +43,7 @@ ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue,
 		glVertexAttribDivisor(7, 1);
 		glVertexAttribDivisor(8, 1);
 		glVertexAttribDivisor(9, 1);
+		glVertexAttribDivisor(10, 1);
 
 		glBindVertexArray(0);
 	}

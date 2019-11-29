@@ -41,7 +41,6 @@ public:
 	//bMaxDrawCount
 	//MaxDrawCount
 private:
-	ClKernel				kernelClean_;
     ModuleRequiredParams    moduleRequiredParams_;
     cl::Buffer              bufferModuleParams_;
 };

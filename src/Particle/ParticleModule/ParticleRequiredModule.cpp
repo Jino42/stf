@@ -24,9 +24,6 @@ bufferModuleParams_(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleRe
 
 	kernelUpdate_.setKernel(emitter_, "RequiredUpdate");
 	kernelUpdate_.setArgsGPUBuffers(eParticleBuffer::kAllBuffers);
-
-	kernelClean_.setKernel(emitter_, "CleanAlive");
-	kernelClean_.setArgsGPUBuffers(eParticleBuffer::kAlive | eParticleBuffer::kSpawned | eParticleBuffer::kSubIndex);
 }
 
 
@@ -71,29 +68,25 @@ void	ParticleRequiredModule::update(float deltaTime) {
 		init();
 	}
 
-	{
-		kernelClean_.beginAndSetUpdatedArgs();
-		std::vector<cl::Memory> cl_vbos;
-		queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
-		OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelClean_, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
-		queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
-	}
-	std::cout << "-------- Clean Alive" << std::endl;
-	printSubArrayParticle(emitter_, queue_.getQueue());
-	std::cout << "xxxxxxxx Clean Alive" << std::endl;
+	//std::cout << "-------- Clean Alive" << std::endl;
+	//printSubArrayParticle(emitter_, queue_.getQueue());
+	//std::cout << "xxxxxxxx Clean Alive" << std::endl;
 
 	assert(!kernelUpdate_.beginAndSetUpdatedArgs(deltaTime));
 
 	std::vector<cl::Memory> cl_vbos;
 	cl_vbos.push_back(emitter_.getParticleOCGL_BufferData().mem);
 
+	emitter_.indexSub_[0] = 0;
 	queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelUpdate_, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
 	queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+	emitter_.indexSub_[1] = 0;
 
-	std::cout << "-------- RequiredUpdate" << std::endl;
-	printSubArrayParticle(emitter_, queue_.getQueue());
-	std::cout << "xxxxxxxx RequiredUpdate" << std::endl;
+
+	//std::cout << "-------- RequiredUpdate" << std::endl;
+	//printSubArrayParticle(emitter_, queue_.getQueue());
+	//std::cout << "xxxxxxxx RequiredUpdate" << std::endl;
 }
 
 void    ParticleRequiredModule::reload()

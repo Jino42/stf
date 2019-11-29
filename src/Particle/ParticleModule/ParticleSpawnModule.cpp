@@ -96,9 +96,9 @@ void	ParticleSpawnModule::spawn(unsigned int nbToSpawn, unsigned int at) {
 		spwaned_ += nbToSpawn;
 	}
 
-	std::cout << "-------- spawnParticle" << std::endl;
-	printSubArrayParticle(emitter_, queue_.getQueue());
-	std::cout << "xxxxxxxx spawnParticle" << std::endl;
+	//std::cout << "-------- spawnParticle" << std::endl;
+	//printSubArrayParticle(emitter_, queue_.getQueue());
+	//std::cout << "xxxxxxxx spawnParticle" << std::endl;
 
 
 }

@@ -4,7 +4,7 @@
 #include "Cl/ClQueue.hpp"
 #include "OCGL_Buffer.hpp"
 
-class ParticleEmitterMesh;
+class AParticleEmitter;
 
 struct ParticleAttractorModuleData {
 };

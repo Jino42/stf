@@ -147,17 +147,6 @@ int removeDeath(    __global int *arrayParticlesDeath,
     return ret;
 }
 
-void kernel CleanAlive(__global int *arrayParticlesAlive,
-                        __global int *arrayParticlesAlive2,
-                        __global int *arrayParticlesLengthSub) {
-    arrayParticlesAlive[get_global_id(0)] = -1;
-    arrayParticlesAlive2[get_global_id(0)] = -1;
-    if (!get_global_id(0)) {
-        arrayParticlesLengthSub[SUB_LENGTH_ALIVE] = 0;
-        arrayParticlesLengthSub[SUB_LENGTH_ALIVE2] = 0;
-    }
-}
-
 void kernel RequiredUpdate(__global ParticleData *data,
                             __global int *arrayParticlesAlive,
                             __global int *arrayParticlesAlive2,
@@ -168,6 +157,9 @@ void kernel RequiredUpdate(__global ParticleData *data,
     __global ParticleData *particle = &data[id];
 
     particle->age += deltaTime;
+
+    if (id < arrayParticlesLengthSub[SUB_LENGTH_ALIVE2])
+            arrayParticlesAlive2[id] = -1;
 
     if (particle->isAlive && !particleIsActive(particle))
     {

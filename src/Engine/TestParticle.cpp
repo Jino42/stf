@@ -5,6 +5,7 @@
 #include "TestParticle.hpp"
 #include "Particle/ParticleModule/ParticleAttractorModule.hpp"
 #include "Particle/ParticleModule/ParticleColorModule.hpp"
+#include "Particle/PaticleEmitter/ParticleEmitterMesh.hpp"
 #include "Particle/PaticleEmitter/ParticleEmitterSprite.hpp"
 #include "Particle/PaticleEmitter/ParticleEmitterPoint.hpp"
 #include "Particle/ParticleModule/ParticleMovementModule.hpp"
@@ -26,9 +27,10 @@ void TestParticle::init() {
 
 	int i = 0;
 	for (auto &system : particleSystem_) {
+/*
 		//system.addEmitter<ParticleEmitterSprite>("Lol", 30.f / 8.f * 0.9f, 30);
-		system.addEmitter<ParticleEmitterSprite>("Lol", 120000.f / 8.f * 0.9f, 7050);
-		//system.addEmitter<ParticleEmitterSprite>("Lol", 100.f / 8.f * 0.9f, 1000000);
+		//system.addEmitter<ParticleEmitterSprite>("Lol", 120000.f / 8.f * 0.9f, 5000);
+		system.addEmitter<ParticleEmitterSprite>("Lol", 10000000.f / 8.f * 0.9f, 1000000);
 		//system.addEmitter<ParticleEmitterSprite>("Lol", 50.0f / 5.0f * 0.9f, 50);
 		system.setPosition(glm::vec3(60 * i, 258.0f, -30.0f));
 		AParticleEmitter &emitter = system.getEmitter<ParticleEmitterSprite>("Lol");
@@ -36,6 +38,23 @@ void TestParticle::init() {
 		emitter.addModule<ParticleMovementModule>();
 		emitter.addModule<ModuleSizeOverLifetime>();
 		//emitter.addModule<ParticleAttractorModule>();
+*/
+/*
+		system.addEmitter<ParticleEmitterPoint>("Lol", 1000000);
+
+		system.setPosition(glm::vec3(60 * i, 258.0f, -30.0f));
+		AParticleEmitter &emitter = system.getEmitter<ParticleEmitterPoint>("Lol");
+
+		emitter.addModule<ParticleAttractorModule>();
+		emitter.addModule<ParticleColorModule>();
+*/
+		system.addEmitter<ParticleEmitterMesh>("Lol", 30.f / 8.f * 0.9f, 30);
+
+		system.setPosition(glm::vec3(60 * i, 258.0f, -30.0f));
+		AParticleEmitter &emitter = system.getEmitter<ParticleEmitterMesh>("Lol");
+
+		emitter.addModule<ParticleMovementModule>();
+		emitter.addModule<ModuleSizeOverLifetime>();
 
 		system.init();
 		i++;

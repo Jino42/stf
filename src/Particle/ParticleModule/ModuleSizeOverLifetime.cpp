@@ -1,9 +1,9 @@
 #include "ModuleSizeOverLifetime.hpp"
-#include "Particle/PaticleEmitter/ParticleEmitterMesh.hpp"
 #include <iostream>
 #include "Cl/ClProgram.hpp"
 #include "OpenCGL_Tools.hpp"
 #include "Cl/ClKernel.hpp"
+#include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 
 ModuleSizeOverLifetime::ModuleSizeOverLifetime(AParticleEmitter &emitter) :
         AParticleModule(emitter),

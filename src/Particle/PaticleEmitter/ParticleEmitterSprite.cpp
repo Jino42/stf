@@ -11,11 +11,13 @@
 #include <Engine/Camera.hpp>
 #include <Engine/ShaderManager.hpp>
 #include "Cl/ClKernel.hpp"
+#include "NTL_Debug.hpp"
+#include <string.h>
 
 ParticleEmitterSprite::ParticleEmitterSprite(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax) :
 		AParticleEmitter(system, queue, name, nbParticleMax, nbParticlePerSec),
 		deviceBufferSpriteData_(nbParticleMax * sizeof(ParticleSpriteData)),
-		atlas_("test.jpg", boost::filesystem::path(ROOT_PATH) / "resources" / "atlas/", 4),
+		atlas_("bloup.png", boost::filesystem::path(ROOT_PATH) / "resources" / "atlas/", 4),
 		distBuffer_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax * sizeof(CL_FLOAT)),
 		nbParticleActiveOutpourBuffer_(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int))
 {
@@ -155,14 +157,19 @@ void ParticleEmitterSprite::update(float deltaTime) {
     checkReload();
     updateSpriteData();
     getNbParticleActive_();
+
     for (auto &module : modules_) {
         module->update(deltaTime);
     }
 
-    return ;
-    /// OLD
-    sortDeviceBuffer_();
-    getNbParticleActive_();
+	//sortDeviceBuffer_();
+	//getNbParticleActive_();
+
+	//std::cout << "-------- After ParticleEmitterSprite update" << std::endl;
+	//printSubArrayParticle(*this, queue_.getQueue());
+	//std::cout << "xxxxxxxx After ParticleEmitterSprite update" << std::endl;
+
+
 }
 
 void ParticleEmitterSprite::render() {
@@ -173,7 +180,7 @@ void ParticleEmitterSprite::render() {
 	ShaderManager::Get().getShader("particleSprite").activate();
 	ShaderManager::Get().getShader("particleSprite").setMat4("projection", Camera::focus->getProjectionMatrix());
 	ShaderManager::Get().getShader("particleSprite").setMat4("view", Camera::focus->getViewMatrix());
-	//shader_.setUInt("numberOfRows", atlas_.getNumberOfRows());
+	ShaderManager::Get().getShader("particleSprite").setUInt("numberOfRows", atlas_.getNumberOfRows());
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, atlas_.getAtlasId());
 
@@ -249,7 +256,13 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 	//kernel.setArg(3, temp);
 
 	kernel.beginAndSetUpdatedArgs(particleOCGL_BufferData_.mem,
+					  particleBufferAlive_,
+					  particleBufferSpawned_,
+					  particleBufferDeath_,
+					  particleSubBuffersLength_,
+
 					  deviceBufferSpriteData_.mem,
+
 					  distBuffer_,
 					  temp);
 
@@ -263,5 +276,49 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 	cl_vbos.push_back(particleOCGL_BufferData_.mem);
 	cl_vbos.push_back(deviceBufferSpriteData_.mem);
 
-	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
+	std::cout << indexSub_[0] << std::endl;
+	if (indexSub_[0]) {
+		OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(indexSub_[0]));
+
+
+		int *arrayDeath = new int[nbParticleMax_];
+		memset((void*)arrayDeath, -1, nbParticleMax_ * sizeof(int));
+		int i = 0;
+		while (i < nbParticleMax_ - indexSub_[0]){
+			arrayDeath[i] = indexSub_[0] + i;
+			i++;
+		}
+		queue_.getQueue().enqueueWriteBuffer(particleBufferDeath_,
+				CL_TRUE, 0, sizeof(int) * nbParticleMax_, arrayDeath);
+
+
+		indexSub_[2] = i;
+
+		queue_.getQueue().enqueueWriteBuffer(particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &indexSub_);
+
+
+		/*
+		ClKernel kernelDeath;
+		kernelDeath.setKernel(*this, "ParallelSelection");
+
+		std::vector<cl::Memory> cl_vbos2;
+
+		cl_vbos2.push_back(particleOCGL_BufferData_.mem);
+
+
+		indexSub_[2] = 0;
+
+		queue_.getQueue().enqueueWriteBuffer(particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &indexSub_);
+		kernel.beginAndSetUpdatedArgs(
+				particleOCGL_BufferData_.mem,
+				particleBufferAlive_,
+				particleBufferSpawned_,
+				particleBufferDeath_,
+				particleSubBuffersLength_);
+		queue_.getQueue().enqueueReadBuffer(particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &indexSub_);
+		*/
+	}
+
+
+
 }

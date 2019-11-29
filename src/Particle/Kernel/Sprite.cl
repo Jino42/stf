@@ -1,6 +1,7 @@
 #include "NTL.hl"
 
 float2 setSpriteOffset(unsigned int numberRows, int index) {
+
     int column;
     int row ;
     if (numberRows != 0) {
@@ -17,6 +18,7 @@ float2 setSpriteOffset(unsigned int numberRows, int index) {
         offset.x = 0;
         offset.y = 0;
     }
+
     return offset;
 }
 

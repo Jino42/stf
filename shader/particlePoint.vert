@@ -4,8 +4,10 @@ layout (location = 4) in vec3 aVelocity;
 layout (location = 5) in vec4 aColor;
 layout (location = 6) in float aRotate;
 layout (location = 7) in float aSize;
-layout (location = 8) in float aAge;
+layout (location = 8) in float aAge;-A
+ g
 layout (location = 9) in float aLifeTime;
+layout (location = 10) in float aIsAlive;
 
 flat out vec3 Position;
 

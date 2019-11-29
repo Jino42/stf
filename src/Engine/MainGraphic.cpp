@@ -5,6 +5,7 @@
 #include "Engine/Display/DisplayWindow.hpp"
 #include <Engine/TestParticle.hpp>
 #include <Engine/ModelEngine/MainGraphicExtendModel.hpp>
+#include "Debug.hpp"
 
 /// Rmove
 #include "Cl/ClProgram.hpp"
@@ -59,6 +60,9 @@ void MainGraphic::render() {
 		Camera::focus->processPosition(Camera::Movement::DOWN, deltaTime_ * 5);
 	if (DisplayWindow::Get().getKey(GLFW_KEY_RIGHT_SHIFT) || DisplayWindow::Get().getKey(GLFW_KEY_E))
 		Camera::focus->processPosition(Camera::Movement::UP, deltaTime_ * 5);
+
+	if (DisplayWindow::Get().getKey(GLFW_KEY_V))
+		Debug::Get().flipDebug("ParticleModule");
 
     renderBuffer_.bind();
     renderBuffer_.clear();

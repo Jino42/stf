@@ -5,7 +5,7 @@
 #include "OCGL_Buffer.hpp"
 #include "Range.hpp"
 
-class ParticleEmitterMesh;
+class AParticleEmitter;
 
 struct ModuleSizeOverLifetimeParams {
     Rangef size;

@@ -17,6 +17,13 @@ void resetParticleData(__global ParticleData *particle)
 	//particle->lifeTime = 5.f;
 }
 
+void killParticle(__global ParticleData *particle)
+{
+    particle->isAlive = 0;
+    particle->lifeTime = 5.f;
+    particle->age = particle->lifeTime + 1.f;
+}
+
 float random(uint seed)
 {
     //seed = (seed * 0x5DEECE66DL + 0xBL) & ((1L << 48) - 1);

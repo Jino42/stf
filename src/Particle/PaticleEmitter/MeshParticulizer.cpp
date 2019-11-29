@@ -12,6 +12,8 @@ MeshParticulizer::MeshParticulizer(ParticleSystem &system, ClQueue &queue, std::
         mesh_(mesh),
         deviceBufferVertexBasic_(sizeof(PointVertexData) * nbParticleMax_)
 {
+    //modules_.emplace_back(std::make_unique<ParticleSpawnModule>(*this));
+
     shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "basic.vert").generic_string());
     shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "basic.geom").generic_string());
     shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "basic.frag").generic_string());
@@ -43,16 +45,18 @@ void MeshParticulizer::reload() {
     glVertexAttribPointer(8, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, age)));
     glEnableVertexAttribArray(9); //LifeTime
     glVertexAttribPointer(9, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, lifeTime)));
+    glEnableVertexAttribArray(10); //IsAlive
+    glVertexAttribPointer(10, 1, GL_INT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, isAlive)));
 
     deviceBufferVertexBasic_ = OCGL_Buffer(nbParticleMax_ * sizeof(PointVertexData));
     glBindBuffer(GL_ARRAY_BUFFER, deviceBufferVertexBasic_.vbo);
 
-    glEnableVertexAttribArray(10); //Offset1
-    glVertexAttribPointer(10, 3 * 3, GL_FLOAT, GL_FALSE, sizeof(PointVertexData), reinterpret_cast<const void *>(offsetof(PointVertexData, position)));
-    glEnableVertexAttribArray(11); //Offset2
-    glVertexAttribPointer(11, 3 * 3, GL_FLOAT, GL_FALSE, sizeof(PointVertexData), reinterpret_cast<const void *>(offsetof(PointVertexData, normal)));
-    glEnableVertexAttribArray(12); //Blend
-    glVertexAttribPointer(12, 2 * 3, GL_FLOAT, GL_FALSE, sizeof(PointVertexData), reinterpret_cast<const void *>(offsetof(PointVertexData, texCoords)));
+    glEnableVertexAttribArray(11); //Offset1
+    glVertexAttribPointer(11, 3 * 3, GL_FLOAT, GL_FALSE, sizeof(PointVertexData), reinterpret_cast<const void *>(offsetof(PointVertexData, position)));
+    glEnableVertexAttribArray(12); //Offset2
+    glVertexAttribPointer(12, 3 * 3, GL_FLOAT, GL_FALSE, sizeof(PointVertexData), reinterpret_cast<const void *>(offsetof(PointVertexData, normal)));
+    glEnableVertexAttribArray(13); //Blend
+    glVertexAttribPointer(13, 2 * 3, GL_FLOAT, GL_FALSE, sizeof(PointVertexData), reinterpret_cast<const void *>(offsetof(PointVertexData, texCoords)));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);

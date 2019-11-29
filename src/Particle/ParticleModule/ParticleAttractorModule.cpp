@@ -1,5 +1,4 @@
 #include "ParticleAttractorModule.hpp"
-#include "Particle/PaticleEmitter/ParticleEmitterMesh.hpp"
 #include <iostream>
 #include <Engine/ModelEngine/MainGraphicExtendModel.hpp>
 #include "Cl/ClProgram.hpp"
@@ -7,6 +6,7 @@
 #include "cl_type.hpp"
 #include <Engine/Display/DisplayWindow.hpp>
 #include "Cl/ClKernel.hpp"
+#include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 
 ParticleAttractorModule::ParticleAttractorModule(AParticleEmitter &emitter) :
 		AParticleModule(emitter),

@@ -19,5 +19,10 @@ void main()
     vec4 color1 = texture(sprite, fSpriteOffset1);
     vec4 color2 = texture(sprite, fSpriteOffset2);
         FragColor = mix(color1, color2, fSpriteBlend);
-        //FragColor = vec4(1.f);
+        //FragColor =  vec4(fSpriteBlend, fSpriteBlend, fSpriteBlend, 1.f);
+        //FragColor =  vec4(fNormal.xyz, 1.f);
+        //FragColor = vec4(fSpriteOffset1.x, fSpriteOffset1.y, 0.f, 1.f);
+
+
+        //FragColor = vec4(fColor);
 }

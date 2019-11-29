@@ -10,6 +10,7 @@ enum class eParticleBuffer {
 
 	kMaskSubBuffer = kAlive | kSpawned | kDeath,
 	kAllBuffers = kData | kAlive | kSpawned | kDeath | kSubIndex,
+	kAllSubBuffers = kAlive | kSpawned | kDeath | kSubIndex,
 };
 
 inline eParticleBuffer operator|(eParticleBuffer const lhs, eParticleBuffer const rhs) { return static_cast<eParticleBuffer> (static_cast<int>(lhs) | static_cast<int>(rhs)); }
