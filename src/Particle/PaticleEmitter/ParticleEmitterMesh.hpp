@@ -7,7 +7,7 @@ class Shader;
 
 class ParticleEmitterMesh : public AParticleEmitter {
 public:
-	ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticle, size_t nbParticlePerSec);
+	ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax);
 
 	void init() override;
 

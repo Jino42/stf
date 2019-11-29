@@ -2,12 +2,13 @@
 #include "Engine/Shader.hpp"
 #include "Cl/ClQueue.hpp"
 #include "Particle/ParticleData.hpp"
-#include "Particle/ParticleModule/ParticleAttractorModule.hpp"
+#include "Particle/ParticleModule/ParticleSpawnModule.hpp"
 #include "Engine/Camera.hpp"
 
-ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticle, size_t nbParticlePerSec) :
-	AParticleEmitter(system, queue, name, nbParticle, nbParticlePerSec)
+ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax) :
+	AParticleEmitter(system, queue, name, nbParticleMax, nbParticlePerSec)
 {
+	modules_.emplace_back(std::make_unique<ParticleSpawnModule>(*this));
 
 	shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleMesh.vert").generic_string());
 	shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleMesh.frag").generic_string());
@@ -53,18 +54,26 @@ ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue,
 }
 
 void ParticleEmitterMesh::init() {
+	if (debug_)
+		printf("%s\n", __FUNCTION_NAME__);
 	for (auto &module : modules_) {
 		module->init();
 	}
 }
 
 void ParticleEmitterMesh::update(float deltaTime) {
+	if (debug_)
+		printf("%s\n", __FUNCTION_NAME__);
+
+	checkReload();
 	for (auto &module : modules_) {
 		module->update(deltaTime);
 	}
 }
 
 void ParticleEmitterMesh::render() {
+	if (debug_)
+		printf("%s\n", __FUNCTION_NAME__);
 	shader_.activate();
 	shader_.setMat4("projection", Camera::focus->getProjectionMatrix());
 	shader_.setMat4("view", Camera::focus->getViewMatrix());

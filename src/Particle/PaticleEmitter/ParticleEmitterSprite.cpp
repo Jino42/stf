@@ -2,7 +2,6 @@
 #include "Engine/Shader.hpp"
 #include "Cl/ClQueue.hpp"
 #include "Particle/ParticleData.hpp"
-#include "Particle/ParticleModule/ParticleAttractorModule.hpp"
 #include "Particle/ParticleModule/ParticleSpawnModule.hpp"
 #include "Engine/MainGraphic.hpp"
 #include "Cl/ClProgram.hpp"
