@@ -9,6 +9,7 @@
 
 /// Rmove
 #include "Cl/ClProgram.hpp"
+#include "ShaderManager.hpp"
 
 
 MainGraphic::MainGraphic() :
@@ -22,6 +23,8 @@ MainGraphic::MainGraphic() :
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glDepthMask(GL_FALSE);
+
+	boost::filesystem::path pathRoot(ROOT_PATH);
 }
 
 MainGraphic &MainGraphic::Get() {
@@ -74,7 +77,6 @@ void MainGraphic::render() {
     //VoxelWorld::Get().render();
 
 	debug_.render();
-
 
     renderBuffer_.unbind();
 }

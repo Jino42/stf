@@ -26,6 +26,7 @@ public:
 
 	void spawn();
 
+
 	std::string const &getName() const;
 	OCGL_Buffer &getParticleOCGL_BufferData();
 	cl::Buffer &getParticleBufferAlive();
@@ -34,6 +35,18 @@ public:
 	cl::Buffer &getParticleSubBuffersLength();
 
 	ParticleSystem &getSystem() const;
+
+	template < typename T >
+	bool contain() const {
+		for (auto &module : modules_)
+		{
+			if (dynamic_cast<T *>(module.get()))
+				return true;
+		}
+		return false;
+	}
+
+
 	template < typename T >
     std::shared_ptr<T> getModule() const {
         for (auto &module : modules_)

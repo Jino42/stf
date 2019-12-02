@@ -138,4 +138,4 @@ Shader		const &Shader::setUInt(const std::string &name, unsigned int i) const  {
 	return *this;
 }
 
-bool				Shader::debug_ = true;
+bool				Shader::debug_ = false;

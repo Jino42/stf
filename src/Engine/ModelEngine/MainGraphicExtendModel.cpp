@@ -19,6 +19,13 @@ MainGraphicExtendModel::MainGraphicExtendModel() :
 
     block_.setModel((pathRoot / "resources" / "objects" / "nanosuit" / "nanosuit.obj").generic_string());
     actor_.assign(&block_);
+/*
+    modelRoom_.setModel((pathRoot / "resources" / "objects" / "room" / "interior.obj").generic_string());
+    actorRoom_.assign(&modelRoom_);
+    actorRoom_.resetTransform();
+    actorRoom_.scale(10.f, 1.f);
+    actorRoom_.setPosition(glm::vec3(60, 258.0f, -10.0f));
+*/
 }
 
 void MainGraphicExtendModel::constructMaterialMap_() {
@@ -119,6 +126,12 @@ void MainGraphicExtendModel::update(float deltaTime)
     actor_.resetTransform();
     actor_.translate(attractorPoint);
     actor_.render(shader_);
+
+//    actorRoom_.resetTransform();
+//    actorRoom_.translate(attractorPoint);
+
+//      actorRoom_.render(shader_);
+
     shader_.setInt("uBackground", 0);
 
 

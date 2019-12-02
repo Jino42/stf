@@ -39,6 +39,7 @@ public:
 	unsigned int		getVAO() const;
 	void				activeTexture() const;
 	std::vector<unsigned int> const	&getIndice() const;
+	std::vector<Vertex> const	&getVertice() const;
 
 	~Mesh();
 

@@ -31,6 +31,9 @@ unsigned int		Mesh::getVAO() const {
 std::vector<unsigned int> const	&Mesh::getIndice() const {
 	return (indice_);
 }
+std::vector<Vertex> const &Mesh::getVertice() const {
+	return (vertice_);
+}
 
 void Mesh::activeTexture() const {
 	unsigned int diffuseNr = 1;

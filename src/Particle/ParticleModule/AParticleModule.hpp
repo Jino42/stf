@@ -11,10 +11,10 @@ class AParticleModule {
 public:
 	explicit AParticleModule (AParticleEmitter &emitter);
 	virtual			~AParticleModule() = default;
-	virtual	void	init() = 0;
-	virtual	void	update(float deltaTime) = 0;
+	virtual	void	init() {};
+	virtual	void	update(float deltaTime) {};
 	virtual	void	spawn(unsigned int, unsigned int) {};
-	virtual void    reload() = 0;
+	virtual void    reload() {};
 
 protected:
 	AParticleEmitter		&emitter_;

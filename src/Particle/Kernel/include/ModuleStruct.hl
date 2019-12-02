@@ -4,6 +4,15 @@
 #include "Base_NTL.hl"
 #include "Range.hl"
 
+typedef struct ALIGN sModuleTargetData {
+	float3	target;
+}   ModuleTargetData;
+
+
+typedef struct ALIGN sModuleMeshParticulizerData {
+	float3	position;
+}   ModuleMeshParticulizerData;
+
 typedef struct ALIGN sModuleRequiredParams {
 		float gravityModifier;
 		float simulationSpeed;

@@ -15,6 +15,8 @@ public:
         return seed_(rng);
     }
 
+    float getRandom01();
+
     static Random &Get() {
         if (!instance_) {
             instance_ = std::make_unique<Random>();

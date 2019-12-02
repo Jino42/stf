@@ -10,6 +10,8 @@
 #include "Particle/PaticleEmitter/ParticleEmitterPoint.hpp"
 #include "Particle/ParticleModule/ParticleMovementModule.hpp"
 #include "Particle/ParticleModule/ModuleSizeOverLifetime.hpp"
+#include "Particle/ParticleModule/ParticleParticulizerModule.hpp"
+#include "Particle/ParticleModule/ParticleMoveToTarget.hpp"
 
 void TestParticle::init() {
     //Cloud Emitter
@@ -39,15 +41,20 @@ void TestParticle::init() {
 		emitter.addModule<ModuleSizeOverLifetime>();
 		//emitter.addModule<ParticleAttractorModule>();
 */
+
 /*
-		system.addEmitter<ParticleEmitterPoint>("Lol", 1000000);
+		system.addEmitter<ParticleEmitterPoint>("Lol", 500000);
 
 		system.setPosition(glm::vec3(60 * i, 258.0f, -30.0f));
 		AParticleEmitter &emitter = system.getEmitter<ParticleEmitterPoint>("Lol");
 
-		emitter.addModule<ParticleAttractorModule>();
+		//emitter.addModule<ParticleAttractorModule>();
+		emitter.addModule<ParticleParticulizerModule>();
+		emitter.addModule<ParticleMoveToTarget>();
 		emitter.addModule<ParticleColorModule>();
 */
+
+
 		system.addEmitter<ParticleEmitterMesh>("Lol", 30.f / 8.f * 0.9f, 30);
 
 		system.setPosition(glm::vec3(60 * i, 258.0f, -30.0f));
@@ -65,6 +72,7 @@ void TestParticle::init() {
 }
 
 void TestParticle::update(float deltaTime) {
+
 	for (auto &system : particleSystem_) {
 		system.update(deltaTime);
 		system.render();

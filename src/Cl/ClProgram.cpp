@@ -51,10 +51,11 @@ void ClProgram::buildProgram() {
 
         temp += content;
 	}
+	/*
 	std::cout << "KAPPA" << std::endl;
 	std::cout << temp << std::endl;
-
 	std::cout << "Kappa end" << std::endl;
+	*/
 
 //	for (std::string &s : rawSources_) {
 //		std::cout << "-----------------" << std::endl;
