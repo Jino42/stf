@@ -4,12 +4,13 @@
 #include "Particle/ParticleData.hpp"
 #include "Particle/ParticleModule/ParticleAttractorModule.hpp"
 #include "Engine/Camera.hpp"
+#include <PathManager.hpp>
 
 ParticleEmitterPoint::ParticleEmitterPoint(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticle) :
 	AParticleEmitter(system, queue, name, nbParticle, 0)
 {
-	shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particlePoint.vert").generic_string());
-	shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particlePoint.frag").generic_string());
+	shader_.attach((PathManager::Get().getPath("shaders") / "particlePoint.vert").generic_string());
+	shader_.attach((PathManager::Get().getPath("shaders") / "particlePoint.frag").generic_string());
 	shader_.link();
 
 	glGenVertexArrays(1, &VAO);

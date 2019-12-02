@@ -22,7 +22,7 @@ protected:
     unsigned int 			&nbParticleMax_;
     unsigned int 			&nbParticlePerSec_;
     unsigned int			&nbParticleActive_;
-	boost::filesystem::path	pathKernel_;
+	boost::filesystem::path	&pathKernel_;
 
 	ClKernel				kernelInit_;
 	ClKernel				kernelUpdate_;

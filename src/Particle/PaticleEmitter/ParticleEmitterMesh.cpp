@@ -4,17 +4,18 @@
 #include "Particle/ParticleData.hpp"
 #include "Particle/ParticleModule/ParticleSpawnModule.hpp"
 #include "Engine/Camera.hpp"
+#include <PathManager.hpp>
 
 ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax) :
 	AParticleEmitter(system, queue, name, nbParticleMax, nbParticlePerSec)
 {
 	modules_.emplace_back(std::make_unique<ParticleSpawnModule>(*this));
 
-	shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleMesh.vert").generic_string());
-	shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleMesh.frag").generic_string());
+	shader_.attach((PathManager::Get().getPath("shaders") / "particleMesh.vert").generic_string());
+	shader_.attach((PathManager::Get().getPath("shaders") / "particleMesh.frag").generic_string());
 	shader_.link();
 
-	model_.setModel((boost::filesystem::path(ROOT_PATH) / "resources" / "objects" / "nanosuit" / "nanosuit.obj").generic_string());
+	model_.setModel((PathManager::Get().getPath("objects") / "nanosuit" / "nanosuit.obj").generic_string());
 
 	glBindBuffer(GL_ARRAY_BUFFER, particleOCGL_BufferData_.vbo);
 	for (const auto &mesh : model_.getMeshes()) {

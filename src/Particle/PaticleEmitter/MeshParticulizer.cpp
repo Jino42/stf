@@ -5,7 +5,7 @@
 #include "MeshParticulizer.hpp"
 #include "Particle/ParticleData.hpp"
 #include "Engine/Camera.hpp"
-
+#include <PathManager.hpp>
 
 MeshParticulizer::MeshParticulizer(ParticleSystem &system, ClQueue &queue, std::string const &name, Mesh &mesh) :
         AParticleEmitter(system, queue, name, mesh.getIndice().size() / 3, 0),
@@ -14,9 +14,11 @@ MeshParticulizer::MeshParticulizer(ParticleSystem &system, ClQueue &queue, std::
 {
     //modules_.emplace_back(std::make_unique<ParticleSpawnModule>(*this));
 
-    shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "basic.vert").generic_string());
-    shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "basic.geom").generic_string());
-    shader_.attach((boost::filesystem::path(ROOT_PATH) / "shader" / "basic.frag").generic_string());
+    boost::filesystem::path &pathShaders = PathManager::Get().getPath("shaders");
+
+    shader_.attach((pathShaders / "basic.vert").generic_string());
+    shader_.attach((pathShaders / "basic.geom").generic_string());
+    shader_.attach((pathShaders / "basic.frag").generic_string());
     shader_.link();
 
     glGenVertexArrays(1, &VAO);

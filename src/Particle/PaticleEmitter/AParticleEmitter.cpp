@@ -5,6 +5,7 @@
 #include "Cl/ClProgram.hpp"
 #include "OpenCGL_Tools.hpp"
 #include "Cl/ClKernel.hpp"
+#include <PathManager.hpp>
 
 AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticle, size_t nbParticlePerSec) :
 		system_(system),
@@ -23,7 +24,7 @@ AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::
         needReload_(false)
 {
 	modules_.emplace_back(std::make_unique<ParticleRequiredModule>(*this));
-    ClProgram::Get().addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel" / "Print.cl");
+    ClProgram::Get().addProgram(PathManager::Get().getPath("particleKernels") / "Print.cl");
 }
 
 void AParticleEmitter::reload() {

@@ -4,20 +4,22 @@
 #include <Engine/Display/DisplayWindow.hpp>
 #include <Gui/WidgetRender.hpp>
 #include <Engine/Camera.hpp>
+#include <PathManager.hpp>
 
 MainGraphicExtendModel::MainGraphicExtendModel() :
         light_(glm::vec3(0.f, 0.f, 30.f)),
         model_(1.f)
 {
-    boost::filesystem::path pathRoot(ROOT_PATH);
+    boost::filesystem::path &pathShaders = PathManager::Get().getPath("shaders");
     constructMaterialMap_();
 
-    shader_.attach((pathRoot / "shader" / "basic.vert").generic_string());
-    shader_.attach((pathRoot / "shader" / "basic.geom").generic_string());
-    shader_.attach((pathRoot / "shader" / "basic.frag").generic_string());
+
+    shader_.attach((pathShaders / "basic.vert").generic_string());
+    shader_.attach((pathShaders / "basic.geom").generic_string());
+    shader_.attach((pathShaders / "basic.frag").generic_string());
     shader_.link();
 
-    block_.setModel((pathRoot / "resources" / "objects" / "nanosuit" / "nanosuit.obj").generic_string());
+    block_.setModel((PathManager::Get().getPath("objects") / "nanosuit" / "nanosuit.obj").generic_string());
     actor_.assign(&block_);
 /*
     modelRoom_.setModel((pathRoot / "resources" / "objects" / "room" / "interior.obj").generic_string());

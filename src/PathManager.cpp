@@ -1,9 +1,18 @@
 #include "PathManager.hpp"
 #include <utility>
+#include "json.hpp"
 
 PathManager::PathManager() {
 	boost::filesystem::path pathRoot(ROOT_PATH);
 	addPath("rootPath", ROOT_PATH);
+
+	json &&j = getJsonFromFileRelativeToRootPath("config/path.json");
+
+	for (auto &it : j["paths"]) {
+		std::cout << it["name"] << std::endl;
+		std::cout << it["path"] << std::endl;
+		addPath(it["name"].get<std::string>(), pathRoot / it["path"].get<std::string>());
+	}
 }
 
 PathManager &PathManager::Get() {

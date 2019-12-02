@@ -7,16 +7,16 @@
 #include <Engine/Display/DisplayWindow.hpp>
 #include <Engine/CameraManager.hpp>
 #include <Engine/Time.hpp>
+#include <PathManager.hpp>
 
 VoxelWorld::VoxelWorld(Camera &camera) :
 camera_(camera) {
     camera_.getFrustum().setDebug(true);
-    boost::filesystem::path pathRoot(ROOT_PATH);
 
     ShaderManager::Get().addShader("voxel");
-    ShaderManager::Get().getShader("voxel").attach((pathRoot / "shader" / "voxel.vert").generic_string());
-    ShaderManager::Get().getShader("voxel").attach((pathRoot / "shader" / "voxel.geom").generic_string());
-    ShaderManager::Get().getShader("voxel").attach((pathRoot / "shader" / "voxel.frag").generic_string());
+    ShaderManager::Get().getShader("voxel").attach((PathManager::Get().getPath("shaders") / "voxel.vert").generic_string());
+    ShaderManager::Get().getShader("voxel").attach((PathManager::Get().getPath("shaders") / "voxel.geom").generic_string());
+    ShaderManager::Get().getShader("voxel").attach((PathManager::Get().getPath("shaders") / "voxel.frag").generic_string());
     ShaderManager::Get().getShader("voxel").link();
 }
 

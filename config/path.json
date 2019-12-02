@@ -1,0 +1,34 @@
+{
+  "_comment": "relative to the rootPath",
+  "paths": [
+    {
+      "name": "resources",
+      "path": "resources/"
+    },
+    {
+      "name": "atlas",
+      "path": "resources/atlas/"
+    },
+    {
+      "name": "objects",
+      "path": "resources/objects/"
+    },
+    {
+      "name": "objects",
+      "path": "resources/objects/"
+    },
+    {
+      "name": "shaders",
+      "path": "shader/"
+    },
+    {
+      "name": "particleKernels",
+      "path": "src/Particle/Kernel/"
+    }
+  ,
+    {
+      "name": "particleKernelIncludes",
+      "path": "src/Particle/Kernel/include/"
+    }
+  ]
+}

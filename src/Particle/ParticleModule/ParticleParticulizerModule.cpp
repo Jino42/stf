@@ -8,7 +8,7 @@
 #include "OpenCGL_Tools.hpp"
 #include "cl_type.hpp"
 #include "ParticuleTargetModule.hpp"
-
+#include <PathManager.hpp>
 
 ParticleParticulizerModule::ParticleParticulizerModule(AParticleEmitter &emitter) :
 	AParticleModule(emitter),
@@ -21,7 +21,7 @@ ParticleParticulizerModule::ParticleParticulizerModule(AParticleEmitter &emitter
 	}
 	targetModule_ = emitter_.getModule<ParticuleTargetModule>();
 
-	model_.setModel((boost::filesystem::path(ROOT_PATH) / "resources" / "objects" / "nanosuit" / "nanosuit.obj").generic_string());
+	model_.setModel((PathManager::Get().getPath("objects") / "nanosuit" / "nanosuit.obj").generic_string());
 
 		ClProgram::Get().addProgram(pathKernel_ / "MeshParticulizer.cl");
 

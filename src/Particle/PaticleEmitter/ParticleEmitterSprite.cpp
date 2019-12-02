@@ -12,11 +12,12 @@
 #include "Cl/ClKernel.hpp"
 #include "NTL_Debug.hpp"
 #include <string.h>
+#include <PathManager.hpp>
 
 ParticleEmitterSprite::ParticleEmitterSprite(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax) :
 		AParticleEmitter(system, queue, name, nbParticleMax, nbParticlePerSec),
 		deviceBufferSpriteData_(nbParticleMax * sizeof(ParticleSpriteData)),
-		atlas_("bloup.png", boost::filesystem::path(ROOT_PATH) / "resources" / "atlas/", 4),
+		atlas_("bloup.png", PathManager::Get().getPath("atlas"), 4),
 		distBuffer_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax * sizeof(CL_FLOAT)),
 		nbParticleActiveOutpourBuffer_(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int))
 {
@@ -24,15 +25,15 @@ ParticleEmitterSprite::ParticleEmitterSprite(ParticleSystem &system, ClQueue &qu
 	modules_.emplace_back(std::make_unique<ParticleSpawnModule>(*this));
 
 	ClProgram &program = ClProgram::Get();
-	program.addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel" / "Sort.cl");
-	program.addProgram(boost::filesystem::path(ROOT_PATH) / "src" / "Particle" / "Kernel" / "Sprite.cl");
+	program.addProgram(PathManager::Get().getPath("particleKernels") / "Sort.cl");
+	program.addProgram(PathManager::Get().getPath("particleKernels") / "Sprite.cl");
 
 
 
 	ShaderManager::Get().addShader("particleSprite");
-	ShaderManager::Get().getShader("particleSprite").attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleSprite.vert").generic_string());
-	ShaderManager::Get().getShader("particleSprite").attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleSprite.geom").generic_string());
-	ShaderManager::Get().getShader("particleSprite").attach((boost::filesystem::path(ROOT_PATH) / "shader" / "particleSprite.frag").generic_string());
+	ShaderManager::Get().getShader("particleSprite").attach((PathManager::Get().getPath("shaders") / "particleSprite.vert").generic_string());
+	ShaderManager::Get().getShader("particleSprite").attach((PathManager::Get().getPath("shaders") / "particleSprite.geom").generic_string());
+	ShaderManager::Get().getShader("particleSprite").attach((PathManager::Get().getPath("shaders") / "particleSprite.frag").generic_string());
 	ShaderManager::Get().getShader("particleSprite").link();
 
 	float data[] = {

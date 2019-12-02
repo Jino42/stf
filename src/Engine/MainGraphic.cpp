@@ -10,7 +10,7 @@
 /// Rmove
 #include "Cl/ClProgram.hpp"
 #include "ShaderManager.hpp"
-
+#include "PathManager.hpp"
 
 MainGraphic::MainGraphic() :
         renderBuffer_(DisplayWindow::Get().getWidthWindow() / 2, DisplayWindow::Get().getHeightWindow()),
@@ -24,7 +24,7 @@ MainGraphic::MainGraphic() :
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glDepthMask(GL_FALSE);
 
-	boost::filesystem::path pathRoot(ROOT_PATH);
+	PathManager::Get();
 }
 
 MainGraphic &MainGraphic::Get() {
