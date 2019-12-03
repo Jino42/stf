@@ -1,4 +1,4 @@
-#include "ParticleParticulizerModule.hpp"
+#include "ModuleMeshParticulizer.hpp"
 #include "Particle/ParticleSystem.hpp"
 #include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 #include "Engine/Random.hpp"
@@ -7,18 +7,18 @@
 #include "Cl/ClQueue.hpp"
 #include "OpenCGL_Tools.hpp"
 #include "cl_type.hpp"
-#include "ParticuleTargetModule.hpp"
+#include "ModuleTarget.hpp"
 #include <PathManager.hpp>
 
-ParticleParticulizerModule::ParticleParticulizerModule(AParticleEmitter &emitter) :
+ModuleMeshParticulizer::ModuleMeshParticulizer(AParticleEmitter &emitter) :
 	AParticleModule(emitter),
 	cpuBufferParticles_Position_(std::make_unique<ParticleDataMeshParticulizer[]>(nbParticleMax_))
 	{
 
-	if (!emitter_.contain<ParticuleTargetModule>()) {
-		emitter_.addModule<ParticuleTargetModule>();
+	if (!emitter_.contain<ModuleTarget>()) {
+		emitter_.addModule<ModuleTarget>();
 	}
-	moduleTarget_ = emitter_.getModule<ParticuleTargetModule>();
+	moduleTarget_ = emitter_.getModule<ModuleTarget>();
 
 	model_.setModel((PathManager::Get().getPath("objects") / "nanosuit" / "nanosuit.obj").generic_string());
 
@@ -28,7 +28,7 @@ ParticleParticulizerModule::ParticleParticulizerModule(AParticleEmitter &emitter
 		kernelInit_.setArgsGPUBuffers(eParticleBuffer::kData);
 }
 
-void ParticleParticulizerModule::init() {
+void ModuleMeshParticulizer::init() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 	for (int i = 0; i < nbParticleMax_; i++) {

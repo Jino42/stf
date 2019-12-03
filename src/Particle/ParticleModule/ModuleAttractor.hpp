@@ -6,9 +6,9 @@
 
 class AParticleEmitter;
 
-class ParticleAttractorModule : public AParticleModule {
+class ModuleAttractor : public AParticleModule {
 public:
-	ParticleAttractorModule(AParticleEmitter &emitter);
+	ModuleAttractor(AParticleEmitter &emitter);
 	void	init() override;
 	void	update(float deltaTime) override;
     void    reload() override;

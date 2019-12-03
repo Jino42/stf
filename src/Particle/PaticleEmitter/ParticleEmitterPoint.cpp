@@ -2,7 +2,7 @@
 #include "Engine/Shader.hpp"
 #include "Cl/ClQueue.hpp"
 #include "Particle/ParticleData.hpp"
-#include "Particle/ParticleModule/ParticleAttractorModule.hpp"
+#include "Particle/ParticleModule/ModuleAttractor.hpp"
 #include "Engine/Camera.hpp"
 #include <PathManager.hpp>
 

@@ -1,4 +1,4 @@
-#include "ParticleMovementModule.hpp"
+#include "ModuleMovement.hpp"
 #include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 #include <iostream>
 #include <Engine/ModelEngine/MainGraphicExtendModel.hpp>
@@ -10,7 +10,7 @@
 #include "cl_type.hpp"
 #include "Cl/ClKernel.hpp"
 
-ParticleMovementModule::ParticleMovementModule(AParticleEmitter &emitter) :
+ModuleMovement::ModuleMovement(AParticleEmitter &emitter) :
 		AParticleModule(emitter),
 
 		gpuBufferParticles_Movement_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ParticleDataMovement))
@@ -25,12 +25,12 @@ ParticleMovementModule::ParticleMovementModule(AParticleEmitter &emitter) :
 }
 
 
-void	ParticleMovementModule::init() {
+void	ModuleMovement::init() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 }
 
-void	ParticleMovementModule::update(float deltaTime) {
+void	ModuleMovement::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 
@@ -41,7 +41,7 @@ void	ParticleMovementModule::update(float deltaTime) {
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelUpdate_, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
-void	ParticleMovementModule::spawn(unsigned int nbToSpawn, unsigned int at) {
+void	ModuleMovement::spawn(unsigned int nbToSpawn, unsigned int at) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 
@@ -54,7 +54,7 @@ void	ParticleMovementModule::spawn(unsigned int nbToSpawn, unsigned int at) {
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelSpawn_, cl_vbos, cl::NullRange, cl::NDRange(nbToSpawn));
 }
 
-void    ParticleMovementModule::reload()
+void    ModuleMovement::reload()
 {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);

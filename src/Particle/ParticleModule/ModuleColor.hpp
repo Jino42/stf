@@ -4,9 +4,9 @@
 #include "Cl/ClQueue.hpp"
 #include "OCGL_Buffer.hpp"
 
-class ParticleColorModule : public AParticleModule {
+class ModuleColor : public AParticleModule {
 public:
-	ParticleColorModule(AParticleEmitter &emitter);
+	ModuleColor(AParticleEmitter &emitter);
 	void	init();
 	void	update(float deltaTime);
 	void    reload() override;

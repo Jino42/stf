@@ -1,4 +1,4 @@
-#include "ParticleRequiredModule.hpp"
+#include "ModuleRequired.hpp"
 #include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 #include <iostream>
 #include "Particle/ParticleData.hpp"
@@ -12,7 +12,7 @@
 #include "Cl/ClKernel.hpp"
 #include "Enum/eParticleBuffer.hpp"
 
-ParticleRequiredModule::ParticleRequiredModule(AParticleEmitter &emitter) :
+ModuleRequired::ModuleRequired(AParticleEmitter &emitter) :
 AParticleModule(emitter),
 gpuBufferModuleParam_(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleParamRequired))
 {
@@ -27,7 +27,7 @@ gpuBufferModuleParam_(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(Module
 }
 
 
-void	ParticleRequiredModule::init() {
+void	ModuleRequired::init() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 
@@ -59,7 +59,7 @@ void	ParticleRequiredModule::init() {
 
 }
 
-void	ParticleRequiredModule::update(float deltaTime) {
+void	ModuleRequired::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 
@@ -89,7 +89,7 @@ void	ParticleRequiredModule::update(float deltaTime) {
 	//std::cout << "xxxxxxxx RequiredUpdate" << std::endl;
 }
 
-void    ParticleRequiredModule::reload()
+void    ModuleRequired::reload()
 {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);

@@ -8,9 +8,9 @@ struct ParticleDataTarget {
 	cl_float3	target;
 };
 
-class ParticuleTargetModule : public AParticleModule {
+class ModuleTarget : public AParticleModule {
 public:
-	ParticuleTargetModule(AParticleEmitter &emitter);
+	ModuleTarget(AParticleEmitter &emitter);
 
 	ParticleDataTarget *getCpuBuffer();
 	cl::Buffer &getGpuBuffer();

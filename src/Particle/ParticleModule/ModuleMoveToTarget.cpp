@@ -1,4 +1,4 @@
-#include "ParticleMoveToTarget.hpp"
+#include "ModuleMoveToTarget.hpp"
 #include "Particle/ParticleSystem.hpp"
 #include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 #include "Engine/Random.hpp"
@@ -7,18 +7,18 @@
 #include "Cl/ClQueue.hpp"
 #include "OpenCGL_Tools.hpp"
 #include "cl_type.hpp"
-#include "ParticuleTargetModule.hpp"
+#include "ModuleTarget.hpp"
 
 
-ParticleMoveToTarget::ParticleMoveToTarget(AParticleEmitter &emitter) :
+ModuleMoveToTarget::ModuleMoveToTarget(AParticleEmitter &emitter) :
 		AParticleModule(emitter)
 {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	if (!emitter_.contain<ParticuleTargetModule>()) {
-		emitter_.addModule<ParticuleTargetModule>();
+	if (!emitter_.contain<ModuleTarget>()) {
+		emitter_.addModule<ModuleTarget>();
 	}
-	targetModule_ = emitter_.getModule<ParticuleTargetModule>();
+	targetModule_ = emitter_.getModule<ModuleTarget>();
 
 	ClProgram::Get().addProgram(pathKernel_ / "Target.cl");
 
@@ -26,7 +26,7 @@ ParticleMoveToTarget::ParticleMoveToTarget(AParticleEmitter &emitter) :
 	kernelUpdate_.setArgsGPUBuffers(eParticleBuffer::kData);
 }
 
-void ParticleMoveToTarget::update(float deltaTime) {
+void ModuleMoveToTarget::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 	kernelUpdate_.beginAndSetUpdatedArgs(targetModule_->getGpuBuffer(), deltaTime);

@@ -15,9 +15,9 @@ struct ModuleParamRequired {
     float simulationSpeed = 1.0f;
 };
 
-class ParticleRequiredModule : public AParticleModule {
+class ModuleRequired : public AParticleModule {
 public:
-	ParticleRequiredModule(AParticleEmitter &emitter);
+	ModuleRequired(AParticleEmitter &emitter);
 	void	init() override;
 	void	update(float deltaTime) override;
     void    reload() override;

@@ -1,4 +1,4 @@
-#include "ParticleAttractorModule.hpp"
+#include "ModuleAttractor.hpp"
 #include <iostream>
 #include <Engine/ModelEngine/MainGraphicExtendModel.hpp>
 #include "Cl/ClProgram.hpp"
@@ -8,7 +8,7 @@
 #include "Cl/ClKernel.hpp"
 #include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 
-ParticleAttractorModule::ParticleAttractorModule(AParticleEmitter &emitter) :
+ModuleAttractor::ModuleAttractor(AParticleEmitter &emitter) :
 		AParticleModule(emitter)
 {
 	ClProgram::Get().addProgram(pathKernel_ / "Attractor.cl");
@@ -17,12 +17,12 @@ ParticleAttractorModule::ParticleAttractorModule(AParticleEmitter &emitter) :
 	kernelUpdate_.setArgsGPUBuffers(eParticleBuffer::kData);
 }
 
-void	ParticleAttractorModule::init() {
+void	ModuleAttractor::init() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 }
 
-void	ParticleAttractorModule::update(float deltaTime) {
+void	ModuleAttractor::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 
@@ -36,7 +36,7 @@ void	ParticleAttractorModule::update(float deltaTime) {
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelUpdate_, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
-void    ParticleAttractorModule::reload()
+void    ModuleAttractor::reload()
 {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);

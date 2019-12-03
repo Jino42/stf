@@ -3,15 +3,15 @@
 //
 
 #include "TestParticle.hpp"
-#include "Particle/ParticleModule/ParticleAttractorModule.hpp"
-#include "Particle/ParticleModule/ParticleColorModule.hpp"
+#include "Particle/ParticleModule/ModuleAttractor.hpp"
+#include "Particle/ParticleModule/ModuleColor.hpp"
 #include "Particle/PaticleEmitter/ParticleEmitterMesh.hpp"
 #include "Particle/PaticleEmitter/ParticleEmitterSprite.hpp"
 #include "Particle/PaticleEmitter/ParticleEmitterPoint.hpp"
-#include "Particle/ParticleModule/ParticleMovementModule.hpp"
+#include "Particle/ParticleModule/ModuleMovement.hpp"
 #include "Particle/ParticleModule/ModuleSizeOverLifetime.hpp"
-#include "Particle/ParticleModule/ParticleParticulizerModule.hpp"
-#include "Particle/ParticleModule/ParticleMoveToTarget.hpp"
+#include "Particle/ParticleModule/ModuleMeshParticulizer.hpp"
+#include "Particle/ParticleModule/ModuleMoveToTarget.hpp"
 
 void TestParticle::init() {
     //Cloud Emitter
@@ -60,7 +60,7 @@ void TestParticle::init() {
 		system.setPosition(glm::vec3(60 * i, 258.0f, -30.0f));
 		AParticleEmitter &emitter = system.getEmitter<ParticleEmitterMesh>("Lol");
 
-		emitter.addModule<ParticleMovementModule>();
+		emitter.addModule<ModuleMovement>();
 		emitter.addModule<ModuleSizeOverLifetime>();
 
 		system.init();

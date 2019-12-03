@@ -12,9 +12,9 @@ struct ParticleDataMovement {
 	float		masse;
 };
 
-class ParticleMovementModule : public AParticleModule {
+class ModuleMovement : public AParticleModule {
 public:
-	ParticleMovementModule(AParticleEmitter &emitter);
+	ModuleMovement(AParticleEmitter &emitter);
 	void	init() override;
 	void	update(float deltaTime) override;
 	void	spawn(unsigned int nbToSpawn, unsigned int at) override;

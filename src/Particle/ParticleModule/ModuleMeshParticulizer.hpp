@@ -5,20 +5,20 @@
 #include <memory>
 
 class AParticleEmitter;
-class ParticuleTargetModule;
+class ModuleTarget;
 
 struct ParticleDataMeshParticulizer {
 	cl_float3	position;
 };
 
-class ParticleParticulizerModule : public AParticleModule {
+class ModuleMeshParticulizer : public AParticleModule {
 public:
-	ParticleParticulizerModule(AParticleEmitter &emitter);
+	ModuleMeshParticulizer(AParticleEmitter &emitter);
 
 	void	init() override;
 
 private:
 	Model			model_;
 	std::unique_ptr<ParticleDataMeshParticulizer[]> cpuBufferParticles_Position_;
-	std::shared_ptr<ParticuleTargetModule> moduleTarget_;
+	std::shared_ptr<ModuleTarget> moduleTarget_;
 };

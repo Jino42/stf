@@ -1,6 +1,6 @@
 #include "AParticleEmitter.hpp"
 #include "Particle/ParticleModule/AParticleModule.hpp"
-#include "Particle/ParticleModule/ParticleRequiredModule.hpp"
+#include "Particle/ParticleModule/ModuleRequired.hpp"
 #include "Particle/ParticleData.hpp"
 #include "Cl/ClProgram.hpp"
 #include "OpenCGL_Tools.hpp"
@@ -26,7 +26,7 @@ AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::
 		at_(0),
         needReload_(false)
 {
-	modules_.emplace_back(std::make_unique<ParticleRequiredModule>(*this));
+	modules_.emplace_back(std::make_unique<ModuleRequired>(*this));
     ClProgram::Get().addProgram(PathManager::Get().getPath("particleKernels") / "Print.cl");
     cpuBufferParam_Emitter_.position = glmVec3toClFloat3(system_.getPosition());
 	cpuBufferParam_Emitter_.nbMaxParticle = nbParticleMax_;

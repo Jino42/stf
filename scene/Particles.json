@@ -14,7 +14,9 @@
       },
       "emitters": [
         {
-          "_comment": "Position"
+          "_comment": "Position not yet supported",
+          "type": "Sprite",
+          ""
         }
       ]
     }

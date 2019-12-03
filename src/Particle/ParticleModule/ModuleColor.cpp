@@ -1,4 +1,4 @@
-#include "ParticleColorModule.hpp"
+#include "ModuleColor.hpp"
 #include "Particle/PaticleEmitter/ParticleEmitterMesh.hpp"
 #include <iostream>
 #include <Engine/ModelEngine/MainGraphicExtendModel.hpp>
@@ -7,7 +7,7 @@
 #include "cl_type.hpp"
 #include "Cl/ClKernel.hpp"
 
-ParticleColorModule::ParticleColorModule(AParticleEmitter &emitter) :
+ModuleColor::ModuleColor(AParticleEmitter &emitter) :
 		AParticleModule(emitter)
 {
 	ClProgram::Get().addProgram(pathKernel_ / "Color.cl");
@@ -17,12 +17,12 @@ ParticleColorModule::ParticleColorModule(AParticleEmitter &emitter) :
 }
 
 
-void	ParticleColorModule::init() {
+void	ModuleColor::init() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 }
 
-void	ParticleColorModule::update(float deltaTime) {
+void	ModuleColor::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 
@@ -34,7 +34,7 @@ void	ParticleColorModule::update(float deltaTime) {
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelUpdate_, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
-void    ParticleColorModule::reload()
+void    ModuleColor::reload()
 {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
