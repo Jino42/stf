@@ -36,7 +36,6 @@ void	ParticleMovementModule::update(float deltaTime) {
 
 	glm::vec3 attractorPosition = MainGraphicExtendModel::Get().attractorPoint;
 	kernelUpdate_.beginAndSetUpdatedArgs(gpuBufferParticles_Movement_,
-			deltaTime,
 			glmVec3toClFloat3(MainGraphicExtendModel::Get().attractorPoint));
 
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelUpdate_, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));

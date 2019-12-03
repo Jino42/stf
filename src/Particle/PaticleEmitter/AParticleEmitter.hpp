@@ -14,6 +14,20 @@
 	
 class ParticleSystem;
 
+struct EmitterParam {
+	EmitterParam() :
+	position({0, 0, 0}),
+	nbMaxParticle(0),
+	spawnParticlePerSec(0),
+	time(0.f)
+	{}
+	cl_float3	position;
+	cl_uint 	nbMaxParticle;
+	cl_uint 	spawnParticlePerSec;
+	cl_float	deltaTime;
+	cl_float	time;
+};
+
 class AParticleEmitter {
 public:
 	AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticle, size_t nbParticlePerSec);
@@ -22,7 +36,7 @@ public:
 
 	virtual void render() = 0;
 
-	virtual void update(float deltaTime) = 0;
+	virtual void update(float deltaTime);
 
 	void spawn();
 
@@ -33,6 +47,7 @@ public:
 	cl::Buffer &getParticleBufferSpawned();
 	cl::Buffer &getParticleBufferDeath();
 	cl::Buffer &getParticleSubBuffersLength();
+	cl::Buffer &getBufferEmitterParam();
 
 	ParticleSystem &getSystem() const;
 
@@ -124,6 +139,8 @@ protected:
 	unsigned int									nbParticleActive_;
 	std::vector<std::shared_ptr<AParticleModule>>	modules_;
 	OCGL_Buffer										OCGLBufferEmitterParticles_;
+	EmitterParam									cpuBufferParam_Emitter_;
+	cl::Buffer										gpuBufferParam_Emitter_;
 public:
 	cl::Buffer										gpuBufferParticles_Alive_;
 	cl::Buffer										gpuBufferParticles_Spawned_;

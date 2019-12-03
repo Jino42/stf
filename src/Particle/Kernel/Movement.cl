@@ -21,7 +21,6 @@ void kernel spawnMovementRandom(__global ParticleData *dataParticle,
 
 void kernel movement(__global ParticleData *dataParticle,
         __global ParticleDataMovement *dataMovement,
-        float deltaTime,
         float3 attractor) {
     size_t id = get_global_id(0);
     __global ParticleData *particle = &dataParticle[id];

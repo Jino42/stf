@@ -67,7 +67,7 @@ void ParticleEmitterMesh::init() {
 void ParticleEmitterMesh::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-
+	AParticleEmitter::update(deltaTime);
 	checkReload();
 	for (auto &module : modules_) {
 		module->update(deltaTime);

@@ -46,6 +46,8 @@ void ParticleEmitterPoint::init() {
 }
 
 void ParticleEmitterPoint::update(float deltaTime) {
+	AParticleEmitter::update(deltaTime);
+
 	for (auto &module : modules_) {
 		module->update(deltaTime);
 	}

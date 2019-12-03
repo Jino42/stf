@@ -67,5 +67,10 @@ cl_int ClKernel::updateArgsGPUBuffers_() {
 			return ret;
 	}
 
+
+	if ((enum_ & eParticleBuffer::kEmitterParam) == eParticleBuffer::kEmitterParam) {
+		if ((ret = setArgs_(emitter_->getBufferEmitterParam())))
+			return ret;
+	}
 	return 0;
 }

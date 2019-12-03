@@ -6,6 +6,8 @@
 #include "OpenCGL_Tools.hpp"
 #include "Cl/ClKernel.hpp"
 #include <PathManager.hpp>
+#include "Particle/ParticleSystem.hpp"
+#include "cl_type.hpp"
 
 AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticle, size_t nbParticlePerSec) :
 		system_(system),
@@ -15,6 +17,7 @@ AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::
         nbParticlePerSec_(nbParticlePerSec),
 		nbParticleActive_(0),
 		OCGLBufferEmitterParticles_(nbParticle * sizeof(ParticleData)),
+		gpuBufferParam_Emitter_(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(EmitterParam)),
 		gpuBufferParticles_Alive_(ClContext::Get().context, CL_MEM_READ_WRITE, nbParticle * sizeof(int)),
 		gpuBufferParticles_Spawned_(ClContext::Get().context, CL_MEM_READ_WRITE, nbParticle * sizeof(int)),
 		gpuBufferParticles_Death_(ClContext::Get().context, CL_MEM_READ_WRITE, nbParticle * sizeof(int)),
@@ -25,6 +28,9 @@ AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::
 {
 	modules_.emplace_back(std::make_unique<ParticleRequiredModule>(*this));
     ClProgram::Get().addProgram(PathManager::Get().getPath("particleKernels") / "Print.cl");
+    cpuBufferParam_Emitter_.position = glmVec3toClFloat3(system_.getPosition());
+	cpuBufferParam_Emitter_.nbMaxParticle = nbParticleMax_;
+	cpuBufferParam_Emitter_.spawnParticlePerSec = nbParticlePerSec_;
 }
 
 void AParticleEmitter::reload() {
@@ -37,12 +43,20 @@ cl::Buffer &AParticleEmitter::getParticleBufferAlive() { return gpuBufferParticl
 cl::Buffer &AParticleEmitter::getParticleBufferSpawned() { return gpuBufferParticles_Spawned_; }
 cl::Buffer &AParticleEmitter::getParticleBufferDeath() { return gpuBufferParticles_Death_; }
 cl::Buffer &AParticleEmitter::getParticleSubBuffersLength() { return gpuBufferParticles_SubLength_; }
+cl::Buffer &AParticleEmitter::getBufferEmitterParam() { return gpuBufferParam_Emitter_; }
 ParticleSystem &AParticleEmitter::getSystem() const { return system_; }
 size_t AParticleEmitter::getNbParticleActive_() const { return nbParticleActive_; }
 
 void AParticleEmitter::setShouldBeToSpawn(unsigned int nb, unsigned int at) {
 	shouldBeSpawn_ = nb;
 	at_ = at;
+}
+
+void AParticleEmitter::update(float deltaTime) {
+	cpuBufferParam_Emitter_.position = glmVec3toClFloat3(system_.getPosition());
+	cpuBufferParam_Emitter_.time = static_cast<float>(timerEmitter_.count<std::chrono::milliseconds>()) / 1000.f;
+	cpuBufferParam_Emitter_.deltaTime = deltaTime;
+	queue_.getQueue().enqueueWriteBuffer(gpuBufferParam_Emitter_, CL_TRUE, 0, sizeof(EmitterParam), &cpuBufferParam_Emitter_);
 }
 
 void AParticleEmitter::spawn() {

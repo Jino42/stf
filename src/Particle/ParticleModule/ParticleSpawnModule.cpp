@@ -22,7 +22,7 @@ ParticleSpawnModule::ParticleSpawnModule(AParticleEmitter &emitter) :
     ClProgram::Get().addProgram(pathKernel_ / "Spawn.cl");
 
 	kernelSpawn_.setKernel(emitter_, "spawnParticle");
-	kernelSpawn_.setArgsGPUBuffers(eParticleBuffer::kAllBuffers);
+	kernelSpawn_.setArgsGPUBuffers(eParticleBuffer::kAllBuffers | eParticleBuffer::kEmitterParam);
 
     cpuBufferModuleParam_.startLifeTime.isRange = true;
     cpuBufferModuleParam_.startLifeTime.rangeMin = 1.0f;
@@ -79,7 +79,6 @@ void	ParticleSpawnModule::spawn(unsigned int nbToSpawn, unsigned int at) {
 	queue_.getQueue().enqueueWriteBuffer(gpuBufferModuleParam_, CL_TRUE, 0, sizeof(ModuleParamSpawn),
 										 &cpuBufferModuleParam_);
 	kernelSpawn_.beginAndSetUpdatedArgs(gpuBufferModuleParam_,
-			glmVec3toClFloat3(emitter_.getSystem().getPosition()),
 			Random::Get().getRandomSeed());
 
 

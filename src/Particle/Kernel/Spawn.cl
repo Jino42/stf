@@ -7,9 +7,10 @@ __kernel void spawnParticle(
                         __global int *arrayParticlesDeath,
                         __global int *arrayParticlesLengthSub,
 
+                        __global EmitterParam *emitterParam,
+
                         __global ModuleParamSpawn *moduleParams,
 
-                        float3 particleSystemPosition,
                         int seed) {
 
 
@@ -31,9 +32,9 @@ __kernel void spawnParticle(
     particle->color.y = 1.f;
     particle->color.z = 1.f;
 
-    particle->position.x += particleSystemPosition.x;
-    particle->position.y += particleSystemPosition.y;
-    particle->position.z += particleSystemPosition.z;
+    particle->position.x += emitterParam->position.x;
+    particle->position.y += emitterParam->position.y;
+    particle->position.z += emitterParam->position.z;
 
     particle->isAlive = 1;
     particle->age = 0.f;

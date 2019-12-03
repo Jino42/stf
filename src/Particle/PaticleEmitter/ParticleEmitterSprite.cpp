@@ -154,6 +154,7 @@ void ParticleEmitterSprite::update(float deltaTime) {
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
 
+	AParticleEmitter::update(deltaTime);
     checkReload();
     updateSpriteData();
     getNbParticleActive_();

@@ -8,6 +8,8 @@ enum class eParticleBuffer {
 	kDeath = 1 << 4,
 	kSubIndex = 1 << 5,
 
+	kEmitterParam = 1 << 6,
+
 	kMaskSubBuffer = kAlive | kSpawned | kDeath,
 	kAllBuffers = kData | kAlive | kSpawned | kDeath | kSubIndex,
 	kAllSubBuffers = kAlive | kSpawned | kDeath | kSubIndex,

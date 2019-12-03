@@ -4,6 +4,14 @@
 #include "Base_NTL.hl"
 #include "Range.hl"
 
+typedef struct ALIGN sEmitterParam {
+	float3	position;
+	uint 	nbMaxParticle;
+	uint 	spawnParticlePerSec;
+	float	deltaTime;
+	float	time;
+}   EmitterParam;
+
 typedef struct ALIGN sParticleDataTarget {
 	float3	target;
 }   ParticleDataTarget;
