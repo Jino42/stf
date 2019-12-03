@@ -6,9 +6,6 @@
 
 class AParticleEmitter;
 
-struct ParticleAttractorModuleData {
-};
-
 class ParticleAttractorModule : public AParticleModule {
 public:
 	ParticleAttractorModule(AParticleEmitter &emitter);
@@ -17,5 +14,4 @@ public:
     void    reload() override;
 
 private:
-	cl::Buffer		buffer_;
 };

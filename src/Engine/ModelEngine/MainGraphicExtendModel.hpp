@@ -21,9 +21,8 @@ public:
 
 private:
     Shader							shader_;
-    Model							block_;
     ActorModel						actor_;
-	Model							modelRoom_;
+	Model							*modelRoom_;
 	ActorModel						actorRoom_;
     Light							light_;
     std::vector< Material >		vectorMap_;

@@ -123,17 +123,17 @@ protected:
     unsigned int 									nbParticlePerSec_;
 	unsigned int									nbParticleActive_;
 	std::vector<std::shared_ptr<AParticleModule>>	modules_;
-	OCGL_Buffer										particleOCGL_BufferData_;
+	OCGL_Buffer										OCGLBufferEmitterParticles_;
 public:
-	cl::Buffer										particleBufferAlive_;
-	cl::Buffer										particleBufferSpawned_;
-	cl::Buffer										particleBufferDeath_;
-	cl::Buffer										particleSubBuffersLength_;
+	cl::Buffer										gpuBufferParticles_Alive_;
+	cl::Buffer										gpuBufferParticles_Spawned_;
+	cl::Buffer										gpuBufferParticles_Death_;
+	cl::Buffer										gpuBufferParticles_SubLength_;
 	int 											indexSub_[3];
 protected:
 	Shader											shader_;
 	unsigned int									shouldBeSpawn_;
-	unsigned int									at_;
+	unsigned int									at_; //remove
 	bool                                            needReload_;
     Timer                                           timerEmitter_;
 

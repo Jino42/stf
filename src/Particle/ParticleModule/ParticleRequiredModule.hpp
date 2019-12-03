@@ -9,7 +9,7 @@ class AParticleEmitter;
 
 //Every particle emitter contains this module which contains all the properties that are required by a particle emitter.
 
-struct ModuleRequiredParams {
+struct ModuleParamRequired {
 
     float gravityModifier = 1.0f;
     float simulationSpeed = 1.0f;
@@ -41,6 +41,6 @@ public:
 	//bMaxDrawCount
 	//MaxDrawCount
 private:
-    ModuleRequiredParams    moduleRequiredParams_;
-    cl::Buffer              bufferModuleParams_;
+    ModuleParamRequired    cpuBufferModuleParam_;
+    cl::Buffer             gpuBufferModuleParam_;
 };

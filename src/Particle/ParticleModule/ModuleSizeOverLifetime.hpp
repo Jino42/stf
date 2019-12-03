@@ -7,7 +7,7 @@
 
 class AParticleEmitter;
 
-struct ModuleSizeOverLifetimeParams {
+struct ModuleParamSizeOverLifetime {
     Rangef size;
 };
 
@@ -26,6 +26,6 @@ public:
     float &getSizeMax();
 
 private:
-    cl::Buffer		bufferModule_;
-    ModuleSizeOverLifetimeParams   moduleSizeOverLifetimeParams_;
+    cl::Buffer						gpuBufferModuleParam_;
+    ModuleParamSizeOverLifetime		cpuBufferModuleParam_;
 };

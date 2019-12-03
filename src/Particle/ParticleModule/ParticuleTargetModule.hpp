@@ -4,7 +4,7 @@
 
 class AParticleEmitter;
 
-struct ModuleTargetData {
+struct ParticleDataTarget {
 	cl_float3	target;
 };
 
@@ -12,11 +12,11 @@ class ParticuleTargetModule : public AParticleModule {
 public:
 	ParticuleTargetModule(AParticleEmitter &emitter);
 
-	ModuleTargetData *getCpuBuffer();
+	ParticleDataTarget *getCpuBuffer();
 	cl::Buffer &getGpuBuffer();
 	void writeDataToGPU_Buffer();
 
 private:
-	cl::Buffer		gpuBufferTargetParticles_;
-	std::unique_ptr<ModuleTargetData[]> cpuBufferTargetParticles_;
+	cl::Buffer		gpuBufferParticles_Target_;
+	std::unique_ptr<ParticleDataTarget[]> cpuBufferParticles_Target_;
 };

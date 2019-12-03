@@ -9,9 +9,7 @@
 #include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 
 ParticleAttractorModule::ParticleAttractorModule(AParticleEmitter &emitter) :
-		AParticleModule(emitter),
-
-		buffer_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ParticleAttractorModuleData))
+		AParticleModule(emitter)
 {
 	ClProgram::Get().addProgram(pathKernel_ / "Attractor.cl");
 
@@ -42,6 +40,5 @@ void    ParticleAttractorModule::reload()
 {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-    buffer_ = cl::Buffer(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ParticleAttractorModuleData));
     init();
 }

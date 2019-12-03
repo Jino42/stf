@@ -24,11 +24,14 @@
     {
       "name": "particleKernels",
       "path": "src/Particle/Kernel/"
-    }
-  ,
+    },
     {
       "name": "particleKernelIncludes",
       "path": "src/Particle/Kernel/include/"
+    },
+    {
+      "name": "scene",
+      "path": "scene/"
     }
   ]
 }

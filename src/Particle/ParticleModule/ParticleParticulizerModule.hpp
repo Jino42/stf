@@ -7,8 +7,7 @@
 class AParticleEmitter;
 class ParticuleTargetModule;
 
-
-struct ModuleMeshParticulizerData {
+struct ParticleDataMeshParticulizer {
 	cl_float3	position;
 };
 
@@ -19,8 +18,7 @@ public:
 	void	init() override;
 
 private:
-	cl::Buffer		bufferPositionParticles_;
 	Model			model_;
-	std::unique_ptr<ModuleMeshParticulizerData[]> dataPositionParticles_;
-	std::shared_ptr<ParticuleTargetModule> targetModule_;
+	std::unique_ptr<ParticleDataMeshParticulizer[]> cpuBufferParticles_Position_;
+	std::shared_ptr<ParticuleTargetModule> moduleTarget_;
 };

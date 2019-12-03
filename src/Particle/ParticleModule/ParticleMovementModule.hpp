@@ -6,7 +6,7 @@
 
 class AParticleEmitter;
 
-struct ParticleMovementModuleData {
+struct ParticleDataMovement {
 	cl_float3	acceleration;
 	cl_float3	velocity;
 	float		masse;
@@ -21,5 +21,5 @@ public:
 	void    reload() override;
 
 private:
-	cl::Buffer		buffer_;
+	cl::Buffer		gpuBufferParticles_Movement_;
 };

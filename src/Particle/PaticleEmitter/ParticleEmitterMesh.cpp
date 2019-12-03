@@ -5,6 +5,7 @@
 #include "Particle/ParticleModule/ParticleSpawnModule.hpp"
 #include "Engine/Camera.hpp"
 #include <PathManager.hpp>
+#include <Engine/ModelEngine/ModelManager.hpp>
 
 ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax) :
 	AParticleEmitter(system, queue, name, nbParticleMax, nbParticlePerSec)
@@ -15,10 +16,11 @@ ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue,
 	shader_.attach((PathManager::Get().getPath("shaders") / "particleMesh.frag").generic_string());
 	shader_.link();
 
-	model_.setModel((PathManager::Get().getPath("objects") / "nanosuit" / "nanosuit.obj").generic_string());
+	ModelManager::Get().addModel("nanosuit", PathManager::Get().getPath("objects") / "nanosuit" / "nanosuit.obj");
+	model_ = &ModelManager::Get().getModel("nanosuit");
 
-	glBindBuffer(GL_ARRAY_BUFFER, particleOCGL_BufferData_.vbo);
-	for (const auto &mesh : model_.getMeshes()) {
+	glBindBuffer(GL_ARRAY_BUFFER, OCGLBufferEmitterParticles_.vbo);
+	for (const auto &mesh : model_->getMeshes()) {
 		unsigned int VAO = mesh.getVAO();
 		glBindVertexArray(VAO);
 		glEnableVertexAttribArray(3); //Position
@@ -79,7 +81,7 @@ void ParticleEmitterMesh::render() {
 	shader_.setMat4("projection", Camera::focus->getProjectionMatrix());
 	shader_.setMat4("view", Camera::focus->getViewMatrix());
 
-	for (const auto &mesh : model_.getMeshes()) {
+	for (const auto &mesh : model_->getMeshes()) {
 		mesh.activeTexture();
 		glBindVertexArray(mesh.getVAO());
 		glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(mesh.getIndice().size()), GL_UNSIGNED_INT, 0, nbParticleMax_);

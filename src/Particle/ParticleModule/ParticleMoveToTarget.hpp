@@ -5,7 +5,6 @@
 class AParticleEmitter;
 class ParticuleTargetModule;
 
-
 class ParticleMoveToTarget : public AParticleModule {
 public:
 	ParticleMoveToTarget(AParticleEmitter &emitter);
@@ -13,6 +12,5 @@ public:
 	void update(float deltaTime) override;
 
 private:
-	cl::Buffer		gpuBufferTargetParticles_;
 	std::shared_ptr<ParticuleTargetModule> targetModule_;
 };

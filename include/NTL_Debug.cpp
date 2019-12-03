@@ -4,14 +4,14 @@
 
 void printStructSizeCPU() {
 	printf(">>> CPU SIZE STRUCT <<< \n");
-	printf("[%5li] ModuleRequiredParams \n", sizeof(ModuleRequiredParams));
-	printf("[%5li] ModuleSpawnParams \n", sizeof(ModuleSpawnParams));
-	printf("[%5li] ModuleSizeOverLifetimeParams \n", sizeof(ModuleSizeOverLifetimeParams));
+	printf("[%5li] ModuleRequiredParams \n", sizeof(ModuleParamRequired));
+	printf("[%5li] ModuleSpawnParams \n", sizeof(ModuleParamSpawn));
+	printf("[%5li] ModuleSizeOverLifetimeParams \n", sizeof(ModuleParamSizeOverLifetime));
 	printf("[%5li] Rangef \n", sizeof(Rangef));
 	printf("[%5li] Rangei \n", sizeof(Rangei));
 	printf("[%5li] ParticleData \n", sizeof(ParticleData));
-	printf("[%5li] ParticleSpriteData \n", sizeof(ParticleSpriteData));
-	printf("[%5li] ParticleMovementModuleData \n", sizeof(ParticleMovementModuleData));
+	printf("[%5li] ParticleSpriteData \n", sizeof(ParticleDataSprite));
+	printf("[%5li] ParticleMovementModuleData \n", sizeof(ParticleDataMovement));
 }
 
 void printStructSizeGPU(AParticleEmitter &emitter, cl::CommandQueue &queue) {

@@ -16,7 +16,7 @@
 
 ParticleSpawnModule::ParticleSpawnModule(AParticleEmitter &emitter) :
         AParticleModule(emitter),
-        bufferModuleParams_(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleSpawnParams)),
+        gpuBufferModuleParam_(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleParamSpawn)),
         spwaned_(0)
 {
     ClProgram::Get().addProgram(pathKernel_ / "Spawn.cl");
@@ -24,17 +24,17 @@ ParticleSpawnModule::ParticleSpawnModule(AParticleEmitter &emitter) :
 	kernelSpawn_.setKernel(emitter_, "spawnParticle");
 	kernelSpawn_.setArgsGPUBuffers(eParticleBuffer::kAllBuffers);
 
-    moduleSpawnParams_.startLifeTime.isRange = true;
-    moduleSpawnParams_.startLifeTime.rangeMin = 1.0f;
-    moduleSpawnParams_.startLifeTime.rangeMax = 10.0f;
+    cpuBufferModuleParam_.startLifeTime.isRange = true;
+    cpuBufferModuleParam_.startLifeTime.rangeMin = 1.0f;
+    cpuBufferModuleParam_.startLifeTime.rangeMax = 10.0f;
 
-    moduleSpawnParams_.startSize.isRange = true;
-    moduleSpawnParams_.startSize.rangeMin = 1.0f;
-    moduleSpawnParams_.startSize.rangeMax = 2.0f;
+    cpuBufferModuleParam_.startSize.isRange = true;
+    cpuBufferModuleParam_.startSize.rangeMin = 1.0f;
+    cpuBufferModuleParam_.startSize.rangeMax = 2.0f;
 
-    moduleSpawnParams_.startRotation.isRange = true;
-    moduleSpawnParams_.startRotation.rangeMin = 0.0f;
-    moduleSpawnParams_.startRotation.rangeMax = 100.0f;
+    cpuBufferModuleParam_.startRotation.isRange = true;
+    cpuBufferModuleParam_.startRotation.rangeMin = 0.0f;
+    cpuBufferModuleParam_.startRotation.rangeMax = 100.0f;
 }
 
 
@@ -76,9 +76,9 @@ void	ParticleSpawnModule::spawn(unsigned int nbToSpawn, unsigned int at) {
     if (debug_)
         std::cout << "emitter_.getNbParticleActive_() : " << emitter_.getNbParticleActive_() << std::endl;
 
-	queue_.getQueue().enqueueWriteBuffer(bufferModuleParams_, CL_TRUE, 0, sizeof(ModuleSpawnParams),
-										 &moduleSpawnParams_);
-	kernelSpawn_.beginAndSetUpdatedArgs(bufferModuleParams_,
+	queue_.getQueue().enqueueWriteBuffer(gpuBufferModuleParam_, CL_TRUE, 0, sizeof(ModuleParamSpawn),
+										 &cpuBufferModuleParam_);
+	kernelSpawn_.beginAndSetUpdatedArgs(gpuBufferModuleParam_,
 			glmVec3toClFloat3(emitter_.getSystem().getPosition()),
 			Random::Get().getRandomSeed());
 
@@ -90,9 +90,9 @@ void	ParticleSpawnModule::spawn(unsigned int nbToSpawn, unsigned int at) {
 		TimerOnConstructOffDestruct timerE("----------During");
 
 
-		queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+		queue_.getQueue().enqueueWriteBuffer(emitter_.gpuBufferParticles_SubLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 		OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelSpawn_, cl_vbos, cl::NullRange, cl::NDRange(nbToSpawn));
-		queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+		queue_.getQueue().enqueueReadBuffer(emitter_.gpuBufferParticles_SubLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 		spwaned_ += nbToSpawn;
 	}
 
@@ -106,7 +106,7 @@ void	ParticleSpawnModule::spawn(unsigned int nbToSpawn, unsigned int at) {
 void    ParticleSpawnModule::reload()
 {
 		TimerOnConstructOffDestruct timer(__FUNCTION_NAME__);
-    bufferModuleParams_ = cl::Buffer(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleSpawnParams));
+    gpuBufferModuleParam_ = cl::Buffer(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleParamSpawn));
     init();
     spwaned_ = 0;
 }

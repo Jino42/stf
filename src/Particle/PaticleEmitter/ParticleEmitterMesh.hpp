@@ -1,9 +1,9 @@
 #pragma once
 
 #include "AParticleEmitter.hpp"
-#include "Engine/ModelEngine/Model.hpp"
 
 class Shader;
+class Model;
 
 class ParticleEmitterMesh : public AParticleEmitter {
 public:
@@ -16,5 +16,5 @@ public:
 	void update(float deltaTime) override;
 
 private:
-	Model											model_;
+	Model											*model_;
 };

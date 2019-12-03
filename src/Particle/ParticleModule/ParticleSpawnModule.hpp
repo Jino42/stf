@@ -7,7 +7,7 @@
 
 class AParticleEmitter;
 
-struct ModuleSpawnParams {
+struct ModuleParamSpawn {
     Rangef startLifeTime;
     Rangef startSpeed;
     Rangef startSize;
@@ -24,7 +24,7 @@ public:
     void    reload() override;
 
 private:
-	cl::Buffer		    bufferModuleParams_;
-    ModuleSpawnParams   moduleSpawnParams_;
+	cl::Buffer		    gpuBufferModuleParam_;
+    ModuleParamSpawn	cpuBufferModuleParam_;
 	unsigned int	    spwaned_;
 };

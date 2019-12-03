@@ -10,8 +10,8 @@
 
 ParticuleTargetModule::ParticuleTargetModule(AParticleEmitter &emitter) :
 		AParticleModule(emitter),
-		gpuBufferTargetParticles_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ModuleTargetData)),
-		cpuBufferTargetParticles_(std::make_unique<ModuleTargetData[]>(nbParticleMax_)) {
+		gpuBufferParticles_Target_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ParticleDataTarget)),
+		cpuBufferParticles_Target_(std::make_unique<ParticleDataTarget[]>(nbParticleMax_)) {
 
 	ClProgram::Get().addProgram(pathKernel_ / "MeshParticulizer.cl");
 
@@ -19,15 +19,15 @@ ParticuleTargetModule::ParticuleTargetModule(AParticleEmitter &emitter) :
 	kernelInit_.setArgsGPUBuffers(eParticleBuffer::kData);
 }
 
-ModuleTargetData *ParticuleTargetModule::getCpuBuffer() {
-	return cpuBufferTargetParticles_.get();
+ParticleDataTarget *ParticuleTargetModule::getCpuBuffer() {
+	return cpuBufferParticles_Target_.get();
 }
 
 cl::Buffer &ParticuleTargetModule::getGpuBuffer() {
-	return gpuBufferTargetParticles_;
+	return gpuBufferParticles_Target_;
 }
 
 void ParticuleTargetModule::writeDataToGPU_Buffer() {
-	queue_.getQueue().enqueueWriteBuffer(gpuBufferTargetParticles_, CL_TRUE, 0, sizeof(ModuleTargetData) * nbParticleMax_, cpuBufferTargetParticles_.get());
-	kernelInit_.beginAndSetUpdatedArgs(gpuBufferTargetParticles_, glmVec3toClFloat3(emitter_.getSystem().getPosition()));
+	queue_.getQueue().enqueueWriteBuffer(gpuBufferParticles_Target_, CL_TRUE, 0, sizeof(ParticleDataTarget) * nbParticleMax_, cpuBufferParticles_Target_.get());
+	kernelInit_.beginAndSetUpdatedArgs(gpuBufferParticles_Target_, glmVec3toClFloat3(emitter_.getSystem().getPosition()));
 }

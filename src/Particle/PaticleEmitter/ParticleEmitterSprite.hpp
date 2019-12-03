@@ -5,7 +5,7 @@
 
 class Shader;
 
-struct ParticleSpriteData {
+struct ParticleDataSprite {
 	cl_float2	offset1;
 	cl_float2	offset2;
 	float		blend;
@@ -26,12 +26,12 @@ public:
 
 
 private:
-	OCGL_Buffer deviceBufferSpriteData_;
+	OCGL_Buffer OCGLBufferParticles_SpriteData_;
 	unsigned int VBO, VAO, EBO;
 
 	ParticleSpriteAtlas atlas_;
-	cl::Buffer	distBuffer_;
-	cl::Buffer	nbParticleActiveOutpourBuffer_;
+	cl::Buffer	gpuBufferParticles_Dist_;
+	cl::Buffer	gpuBufferOutput_nbParticleActive_;
 
 	void sortDeviceBuffer_();
 	void sortDeviceBufferCalculateDistanceParticle_();

@@ -7,11 +7,11 @@
 
 ModuleSizeOverLifetime::ModuleSizeOverLifetime(AParticleEmitter &emitter) :
         AParticleModule(emitter),
-        bufferModule_(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(ModuleSizeOverLifetimeParams))
+        gpuBufferModuleParam_(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(ModuleParamSizeOverLifetime))
 {
     ClProgram::Get().addProgram(pathKernel_ / "Size.cl");
-    moduleSizeOverLifetimeParams_.size.rangeMin = 0.0f;
-    moduleSizeOverLifetimeParams_.size.rangeMax = 10.0f;
+    cpuBufferModuleParam_.size.rangeMin = 0.0f;
+    cpuBufferModuleParam_.size.rangeMax = 10.0f;
 
     kernelUpdate_.setKernel(emitter_, "sizeUpdate");
     kernelUpdate_.setArgsGPUBuffers(eParticleBuffer::kData);
@@ -20,15 +20,15 @@ ModuleSizeOverLifetime::ModuleSizeOverLifetime(AParticleEmitter &emitter) :
 void	ModuleSizeOverLifetime::init() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-    queue_.getQueue().enqueueWriteBuffer(bufferModule_, CL_TRUE, 0, sizeof(ModuleSizeOverLifetimeParams), &moduleSizeOverLifetimeParams_);
+    queue_.getQueue().enqueueWriteBuffer(gpuBufferModuleParam_, CL_TRUE, 0, sizeof(ModuleParamSizeOverLifetime), &cpuBufferModuleParam_);
 }
 
 void	ModuleSizeOverLifetime::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 
-	queue_.getQueue().enqueueWriteBuffer(bufferModule_, CL_TRUE, 0, sizeof(ModuleSizeOverLifetimeParams), &moduleSizeOverLifetimeParams_);
-	kernelUpdate_.beginAndSetUpdatedArgs(bufferModule_);
+	queue_.getQueue().enqueueWriteBuffer(gpuBufferModuleParam_, CL_TRUE, 0, sizeof(ModuleParamSizeOverLifetime), &cpuBufferModuleParam_);
+	kernelUpdate_.beginAndSetUpdatedArgs(gpuBufferModuleParam_);
 
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelUpdate_, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
@@ -37,22 +37,22 @@ void    ModuleSizeOverLifetime::reload()
 {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-    bufferModule_ = cl::Buffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(ModuleSizeOverLifetimeParams));
+    gpuBufferModuleParam_ = cl::Buffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(ModuleParamSizeOverLifetime));
     init();
 }
 
 float &ModuleSizeOverLifetime::getSizeMin() {
-    return moduleSizeOverLifetimeParams_.size.rangeMin;
+    return cpuBufferModuleParam_.size.rangeMin;
 }
 float &ModuleSizeOverLifetime::getSizeMax() {
-    return moduleSizeOverLifetimeParams_.size.rangeMax;
+    return cpuBufferModuleParam_.size.rangeMax;
 }
 
 
 void ModuleSizeOverLifetime::setSizeMin(float min) {
-    moduleSizeOverLifetimeParams_.size.rangeMin = min;
+    cpuBufferModuleParam_.size.rangeMin = min;
 }
 
 void ModuleSizeOverLifetime::setSizeMax(float max) {
-    moduleSizeOverLifetimeParams_.size.rangeMax = max;
+    cpuBufferModuleParam_.size.rangeMax = max;
 }

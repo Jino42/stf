@@ -5,6 +5,7 @@
 #include <Gui/WidgetRender.hpp>
 #include <Engine/Camera.hpp>
 #include <PathManager.hpp>
+#include <Engine/ModelEngine/ModelManager.hpp>
 
 MainGraphicExtendModel::MainGraphicExtendModel() :
         light_(glm::vec3(0.f, 0.f, 30.f)),
@@ -19,8 +20,8 @@ MainGraphicExtendModel::MainGraphicExtendModel() :
     shader_.attach((pathShaders / "basic.frag").generic_string());
     shader_.link();
 
-    block_.setModel((PathManager::Get().getPath("objects") / "nanosuit" / "nanosuit.obj").generic_string());
-    actor_.assign(&block_);
+	ModelManager::Get().addModel("nanosuit", PathManager::Get().getPath("objects") / "nanosuit" / "nanosuit.obj");
+    actor_.assign(&ModelManager::Get().getModel("nanosuit"));
 /*
     modelRoom_.setModel((pathRoot / "resources" / "objects" / "room" / "interior.obj").generic_string());
     actorRoom_.assign(&modelRoom_);

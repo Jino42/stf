@@ -4,9 +4,6 @@
 #include "Cl/ClQueue.hpp"
 #include "OCGL_Buffer.hpp"
 
-struct ParticleColorModuleData {
-};
-
 class ParticleColorModule : public AParticleModule {
 public:
 	ParticleColorModule(AParticleEmitter &emitter);
@@ -15,5 +12,4 @@ public:
 	void    reload() override;
 
 private:
-	cl::Buffer		buffer_;
 };

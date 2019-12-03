@@ -13,7 +13,7 @@
 ParticleMovementModule::ParticleMovementModule(AParticleEmitter &emitter) :
 		AParticleModule(emitter),
 
-		buffer_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ParticleMovementModuleData))
+		gpuBufferParticles_Movement_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ParticleDataMovement))
 {
 	ClProgram::Get().addProgram(pathKernel_ / "Movement.cl");
 
@@ -35,7 +35,7 @@ void	ParticleMovementModule::update(float deltaTime) {
 		printf("%s\n", __FUNCTION_NAME__);
 
 	glm::vec3 attractorPosition = MainGraphicExtendModel::Get().attractorPoint;
-	kernelUpdate_.beginAndSetUpdatedArgs(buffer_,
+	kernelUpdate_.beginAndSetUpdatedArgs(gpuBufferParticles_Movement_,
 			deltaTime,
 			glmVec3toClFloat3(MainGraphicExtendModel::Get().attractorPoint));
 
@@ -46,7 +46,7 @@ void	ParticleMovementModule::spawn(unsigned int nbToSpawn, unsigned int at) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 
-	kernelSpawn_.beginAndSetUpdatedArgs(buffer_,
+	kernelSpawn_.beginAndSetUpdatedArgs(gpuBufferParticles_Movement_,
 			Random::Get().getRandomSeed());
 
 	std::vector<cl::Memory> cl_vbos;
@@ -59,6 +59,6 @@ void    ParticleMovementModule::reload()
 {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-    buffer_ = cl::Buffer(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ParticleMovementModuleData));
+    gpuBufferParticles_Movement_ = cl::Buffer(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ParticleDataMovement));
     init();
 }

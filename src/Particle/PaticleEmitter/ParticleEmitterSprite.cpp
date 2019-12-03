@@ -16,10 +16,10 @@
 
 ParticleEmitterSprite::ParticleEmitterSprite(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax) :
 		AParticleEmitter(system, queue, name, nbParticleMax, nbParticlePerSec),
-		deviceBufferSpriteData_(nbParticleMax * sizeof(ParticleSpriteData)),
+		OCGLBufferParticles_SpriteData_(nbParticleMax * sizeof(ParticleDataSprite)),
 		atlas_("bloup.png", PathManager::Get().getPath("atlas"), 4),
-		distBuffer_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax * sizeof(CL_FLOAT)),
-		nbParticleActiveOutpourBuffer_(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int))
+		gpuBufferParticles_Dist_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax * sizeof(CL_FLOAT)),
+		gpuBufferOutput_nbParticleActive_(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int))
 {
 
 	modules_.emplace_back(std::make_unique<ParticleSpawnModule>(*this));
@@ -75,7 +75,7 @@ void ParticleEmitterSprite::reload() {
     AParticleEmitter::reload();
 
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, particleOCGL_BufferData_.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, OCGLBufferEmitterParticles_.vbo);
 
     glEnableVertexAttribArray(3); //Position
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, position)));
@@ -104,15 +104,15 @@ void ParticleEmitterSprite::reload() {
 	glVertexAttribDivisor(10, 1);
 
 
-    deviceBufferSpriteData_ = OCGL_Buffer(nbParticleMax_ * sizeof(ParticleSpriteData));
-    glBindBuffer(GL_ARRAY_BUFFER, deviceBufferSpriteData_.vbo);
+    OCGLBufferParticles_SpriteData_ = OCGL_Buffer(nbParticleMax_ * sizeof(ParticleDataSprite));
+    glBindBuffer(GL_ARRAY_BUFFER, OCGLBufferParticles_SpriteData_.vbo);
 
     glEnableVertexAttribArray(11); //Offset1
-    glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleSpriteData), reinterpret_cast<const void *>(offsetof(ParticleSpriteData, offset1)));
+    glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleDataSprite), reinterpret_cast<const void *>(offsetof(ParticleDataSprite, offset1)));
     glEnableVertexAttribArray(12); //Offset2
-    glVertexAttribPointer(12, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleSpriteData), reinterpret_cast<const void *>(offsetof(ParticleSpriteData, offset2)));
+    glVertexAttribPointer(12, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleDataSprite), reinterpret_cast<const void *>(offsetof(ParticleDataSprite, offset2)));
     glEnableVertexAttribArray(13); //Blend
-    glVertexAttribPointer(13, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSpriteData), reinterpret_cast<const void *>(offsetof(ParticleSpriteData, blend)));
+    glVertexAttribPointer(13, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleDataSprite), reinterpret_cast<const void *>(offsetof(ParticleDataSprite, blend)));
 
     glVertexAttribDivisor(11, 1);
     glVertexAttribDivisor(12, 1);
@@ -120,7 +120,7 @@ void ParticleEmitterSprite::reload() {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    distBuffer_ = cl::Buffer(ClContext::Get().context, CL_MEM_READ_WRITE, nbParticleMax_ * sizeof(CL_FLOAT));
+    gpuBufferParticles_Dist_ = cl::Buffer(ClContext::Get().context, CL_MEM_READ_WRITE, nbParticleMax_ * sizeof(CL_FLOAT));
 
 }
 
@@ -140,11 +140,11 @@ void	ParticleEmitterSprite::updateSpriteData() {
 	ClKernel kernel;
 	kernel.setKernel(*this, "sprite");
 
-	cl_vbos.push_back(particleOCGL_BufferData_.mem);
-	cl_vbos.push_back(deviceBufferSpriteData_.mem);
+	cl_vbos.push_back(OCGLBufferEmitterParticles_.mem);
+	cl_vbos.push_back(OCGLBufferParticles_SpriteData_.mem);
 
-	kernel.beginAndSetUpdatedArgs(particleOCGL_BufferData_.mem,
-			deviceBufferSpriteData_.mem,
+	kernel.beginAndSetUpdatedArgs(OCGLBufferEmitterParticles_.mem,
+			OCGLBufferParticles_SpriteData_.mem,
 			atlas_.getNumberOfRows());
 
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
@@ -221,11 +221,11 @@ void ParticleEmitterSprite::sortDeviceBufferCalculateDistanceParticle_() {
 	kernel.setKernel(*this, "calculateDistanceBetweenParticleAndCamera");
 
 	glm::vec3 cameraPosition = Camera::focus->getPosition();
-	kernel.beginAndSetUpdatedArgs(particleOCGL_BufferData_.mem,
-			distBuffer_,
+	kernel.beginAndSetUpdatedArgs(OCGLBufferEmitterParticles_.mem,
+			gpuBufferParticles_Dist_,
 			glmVec3toClFloat3(cameraPosition));
 
-    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, particleOCGL_BufferData_.mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernel, OCGLBufferEmitterParticles_.mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 	if (debug_)
 		std::cout << "nbParticleMax_ [" << nbParticleMax_ << "]" << std::endl;
 }
@@ -255,15 +255,15 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 	temp.z = cameraPosition.z;
 	//kernel.setArg(3, temp);
 
-	kernel.beginAndSetUpdatedArgs(particleOCGL_BufferData_.mem,
-					  particleBufferAlive_,
-					  particleBufferSpawned_,
-					  particleBufferDeath_,
-					  particleSubBuffersLength_,
+	kernel.beginAndSetUpdatedArgs(OCGLBufferEmitterParticles_.mem,
+					  gpuBufferParticles_Alive_,
+					  gpuBufferParticles_Spawned_,
+					  gpuBufferParticles_Death_,
+					  gpuBufferParticles_SubLength_,
 
-					  deviceBufferSpriteData_.mem,
+					  OCGLBufferParticles_SpriteData_.mem,
 
-					  distBuffer_,
+					  gpuBufferParticles_Dist_,
 					  temp);
 
 	//kernel.setArg(1, sizeof(ParticleData) * localWorkGroupeSize /** blockFactor*/, nullptr);
@@ -273,8 +273,8 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 	ClError err;
 	std::vector<cl::Memory> cl_vbos;
 
-	cl_vbos.push_back(particleOCGL_BufferData_.mem);
-	cl_vbos.push_back(deviceBufferSpriteData_.mem);
+	cl_vbos.push_back(OCGLBufferEmitterParticles_.mem);
+	cl_vbos.push_back(OCGLBufferParticles_SpriteData_.mem);
 
 	std::cout << indexSub_[0] << std::endl;
 	if (indexSub_[0]) {
@@ -288,13 +288,13 @@ void ParticleEmitterSprite::sortDeviceBuffer_() {
 			arrayDeath[i] = indexSub_[0] + i;
 			i++;
 		}
-		queue_.getQueue().enqueueWriteBuffer(particleBufferDeath_,
+		queue_.getQueue().enqueueWriteBuffer(gpuBufferParticles_Death_,
 				CL_TRUE, 0, sizeof(int) * nbParticleMax_, arrayDeath);
 
 
 		indexSub_[2] = i;
 
-		queue_.getQueue().enqueueWriteBuffer(particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &indexSub_);
+		queue_.getQueue().enqueueWriteBuffer(gpuBufferParticles_SubLength_, CL_TRUE, 0, sizeof(int) * 3, &indexSub_);
 
 
 		/*

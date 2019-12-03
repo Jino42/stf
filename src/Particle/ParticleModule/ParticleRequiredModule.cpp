@@ -14,7 +14,7 @@
 
 ParticleRequiredModule::ParticleRequiredModule(AParticleEmitter &emitter) :
 AParticleModule(emitter),
-bufferModuleParams_(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleRequiredParams))
+gpuBufferModuleParam_(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleParamRequired))
 {
 	ClProgram::Get().addProgram(pathKernel_ / "RequiredModule.cl");
 
@@ -31,10 +31,10 @@ void	ParticleRequiredModule::init() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 
-    queue_.getQueue().enqueueWriteBuffer(bufferModuleParams_, CL_TRUE, 0, sizeof(ModuleRequiredParams), &moduleRequiredParams_);
+    queue_.getQueue().enqueueWriteBuffer(gpuBufferModuleParam_, CL_TRUE, 0, sizeof(ModuleParamRequired), &cpuBufferModuleParam_);
 
 	assert(!kernelInit_.beginAndSetUpdatedArgs(
-			bufferModuleParams_,
+			gpuBufferModuleParam_,
 			glmVec3toClFloat3(emitter_.getSystem().getPosition()),
 			Random::Get().getRandomSeed(),
 			emitter_.getNbParticleMax()
@@ -47,9 +47,9 @@ void	ParticleRequiredModule::init() {
 	emitter_.indexSub_[1] = 0;
 	emitter_.indexSub_[2] = nbParticleMax_;
 
-	queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+	queue_.getQueue().enqueueWriteBuffer(emitter_.gpuBufferParticles_SubLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelInit_, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
-	queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+	queue_.getQueue().enqueueReadBuffer(emitter_.gpuBufferParticles_SubLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 	std::cout << emitter_.getNbParticleMax() << std::endl;
 
 	printStructSizeCPU();
@@ -78,9 +78,9 @@ void	ParticleRequiredModule::update(float deltaTime) {
 	cl_vbos.push_back(emitter_.getParticleOCGL_BufferData().mem);
 
 	emitter_.indexSub_[0] = 0;
-	queue_.getQueue().enqueueWriteBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+	queue_.getQueue().enqueueWriteBuffer(emitter_.gpuBufferParticles_SubLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelUpdate_, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
-	queue_.getQueue().enqueueReadBuffer(emitter_.particleSubBuffersLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
+	queue_.getQueue().enqueueReadBuffer(emitter_.gpuBufferParticles_SubLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
 	emitter_.indexSub_[1] = 0;
 
 
@@ -93,6 +93,6 @@ void    ParticleRequiredModule::reload()
 {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-    bufferModuleParams_ = cl::Buffer(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleRequiredParams));
+    gpuBufferModuleParam_ = cl::Buffer(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleParamRequired));
     init();
 }
