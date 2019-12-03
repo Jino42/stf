@@ -3,7 +3,7 @@
 
 #include "Base_NTL.hl"
 
-typedef struct ALIGN s_ParticleData {
+typedef struct ALIGN sParticleData {
 		float3          position; 	// Center point of particle
 		float3          velocity; 	// Current particle velocity
 		float4          color;    	// Particle color
@@ -16,11 +16,11 @@ typedef struct ALIGN s_ParticleData {
 		int             index;
 } ParticleData;
 
-typedef struct ALIGN s_ParticleSpriteData {
+typedef struct ALIGN sParticleDataSprite {
 		float2      offset1;
 		float2      offset2;
 		float       blend;
-} ParticleSpriteData;
+} ParticleDataSprite;
 
 
 bool particleIsActive(__global ParticleData const *particle);

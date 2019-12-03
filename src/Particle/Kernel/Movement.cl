@@ -2,12 +2,12 @@
 
 void kernel spawnMovementRandom(__global ParticleData *dataParticle,
                                 __global int *arrayParticlesAlive2,
-                                __global ParticleMovementModuleData *dataMovement,
+                                __global ParticleDataMovement *dataMovement,
                                 int seed) {
     size_t id = arrayParticlesAlive2[get_global_id(0)];
 
 
-    __global ParticleMovementModuleData *movement = &dataMovement[dataParticle[id].index];
+    __global ParticleDataMovement *movement = &dataMovement[dataParticle[id].index];
 
     movement->acceleration = (float3)(0.f, 0.f, 0.f);
     movement->velocity = (float3)(0.f, 0.f, 0.f);
@@ -20,12 +20,12 @@ void kernel spawnMovementRandom(__global ParticleData *dataParticle,
 }
 
 void kernel movement(__global ParticleData *dataParticle,
-        __global ParticleMovementModuleData *dataMovement,
+        __global ParticleDataMovement *dataMovement,
         float deltaTime,
         float3 attractor) {
     size_t id = get_global_id(0);
     __global ParticleData *particle = &dataParticle[id];
-    __global ParticleMovementModuleData *movement = &dataMovement[particle->index];
+    __global ParticleDataMovement *movement = &dataMovement[particle->index];
 
     //FRICTION
     float3 friction = normalize(movement->velocity) * -1;

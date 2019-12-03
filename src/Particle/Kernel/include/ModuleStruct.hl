@@ -4,35 +4,35 @@
 #include "Base_NTL.hl"
 #include "Range.hl"
 
-typedef struct ALIGN sModuleTargetData {
+typedef struct ALIGN sParticleDataTarget {
 	float3	target;
-}   ModuleTargetData;
+}   ParticleDataTarget;
 
 
-typedef struct ALIGN sModuleMeshParticulizerData {
+typedef struct ALIGN sParticleDataMeshParticulizer {
 	float3	position;
-}   ModuleMeshParticulizerData;
+}   ParticleDataMeshParticulizer;
 
-typedef struct ALIGN sModuleRequiredParams {
+typedef struct ALIGN sModuleParamRequired {
 		float gravityModifier;
 		float simulationSpeed;
-} ModuleRequiredParams;
+} ModuleParamRequired;
 
-typedef struct ALIGN sModuleSpawnParams {
+typedef struct ALIGN sModuleParamSpawn {
 		Rangef startLifeTime;
 		Rangef startSpeed;
 		Rangef startSize;
 		Rangef startRotation;
-} ModuleSpawnParams;
+} ModuleParamSpawn;
 
-typedef struct ALIGN sModuleSizeOverLifetimeParams {
+typedef struct ALIGN sModuleParamSizeOverLifetime {
 		Rangef size;
-} ModuleSizeOverLifetimeParams;
+} ModuleParamSizeOverLifetime;
 
-typedef struct ALIGN s_ParticleMovementModuleData {
+typedef struct ALIGN sParticleDataMovement {
 	float3  acceleration;
 	float3  velocity;
 	float   masse;
-} ParticleMovementModuleData;
+} ParticleDataMovement;
 
 #endif

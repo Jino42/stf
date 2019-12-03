@@ -24,7 +24,7 @@ float2 setSpriteOffset(unsigned int numberRows, int index) {
 
 void updateSpriteCoordInfo(
         __global ParticleData *particle,
-        __global ParticleSpriteData *spriteData,
+        __global ParticleDataSprite *spriteData,
         unsigned int numberRows) {
     float lifeFactor = fmod(particle->age / particle->lifeTime, 1.f);
     int stageCount = numberRows * numberRows;
@@ -38,7 +38,7 @@ void updateSpriteCoordInfo(
 }
 
 __kernel void sprite(__global ParticleData *data,
-                    __global ParticleSpriteData *spriteData,
+                    __global ParticleDataSprite *spriteData,
                     unsigned int numberRows) {
     size_t id = get_global_id(0);
     __global ParticleData *particle = &data[id];

@@ -7,7 +7,7 @@ __kernel void spawnParticle(
                         __global int *arrayParticlesDeath,
                         __global int *arrayParticlesLengthSub,
 
-                        __global ModuleSpawnParams *moduleParams,
+                        __global ModuleParamSpawn *moduleParams,
 
                         float3 particleSystemPosition,
                         int seed) {
