@@ -6,6 +6,8 @@
 #include <Engine/TestParticle.hpp>
 #include <Engine/ModelEngine/MainGraphicExtendModel.hpp>
 #include "Debug.hpp"
+#include "json/JsonParticleParser.hpp"
+#include "Particle/ParticleSystemManager.hpp"
 
 /// Rmove
 #include "Cl/ClProgram.hpp"
@@ -48,6 +50,13 @@ void MainGraphic::init() {
 
     CameraManager::Get().getCamera("Default").setFar(1000.0f);
     CameraManager::Get().getCamera("Default").setPosition(glm::vec3(82.5f, 300.35f, 226.15f));
+
+	if (doParticle_) {
+		JsonParticleParser lol(PathManager::Get().getPath("scene") / "Particles.json");
+		lol.parse();
+		ParticleSystemManager::Get().initAllParticleSystem();
+	}
+
 }
 
 void MainGraphic::render() {
@@ -71,8 +80,12 @@ void MainGraphic::render() {
     renderBuffer_.clear();
 
     MainGraphicExtendModel::Get().update(0.014f);
-	if (doParticle_)
-    	TestParticle::Get().update(0.014f);
+	if (doParticle_) {
+		TestParticle::Get().update(0.014f);
+
+		ParticleSystemManager::Get().updateAllParticleSystem(0.014f);
+		ParticleSystemManager::Get().renderAllParticleSystem();
+	}
     //VoxelWorld::Get().update();
     //VoxelWorld::Get().render();
 

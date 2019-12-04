@@ -18,7 +18,6 @@ ParticleSystem::ParticleSystem() :
 		ClProgram::Get().addInclude(path / "ParticleData.hl");
 		ClProgram::Get().addInclude(path / "NTL.hl");
 		ClProgram::Get().addProgram(PathManager::Get().getPath("particleKernels") / "Tools.cl");
-
 	}
 }
 

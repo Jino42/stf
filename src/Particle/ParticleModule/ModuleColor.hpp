@@ -7,8 +7,8 @@
 class ModuleColor : public AParticleModule {
 public:
 	ModuleColor(AParticleEmitter &emitter);
-	void	init();
-	void	update(float deltaTime);
+	void	init() override;
+	void	update(float deltaTime) override;
 	void    reload() override;
 
 private:

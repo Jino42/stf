@@ -71,7 +71,7 @@ __kernel void ParallelSelection(
                             __global int *arrayParticlesSpawned,
                             __global int *arrayParticlesDeath,
                             __global int *arrayParticlesLengthSub,
-    __global ParticleSpriteData *spriteData,
+    __global ParticleDataSprite *spriteData,
     __global float *bufferDist,
     float3 cameraPosition)
 {
@@ -79,8 +79,8 @@ __kernel void ParallelSelection(
     int n = get_global_size(0); // input size
 
     ParticleData iDataParticle = data[arrayParticlesAlive[i]];
-    __global ParticleSpriteData *spriteDataPointer = &data[arrayParticlesAlive[i]];
-    ParticleSpriteData iDataSprite = spriteData[arrayParticlesAlive[i]];
+    __global ParticleDataSprite *spriteDataPointer = &data[arrayParticlesAlive[i]];
+    ParticleDataSprite iDataSprite = spriteData[arrayParticlesAlive[i]];
 
     float iKey = bufferDist[arrayParticlesAlive[i]];
     int pos = 0;

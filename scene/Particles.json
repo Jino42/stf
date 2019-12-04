@@ -3,8 +3,6 @@
   "Systems": [
     {
       "name": "abc",
-      "particlesMax": 30,
-      "particlesSpawn": 2.0,
       "options": {
         "position": {
           "x": 0,
@@ -15,8 +13,71 @@
       "emitters": [
         {
           "_comment": "Position not yet supported",
+          "name": "Lol0",
           "type": "Sprite",
-          ""
+          "particlesMax": 5000,
+          "particlesSpawn": 12000,
+          "modules": [
+            {
+              "type": "Movement"
+            },
+            {
+              "type": "SizeOverLifetime"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "abc1",
+      "options": {
+        "position": {
+          "x": 60,
+          "y": 258,
+          "z": -30
+        }
+      },
+      "emitters": [
+        {
+          "_comment": "Position not yet supported",
+          "name": "Lol2",
+          "type": "Mesh",
+          "particlesMax": 30,
+          "particlesSpawn": 2.0,
+          "modules": [
+            {
+              "type": "Movement"
+            },
+            {
+              "type": "SizeOverLifetime"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "abc2",
+      "options": {
+        "position": {
+          "x": 120,
+          "y": 258,
+          "z": -30
+        }
+      },
+      "emitters": [
+        {
+          "_comment": "Position not yet supported",
+          "name": "Lol3",
+          "type": "Point",
+          "particles": 300,
+          "modules": [
+            {
+              "type": "Attractor"
+            },
+            {
+              "type": "Color"
+            }
+          ]
         }
       ]
     }
