@@ -157,7 +157,7 @@ void radix() {
 	err.clCheckError();
 
 	int pass = 0;
-	for(pass = 0; pass == 0/*pass < BITS/RADIX*/; pass++) {
+	for(pass = 0; pass < BITS/RADIX; pass++) {
 
 		err.err = kernelCount.setArg(0, arrayGpu);
 		err.err |= kernelCount.setArg(1, histoBuffer);
