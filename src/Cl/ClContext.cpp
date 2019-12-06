@@ -141,9 +141,9 @@ ClContext::ClContext() {
 
 #ifdef WIN32
 	cl_context_properties properties[] = {
-			CL_GL_CONTEXT_KHR, (cl_context_properties)glfwGetWGLContext(DisplayWindow::Get().getWindow()),
-            CL_WGL_HDC_KHR, (cl_context_properties)GetDC(glfwGetWin32Window(DisplayWindow::Get().getWindow())),
-            CL_CONTEXT_PLATFORM, (cl_context_properties)defaultPlatform(),
+//			CL_GL_CONTEXT_KHR, (cl_context_properties)glfwGetWGLContext(DisplayWindow::Get().getWindow()),
+//            CL_WGL_HDC_KHR, (cl_context_properties)GetDC(glfwGetWin32Window(DisplayWindow::Get().getWindow())),
+//            CL_CONTEXT_PLATFORM, (cl_context_properties)defaultPlatform(),
             0
         };
 #elif __APPLE__
