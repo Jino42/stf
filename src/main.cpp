@@ -15,6 +15,7 @@
 #include "noiseutils.h"
 #include <Engine/CameraManager.hpp>
 #include "Engine/TimerOnConstructOffDestruct.hpp"
+#include "limits.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,9 +46,9 @@ void printArray(int *array, int size) {
 	}
 }
 void radix() {
-
-    int ARRLEN_BASE = 10;
+    int ARRLEN_BASE = 674;
     int ARRLEN = 674;
+
 	ClError err;
 	ClContext::Get();
 	ClProgram::Get().addProgram(PathManager::Get().getPath("particleKernels") / "Test.cl");
@@ -76,11 +77,7 @@ void radix() {
 	//size_t localWorkSize = globalWorkSize / groups;
 	//////////
 	int *arrayCpu = new int[ARRLEN];
-	cl::Buffer arrayGpu(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * ARRLEN);
-	cl::Buffer histoBuffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * BUCK * groups * localWorkSize);
-	cl::Buffer scanBuffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * BUCK * groups * localWorkSize);
-	cl::Buffer blocksumBuffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * groups);
-	cl::Buffer outputBuffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * ARRLEN);
+
 
 
     std::cout << "CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS : " << ClContext::Get().deviceDefault.getInfo<CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS>() << std::endl;
@@ -96,10 +93,7 @@ void radix() {
 		arrayCpu[ii] = rand() % 5000;
 	}
 	for ( ; ii < ARRLEN; ii++)
-        arrayCpu[ii] = 5000;
-	arrayCpu[0] = 0;
-	arrayCpu[1] = 0;
-	arrayCpu[8] = 0;
+        arrayCpu[ii] = INT_MAX;
 	//printArray(arrayCpu, ARRLEN);
 
 
@@ -109,6 +103,15 @@ void radix() {
 	cl::Kernel &kernelCoalesce = ClProgram::Get().getKernel("coalesce");
 	cl::Kernel &kernelReorder = ClProgram::Get().getKernel("reorder");
 	cl::Kernel &kernelBlocksum = ClProgram::Get().getKernel("scan2");
+
+    TimerOnConstructOffDestruct *timer = new TimerOnConstructOffDestruct("Radix");
+
+
+    cl::Buffer arrayGpu(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * ARRLEN);
+    cl::Buffer histoBuffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * BUCK * groups * localWorkSize);
+    cl::Buffer scanBuffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * BUCK * groups * localWorkSize);
+    cl::Buffer blocksumBuffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * groups);
+    cl::Buffer outputBuffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * ARRLEN);
 
 
 
@@ -170,8 +173,8 @@ void radix() {
 	size_t ReorderLocalWorkSize = groups;
 	err.err = kernelReorder.setArg(1, scanBuffer);
 	err.err |= kernelReorder.setArg(4, sizeArray);
-	cl::LocalSpaceArg local_histo2 = cl::__local(sizeof(int) * BUCK * ReorderLocalWorkSize);
-	err.err |= kernelReorder.setArg(5, local_histo2);
+	//cl::LocalSpaceArg local_histo2 = cl::__local(sizeof(int) * BUCK * ReorderLocalWorkSize);
+	err.err |= kernelReorder.setArg(5, local_histo);
 	err.clCheckError();
 
 //
@@ -179,7 +182,6 @@ void radix() {
 //
 
 
-    TimerOnConstructOffDestruct *timer = new TimerOnConstructOffDestruct("Radix");
 
 	//Write
 	err.err = queue.enqueueWriteBuffer(arrayGpu, CL_TRUE, 0, sizeof(int) * ARRLEN, arrayCpu);
