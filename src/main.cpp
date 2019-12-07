@@ -14,6 +14,7 @@
 #include <noise/noise.h>
 #include "noiseutils.h"
 #include <Engine/CameraManager.hpp>
+#include "Engine/TimerOnConstructOffDestruct.hpp"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,17 +35,19 @@ extern "C" {
 #define BUCK (1 << RADIX)
 //Number of bits in the radix
 #define RADIX 4
-#define ARRLEN 64
 
+#define DEBUG 0
 
-void printArray(int *array) {
+void printArray(int *array, int size) {
 	std::cout << "CPU-----------------------" << std::endl;
-	for (int i = 0; i < ARRLEN; i++) {
+	for (int i = 0; i < size; i++) {
 		std::cout << "[" << i << "][" << array[i] << "]" << std::endl;
 	}
 }
 void radix() {
 
+    int ARRLEN_BASE = 10;
+    int ARRLEN = 674;
 	ClError err;
 	ClContext::Get();
 	ClProgram::Get().addProgram(PathManager::Get().getPath("particleKernels") / "Test.cl");
@@ -53,11 +56,26 @@ void radix() {
 
 
 	//BUFFERS
-	size_t globalWorkSize = 32;
-	size_t groups = 8;
-	size_t localWorkSize = globalWorkSize / groups;
+	size_t groups = 16;
+    size_t localWorkSize = 16;
+    size_t globalWorkSize = localWorkSize * groups;
+
+    const size_t rest = ARRLEN % (groups * localWorkSize);
+    ARRLEN = rest == 0 ? ARRLEN : (ARRLEN - rest + (groups * localWorkSize));
+
+    /*
+    std::cout << "Size[" << size << "]" << std::endl;
+    std::cout << "Size[" << size / 16 << "]" << std::endl;
+    exit(0);
+    */
+
+	//size_t globalWorkSize = 65536;
+    //size_t globalWorkSize = 512;
+    //size_t groups = 256;
+    //size_t groups = 8;
+	//size_t localWorkSize = globalWorkSize / groups;
 	//////////
-	int arrayCpu[ARRLEN];
+	int *arrayCpu = new int[ARRLEN];
 	cl::Buffer arrayGpu(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * ARRLEN);
 	cl::Buffer histoBuffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * BUCK * groups * localWorkSize);
 	cl::Buffer scanBuffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * BUCK * groups * localWorkSize);
@@ -65,14 +83,24 @@ void radix() {
 	cl::Buffer outputBuffer(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * ARRLEN);
 
 
+    std::cout << "CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS : " << ClContext::Get().deviceDefault.getInfo<CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS>() << std::endl;
+    for (int i = 0; i < ClContext::Get().deviceDefault.getInfo<CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS>(); i++) {
+        std::cout << "CL_DEVICE_MAX_WORK_ITEM_SIZES : " << ClContext::Get().deviceDefault.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>()[i] << std::endl;
+    }
+	std::cout << "CL_DEVICE_MAX_WORK_GROUP_SIZE : " << ClContext::Get().deviceDefault.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>() << std::endl;
+
+
 	srand(time(NULL));
-	for (int &i : arrayCpu) {
-		i = rand() % 32;//(ARRLEN / 8);
+	int ii;
+	for (ii = 0; ii < ARRLEN_BASE; ii++) {
+		arrayCpu[ii] = rand() % 5000;
 	}
+	for ( ; ii < ARRLEN; ii++)
+        arrayCpu[ii] = 5000;
 	arrayCpu[0] = 0;
 	arrayCpu[1] = 0;
 	arrayCpu[8] = 0;
-	printArray(arrayCpu);
+	//printArray(arrayCpu, ARRLEN);
 
 
 	//KERNELS
@@ -151,9 +179,10 @@ void radix() {
 //
 
 
+    TimerOnConstructOffDestruct *timer = new TimerOnConstructOffDestruct("Radix");
 
 	//Write
-	err.err = queue.enqueueWriteBuffer(arrayGpu, CL_TRUE, 0, sizeof(int) * ARRLEN, &arrayCpu);
+	err.err = queue.enqueueWriteBuffer(arrayGpu, CL_TRUE, 0, sizeof(int) * ARRLEN, arrayCpu);
 	err.clCheckError();
 
 	int pass = 0;
@@ -164,29 +193,28 @@ void radix() {
 		err.err |= kernelCount.setArg(3, pass);
 		err.clCheckError();
 
-
-		std::cout << "start  enqueueNDRangeKernel kernelCount" << std::endl;
-
-		err.err = queue.enqueueNDRangeKernel(kernelCount, cl::NullRange, cl::NDRange(globalWorkSize),
+		std::cout << "globalWorkSize : " << globalWorkSize << std::endl;
+        std::cout << "localWorkSize : " << localWorkSize << std::endl;
+        err.err = queue.enqueueNDRangeKernel(kernelCount, cl::NullRange, cl::NDRange(globalWorkSize),
 											 cl::NDRange(localWorkSize));
-		err.clCheckError();
-		queue.finish();
-		std::cout << "end  enqueueNDRangeKernel kernelCount" << std::endl;
-		//}
-
-		int *countput;
-		countput = new int[BUCK * groups * localWorkSize];
-		err.err = queue.enqueueReadBuffer(histoBuffer, CL_TRUE, 0, sizeof(int) * BUCK * groups * localWorkSize,
-										  countput);
+        std::cout << "kernelCount" << std::endl;
 		err.clCheckError();
 		queue.finish();
 
-		std::cout << "start  output histo" << std::endl;
-		for (int i = 0; i < BUCK * groups * localWorkSize; i++)
-			std::cout << i << " : " << countput[i] << std::endl;
-		std::cout << "end  output histo" << std::endl;
-		//////////
+        if (DEBUG) {
+            int *countput;
+            countput = new int[BUCK * groups * localWorkSize];
+            err.err = queue.enqueueReadBuffer(histoBuffer, CL_TRUE, 0, sizeof(int) * BUCK * groups * localWorkSize,
+                                              countput);
+            err.clCheckError();
+            queue.finish();
 
+            std::cout << "start  output histo" << std::endl;
+            for (int i = 0; i < BUCK * groups * localWorkSize; i++)
+                std::cout << i << " : " << countput[i] << std::endl;
+            std::cout << "end  output histo" << std::endl;
+            //////////
+        }
 
 
 //
@@ -195,6 +223,7 @@ void radix() {
 		kernelScan.setArg(0, histoBuffer);
 		err.err = queue.enqueueNDRangeKernel(kernelScan, cl::NullRange, cl::NDRange(ScanGlobalWorkSize),
 											 cl::NDRange(ScanLocalWorkSize));
+        std::cout << "kernelScan" << std::endl;
 		err.clCheckError();
 		queue.finish();
 		int *scanput = new int[BUCK * groups * localWorkSize];
@@ -202,41 +231,44 @@ void radix() {
 		err.clCheckError();
 		queue.finish();
 
-		std::cout << "start  output scanput" << std::endl;
-		for (int i = 0; i < BUCK * groups * localWorkSize; i++)
-			std::cout << i << " : " << scanput[i] << std::endl;
-		std::cout << "end  output scanput" << std::endl;
+        if (DEBUG) {
+            std::cout << "start  output scanput" << std::endl;
+            for (int i = 0; i < BUCK * groups * localWorkSize; i++)
+                std::cout << i << " : " << scanput[i] << std::endl;
+            std::cout << "end  output scanput" << std::endl;
 
-		int *oblockput = new int[groups];
-		err.err = queue.enqueueReadBuffer(blocksumBuffer, CL_TRUE, 0, sizeof(int) * groups, oblockput);
-		err.clCheckError();
-		queue.finish();
+            int *oblockput = new int[groups];
+            err.err = queue.enqueueReadBuffer(blocksumBuffer, CL_TRUE, 0, sizeof(int) * groups, oblockput);
+            err.clCheckError();
+            queue.finish();
 
 
-		std::cout << "start  output oblockput" << std::endl;
-		for (int i = 0; i < groups; i++)
-			std::cout << i << " : " << oblockput[i] << std::endl;
-		std::cout << "end  output oblockput" << std::endl;
-
+            std::cout << "start  output oblockput" << std::endl;
+            for (int i = 0; i < groups; i++)
+                std::cout << i << " : " << oblockput[i] << std::endl;
+            std::cout << "end  output oblockput" << std::endl;
+        }
 //
 //			------BLOCKSUM
 //
 
 		err.err = queue.enqueueNDRangeKernel(kernelBlocksum, cl::NullRange, cl::NDRange(BlocksumGlobalWorkSize),
 											 cl::NDRange(BlocksumLocalWorkSize));
-		err.clCheckError();
+        std::cout << "kernelBlocksum" << std::endl;
+        err.clCheckError();
 		queue.finish();
 
-		int *blockput = new int[groups];
-		err.err = queue.enqueueReadBuffer(blocksumBuffer, CL_TRUE, 0, sizeof(int) * groups, blockput);
-		err.clCheckError();
-		queue.finish();
+        if (DEBUG) {
+            int *blockput = new int[groups];
+            err.err = queue.enqueueReadBuffer(blocksumBuffer, CL_TRUE, 0, sizeof(int) * groups, blockput);
+            err.clCheckError();
+            queue.finish();
 
-		std::cout << "start  output blockput" << std::endl;
-		for (int i = 0; i < groups; i++)
-			std::cout << i << " : " << blockput[i] << std::endl;
-		std::cout << "end  output blockput" << std::endl;
-
+            std::cout << "start  output blockput" << std::endl;
+            for (int i = 0; i < groups; i++)
+                std::cout << i << " : " << blockput[i] << std::endl;
+            std::cout << "end  output blockput" << std::endl;
+        }
 //
 //			------BLOCKSUM
 //
@@ -244,16 +276,21 @@ void radix() {
 
 		err.err = queue.enqueueNDRangeKernel(kernelCoalesce, cl::NullRange, cl::NDRange(CoalesceGlobalWorkSize),
 											 cl::NDRange(CoalesceLocalWorkSize));
-		err.clCheckError();
+        std::cout << "kernelCoalesce" << std::endl;
+
+        err.clCheckError();
 		queue.finish();
-		int *coalput = new int[BUCK * localWorkSize * groups];
-		err.err = queue.enqueueReadBuffer(scanBuffer, CL_TRUE, 0, sizeof(int) * BUCK * localWorkSize * groups, coalput);
-		err.clCheckError();
-		queue.finish();
-		std::cout << "start  output coalput" << std::endl;
-		for (int i = 0; i < BUCK * localWorkSize * groups; i++)
-			std::cout << i << " : " << coalput[i] << std::endl;
-		std::cout << "end  output coalput" << std::endl;
+        if (DEBUG) {
+            int *coalput = new int[BUCK * localWorkSize * groups];
+            err.err = queue.enqueueReadBuffer(scanBuffer, CL_TRUE, 0, sizeof(int) * BUCK * localWorkSize * groups,
+                                              coalput);
+            err.clCheckError();
+            queue.finish();
+            std::cout << "start  output coalput" << std::endl;
+            for (int i = 0; i < BUCK * localWorkSize * groups; i++)
+                std::cout << i << " : " << coalput[i] << std::endl;
+            std::cout << "end  output coalput" << std::endl;
+        }
 
 //
 //			------REORDER
@@ -265,26 +302,30 @@ void radix() {
 		err.err |= kernelReorder.setArg(3, pass);
 		err.clCheckError();
 
-		std::cout << "ReorderGlobalWorkSize : " << ReorderGlobalWorkSize << std::endl;
-		std::cout << "ReorderLocalWorkSize : " << ReorderLocalWorkSize << std::endl;
+		if (DEBUG) {
+            std::cout << "ReorderGlobalWorkSize : " << ReorderGlobalWorkSize << std::endl;
+            std::cout << "ReorderLocalWorkSize : " << ReorderLocalWorkSize << std::endl;
+		}
+
 		err.err = queue.enqueueNDRangeKernel(kernelReorder, cl::NullRange, cl::NDRange(ReorderGlobalWorkSize),
 											 cl::NDRange(ReorderLocalWorkSize));
-		std::cout << "ReorderLocalWorkSize : " << ReorderLocalWorkSize << std::endl;
-		err.clCheckError();
-		std::cout << "ReorderLocalWorkSize : " << ReorderLocalWorkSize << std::endl;
-		queue.finish();
-		std::cout << "ReorderLocalWorkSize : " << ReorderLocalWorkSize << std::endl;
-
-
-		int *output = new int[ARRLEN];
-		err.err = queue.enqueueReadBuffer(outputBuffer, CL_TRUE, 0, sizeof(int) * ARRLEN, output);
-		err.clCheckError();
+        std::cout << "kernelReorder" << std::endl;
+        err.clCheckError();
 		queue.finish();
 
-		std::cout << "start  output output" << std::endl;
-		for (int i = 0; i < ARRLEN; i++)
-			std::cout << i << " : " << output[i] << std::endl;
-		std::cout << "end  output output" << std::endl;
+
+		if (DEBUG) {
+            int *output = new int[ARRLEN];
+            err.err = queue.enqueueReadBuffer(outputBuffer, CL_TRUE, 0, sizeof(int) * ARRLEN, output);
+            err.clCheckError();
+            queue.finish();
+
+            std::cout << "start  output output" << std::endl;
+            for (int i = 0; i < ARRLEN; i++)
+                std::cout << i << " : " << output[i] << std::endl;
+            std::cout << "end  output output" << std::endl;
+		}
+
 
 
 
@@ -301,6 +342,8 @@ void radix() {
 		outputBuffer = tmp;
 	}
 
+	delete timer;
+
 	std::cout << "start  DEB output" << std::endl;
 	for (int i = 0; i < ARRLEN; i++)
 		std::cout << i << " : " << arrayCpu[i] << std::endl;
@@ -315,6 +358,7 @@ void radix() {
 	for (int i = 0; i < ARRLEN; i++)
 		std::cout << i << " : " << output[i] << std::endl;
 	std::cout << "end  output output" << std::endl;
+
 }
 
 void demoGui() {

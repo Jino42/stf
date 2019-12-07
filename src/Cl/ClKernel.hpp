@@ -2,6 +2,7 @@
 
 #include "NTL.hpp"
 #include "Enum/eParticleBuffer.hpp"
+#include "Cl/ClProgram.hpp"
 
 class AParticleEmitter;
 

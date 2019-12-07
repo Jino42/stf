@@ -4,6 +4,8 @@
 //Number of bits in the radix
 #define RADIX 4
 
+#define DEBUG 0
+
 __kernel void count(
                 const __global int* input,
                 __global int* output,
@@ -21,12 +23,12 @@ __kernel void count(
     size_t group_id = get_group_id(0);
     size_t n_groups = get_num_groups(0);
 
-    printf("work_dim[%3i], global_id[%3i/%3i], local_id[%3i/%3i] groups_id[%3i/%3i]\n",
+    if (DEBUG == 1)
+        printf("work_dim[%3i], global_id[%3i/%3i], local_id[%3i/%3i] groups_id[%3i/%3i]\n",
         work_dim,
         global_id, global_size,
         local_id, local_size,
         group_id, n_groups);
-
 
 
     int size = (nkeys / n_groups) / local_size;
@@ -38,7 +40,8 @@ __kernel void count(
         local_histo[i * local_size + local_id] = 0;
     }
 
-    printf("%i : start[%i] size[%i]\n", global_id, start, size);
+    if (DEBUG == 1)
+        printf("%i : start[%i] size[%i]\n", global_id, start, size);
 
     barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -47,7 +50,8 @@ __kernel void count(
         //Extract the corresponding radix of the key
         key = ((key >> (pass * RADIX)) & (BUCK - 1));
         //Count the ocurrences in the corresponding bucket
-        printf("%i index[%i]\n", key, key * local_size + local_id);
+        if (DEBUG == 1)
+            printf("%i index[%i]\n", key, key * local_size + local_id);
         atomic_add(&(local_histo[key * local_size + local_id]), 1);
     }
 
@@ -59,7 +63,7 @@ __kernel void count(
         //"to" maps to the global buckets
         int to = i * n_groups + group_id;
         //Map the local data to its global position
-        //if (!local_id)
+        if (DEBUG == 1)
             printf("Buck[%i/%i] output[%i] = from[%i]\n", i, BUCK, local_size * to + local_id, from);
         output[local_size * to + local_id] = local_histo[from];
     }
@@ -85,7 +89,8 @@ __kernel void scan(__global int* input,
     uint group_id = (uint) get_group_id(0);
     uint n_groups = (uint) get_num_groups(0);
 
-    printf("work_dim[%3i], global_id[%3i/%3i], local_id[%3i/%3i] groups_id[%3i/%3i]\n",
+    if (DEBUG == 1)
+        printf("work_dim[%3i], global_id[%3i/%3i], local_id[%3i/%3i] groups_id[%3i/%3i]\n",
         work_dim,
         g_id, get_global_size(0),
         l_id, l_size,
@@ -98,13 +103,13 @@ __kernel void scan(__global int* input,
     //UP SWEEP
     int d, offset = 1;
     for(d = l_size; d > 0; d >>= 1){
-        if (!group_id && l_id < d)
+        if (DEBUG == 1 && !group_id && l_id < d)
             printf("GO | %i d[%i] > 0\n", g_id, d);
         barrier(CLK_LOCAL_MEM_FENCE);
         if(l_id < d) {
             int a = offset * (2 * l_id + 1) - 1;
             int b = offset * (2 * l_id + 2) - 1;
-            if (!group_id)
+            if (DEBUG == 1 && !group_id)
                 printf("l_id[%i] || a[%i] | b[%i] | local_scan[A]=%i | local_scan[B]=%i  |||| B+A = %i\n", g_id, a, b, local_scan[a], local_scan[b], local_scan[b] + local_scan[a]);
             local_scan[b] += local_scan[a];
         }
@@ -119,7 +124,7 @@ __kernel void scan(__global int* input,
 
         //Clear the last element
         local_scan[l_size * 2 - 1] = 0;
-        if (!group_id) {
+        if (DEBUG == 1 && !group_id) {
             printf("CLEAN 1\n");
             for (int z = 0; z < l_size * 2; z++)
                 printf("%i [%3i]\n", z, local_scan[z]);
@@ -130,12 +135,12 @@ __kernel void scan(__global int* input,
     for(d = 1; d < (l_size*2); d *= 2) {
         offset >>= 1;
         barrier(CLK_LOCAL_MEM_FENCE);
-        if (!group_id && !l_id) {
+        if (DEBUG == 1 && !group_id && !l_id) {
             printf("CLEAN %i\n", d);
             for (int z = 0; z < l_size * 2; z++)
                 printf("%i [%3i]\n", z, local_scan[z]);
         }
-        if (!group_id && l_id < d)
+        if (DEBUG == 1 && !group_id && l_id < d)
             printf("GO | %i d[%i] > 0\n", g_id, d);
         barrier(CLK_LOCAL_MEM_FENCE);
         if(l_id < d) {
@@ -169,7 +174,8 @@ __kernel void scan2(__global int* input,
     uint group_id = (uint) get_group_id(0);
     uint n_groups = (uint) get_num_groups(0);
 
-    printf("work_dim[%3i], global_id[%3i/%3i], local_id[%3i/%3i] groups_id[%3i/%3i]\n",
+    if (DEBUG == 1)
+        printf("work_dim[%3i], global_id[%3i/%3i], local_id[%3i/%3i] groups_id[%3i/%3i]\n",
         work_dim,
         g_id, get_global_size(0),
         l_id, l_size,
@@ -183,13 +189,13 @@ __kernel void scan2(__global int* input,
     //UP SWEEP
     int d, offset = 1;
     for(d = l_size; d > 0; d >>= 1){
-        if (!group_id && l_id < d)
+        if (DEBUG == 1 && !group_id && l_id < d)
             printf("GO | %i d[%i] > 0\n", g_id, d);
         barrier(CLK_LOCAL_MEM_FENCE);
         if(l_id < d) {
             int a = offset * (2 * l_id + 1) - 1;
             int b = offset * (2 * l_id + 2) - 1;
-            if (!group_id)
+            if (DEBUG == 1 && !group_id)
                 printf("l_id[%i] || a[%i] | b[%i] | local_scan[A]=%i | local_scan[B]=%i  |||| B+A = %i\n", g_id, a, b, local_scan[a], local_scan[b], local_scan[b] + local_scan[a]);
             local_scan[b] += local_scan[a];
         }
@@ -204,7 +210,7 @@ __kernel void scan2(__global int* input,
 
         //Clear the last element
         local_scan[l_size * 2 - 1] = 0;
-        if (!group_id) {
+        if (DEBUG == 1 && !group_id) {
             printf("CLEAN 1\n");
             for (int z = 0; z < l_size * 2; z++)
                 printf("%i [%3i]\n", z, local_scan[z]);
@@ -215,12 +221,12 @@ __kernel void scan2(__global int* input,
     for(d = 1; d < (l_size*2); d *= 2) {
         offset >>= 1;
         barrier(CLK_LOCAL_MEM_FENCE);
-        if (!group_id && !l_id) {
+        if (DEBUG == 1 && !group_id && !l_id) {
             printf("CLEAN %i\n", d);
             for (int z = 0; z < l_size * 2; z++)
                 printf("%i [%3i]\n", z, local_scan[z]);
         }
-        if (!group_id && l_id < d)
+        if (DEBUG == 1 && !group_id && l_id < d)
             printf("GO | %i d[%i] > 0\n", g_id, d);
         barrier(CLK_LOCAL_MEM_FENCE);
         if(l_id < d) {
@@ -252,7 +258,8 @@ __kernel void coalesce(__global int* scan,
     uint group_id = (uint) get_group_id(0);
     uint n_groups = (uint) get_num_groups(0);
 
-    printf("work_dim[%3i], global_id[%3i/%3i], local_id[%3i/%3i] groups_id[%3i/%3i]\n",
+    if (DEBUG == 1)
+        printf("work_dim[%3i], global_id[%3i/%3i], local_id[%3i/%3i] groups_id[%3i/%3i]\n",
         work_dim,
         g_id, get_global_size(0),
         l_id, l_size,
@@ -286,7 +293,8 @@ __kernel void reorder(__global int* array,
     uint group_id = (uint) get_group_id(0);
     uint n_groups = (uint) get_num_groups(0);
 
-    printf("work_dim[%3i], global_id[%3i/%3i], local_id[%3i/%3i] groups_id[%3i/%3i]\n",
+    if (DEBUG == 1)
+        printf("work_dim[%3i], global_id[%3i/%3i], local_id[%3i/%3i] groups_id[%3i/%3i]\n",
         work_dim,
         g_id, get_global_size(0),
         l_id, l_size,
@@ -297,16 +305,16 @@ __kernel void reorder(__global int* array,
     int i;
     for(i = 0; i < BUCK; i++){
         int to = i * n_groups + group_id;
-        printf("g_id[%i] local_histo[%i * %i + %i = %i] = histo[%i * %i + %i = %i] || %i ||\n",
-        g_id,
-        i, l_size, l_id, i * l_size + l_id,
-        l_size, to, l_id, l_size * to + l_id,
-        histo[l_size * to + l_id]
-        );
+        if (DEBUG == 1)
+            printf("g_id[%i] local_histo[%i * %i + %i = %i] = histo[%i * %i + %i = %i] || %i ||\n",
+            g_id,
+            i, l_size, l_id, i * l_size + l_id,
+            l_size, to, l_id, l_size * to + l_id,
+            histo[l_size * to + l_id]);
         local_histo[i * l_size + l_id] = histo[l_size * to + l_id];
     }
 
-    if (g_id == 0) {
+    if (DEBUG == 1 && g_id == 0) {
         printf("LLocal histo : \n");
         for (int i = 0; i < l_size; i++)
             printf("%i\n", local_histo[i]);
@@ -317,11 +325,14 @@ __kernel void reorder(__global int* array,
     int size = (nkeys / n_groups) / l_size;
     int start = g_id * size;
 
-    for(i = 0; i < size; i++){
+    for(i = 0; i < size; i++) {
         int item = array[i + start];
         int key = (item >> (pass * RADIX)) & (BUCK - 1);
+        if (DEBUG == 1 && !group_id)
+            printf("pipe l_size[%i/%i] | key[%i] | local_histo[%i]\n",
+                l_id, l_size, key, key * l_size + l_id);
         int pos = local_histo[key * l_size + l_id];
-        local_histo[key * l_size + l_id]++;
+        atomic_add(&(local_histo[key * l_size + l_id]), 1);
 
         output[pos] = item;
     }

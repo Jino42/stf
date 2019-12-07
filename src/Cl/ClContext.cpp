@@ -166,7 +166,8 @@ ClContext::ClContext() {
 	}
 
 	//context = cl::Context(deviceDefault, properties);//, oCL_error_callback, nullptr, &err.err);
-	context = cl::Context(deviceDefault, properties);//, oCL_error_callback, nullptr, &err.err);
+	//context = cl::Context(deviceDefault, properties);//, oCL_error_callback, nullptr, &err.err);
+    context = cl::Context(deviceDefault);
 	err.clCheckError();
 
 	size_t sizeBufferPrintf;
