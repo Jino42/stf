@@ -54,8 +54,6 @@ void radix() {
 	ClProgram::Get().addProgram(PathManager::Get().getPath("particleKernels") / "Test.cl");
 	cl::CommandQueue queue(ClContext::Get().context, ClContext::Get().deviceDefault);
 
-
-
 	//BUFFERS
 	size_t groups = 16;
     size_t localWorkSize = 16;
