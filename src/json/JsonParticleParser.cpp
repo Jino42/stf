@@ -11,6 +11,7 @@
 #include "Particle/ParticleModule/ModuleSizeOverLifetime.hpp"
 #include "Particle/ParticleModule/ModuleMeshParticulizer.hpp"
 #include "Particle/ParticleModule/ModuleMoveToTarget.hpp"
+#include "Particle/ParticleModule/ModuleSPH.hpp"
 
 JsonParticleParser::JsonParticleParser(boost::filesystem::path path) :
 		jsonPath_(path),
@@ -75,6 +76,10 @@ void JsonParticleParser::parse() {
 						for (auto &itModule : *itEmitter.find("modules")) {
 							std::cout << itModule["type"] << std::endl;
 
+							if (itModule["type"].get<std::string>() == "SPH") {
+								currentEmitter_->addModule<ModuleSPH>();
+								std::cout << "Is [SPH]" << std::endl;
+							}
 							if (itModule["type"].get<std::string>() == "Movement") {
 								currentEmitter_->addModule<ModuleMovement>();
 								std::cout << "Is [Movement]" << std::endl;

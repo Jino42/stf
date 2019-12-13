@@ -5,6 +5,31 @@
       "name": "abc",
       "options": {
         "position": {
+          "x": 82.5,
+          "y": 258,
+          "z": 200
+        }
+      },
+      "emitters": [
+        {
+          "_comment": "Position not yet supported",
+          "name": "Lol0",
+          "type": "Point",
+          "particles": 50,
+          "modules": [
+            {
+              "type": "SPH"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "SystemsDISABLE": [
+    {
+      "name": "abc",
+      "options": {
+        "position": {
           "x": 0,
           "y": 258,
           "z": -30
