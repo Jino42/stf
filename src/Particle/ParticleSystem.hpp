@@ -15,7 +15,9 @@ public:
 	//...
 
 	//bOrientZAxisTowardCamera
-	ParticleSystem();
+	ParticleSystem() = delete;
+
+	explicit ParticleSystem(std::string const &name);
 
 	template < typename T , typename ... Args>
 	void addEmitter(std::string const &name, Args ... args) {
@@ -50,12 +52,15 @@ public:
 	void setPosition(glm::vec3 const &position) {
 		position_ = position;
 	}
-	glm::vec3 getPosition() const {
+	glm::vec3 &getPosition() {
 		return position_;
 	}
 
+	std::string const &getName() const { return name_; }
+
 private:
 	std::list<std::unique_ptr<AParticleEmitter> > emitterBuffer_;
+	std::string const				name_;
 	ClQueue							queue_;
 	glm::vec3						position_;
 

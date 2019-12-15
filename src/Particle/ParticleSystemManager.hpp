@@ -14,6 +14,8 @@ public:
 
 	ParticleSystem &getParticleSystem(std::string const &name);
 
+	std::map< std::string, ParticleSystem > &getMapParticleSystem();
+
 	void initAllParticleSystem();
 	void updateAllParticleSystem(float deltaTime);
 	void renderAllParticleSystem();

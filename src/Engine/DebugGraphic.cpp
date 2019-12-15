@@ -30,6 +30,11 @@ void DebugGraphic::buildBuffers_(unsigned int newSize) {
 
 	if (debugBuffer_)
 		delete [] debugBuffer_;
+    if (debug_) {
+        std::cout << "debugVertexBufferActualSize_ :["
+                << debugVertexBufferActualSize_ << "]" << std::endl;
+    }
+		
 	debugBuffer_ = new DebugVertex[debugVertexBufferActualSize_];
 
 
@@ -129,4 +134,4 @@ void DebugGraphic::updateDebugObject_(ADebugObject &object) {
     }
 }
 
-bool DebugGraphic::debug_ = false;
+bool DebugGraphic::debug_ = true;

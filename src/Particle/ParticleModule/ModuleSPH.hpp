@@ -8,7 +8,10 @@
 class AParticleEmitter;
 
 struct ModuleParamSPH {
-	Rangef size;
+	cl_float pressure;		//250.f
+	cl_float densityRef;	//1.f
+	cl_float smoothing;	//1.f
+	cl_float viscosity;	//0.018f
 };
 
 struct ParticleDataSPH {

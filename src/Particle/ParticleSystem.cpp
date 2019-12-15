@@ -3,7 +3,8 @@
 #include "Cl/ClProgram.hpp"
 #include <PathManager.hpp>
 
-ParticleSystem::ParticleSystem() :
+ParticleSystem::ParticleSystem(std::string const &name) :
+		name_(name_),
 		position_(glm::vec3(0))
 {
 	if (ParticleSystem::firstSystem_) {

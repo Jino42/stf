@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Particle/ParticleSystem.hpp"
+#include "Engine/AABB.hpp"
 
 class MainGraphic;
 class Camera;
@@ -14,8 +15,7 @@ public:
 
     static TestParticle &Get();
 private:
-    ParticleSystem					particleSystem_[1];
-
+    AABB box_;
     static std::unique_ptr<TestParticle> instance_;
 
 };

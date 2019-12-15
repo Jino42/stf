@@ -28,13 +28,17 @@ ModuleSPH::ModuleSPH(AParticleEmitter &emitter) :
 void	ModuleSPH::init() {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-	kernelInit_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_);
+	queue_.getQueue().enqueueWriteBuffer(gpuBufferModuleParam_, CL_TRUE, 0, sizeof(ModuleParamSPH), &cpuBufferModuleParam_);
+	kernelInit_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_, gpuBufferModuleParam_);
 	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelInit_, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
 void	ModuleSPH::update(float deltaTime) {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
+
+	queue_.getQueue().enqueueWriteBuffer(gpuBufferModuleParam_, CL_TRUE, 0, sizeof(ModuleParamSPH), &cpuBufferModuleParam_);
+
 /*
 	size_t groups = 16;
 	size_t globalWorkSize = localWorkSize * groups;
@@ -55,7 +59,7 @@ void	ModuleSPH::update(float deltaTime) {
 	cl::LocalSpaceArg bufferLocal = cl::Local(sizeof(ParticleDataSPH) * localWorkSize);
 
 
-	kernelDensity_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_, bufferLocal);
+	kernelDensity_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_, gpuBufferModuleParam_, bufferLocal);
 
 	ClError err;
 	std::vector<cl::Memory> cl_vbos;
@@ -77,7 +81,7 @@ void	ModuleSPH::update(float deltaTime) {
 	queue_.getQueue().finish();
 
 
-	kernelPressure_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_, bufferLocal);
+	kernelPressure_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_, gpuBufferModuleParam_, bufferLocal);
 
 	glFinish();
 	err.err = queue_.getQueue().enqueueAcquireGLObjects(&cl_vbos, nullptr, &ev);
@@ -92,7 +96,7 @@ void	ModuleSPH::update(float deltaTime) {
 	queue_.getQueue().finish();
 
 
-	kernelViscosity_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_, bufferLocal);
+	kernelViscosity_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_, gpuBufferModuleParam_, bufferLocal);
 
 	glFinish();
 	err.err = queue_.getQueue().enqueueAcquireGLObjects(&cl_vbos, nullptr, &ev);
@@ -129,5 +133,6 @@ void    ModuleSPH::reload()
 {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
+	queue_.getQueue().enqueueWriteBuffer(gpuBufferModuleParam_, CL_TRUE, 0, sizeof(ModuleParamSPH), &cpuBufferModuleParam_);
 	init();
 }

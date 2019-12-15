@@ -29,7 +29,7 @@ public:
 
 protected:
     virtual void    updateLines() = 0;
-    virtual void    initDebug() = 0;
+	virtual void	initDebug() {};
 	void            updateDebug();
 
 

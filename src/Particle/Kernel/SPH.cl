@@ -1,5 +1,12 @@
 #include "NTL.hl"
 
+typedef struct ALIGN sModuleParamSPH {
+    float pressure;
+	float densityRef;
+	float smoothing;
+	float viscosity;
+}   ModuleParamSPH;
+
 typedef struct ALIGN sParticleDataSPH {
     float3	position;
     float	density;
@@ -10,7 +17,8 @@ typedef struct ALIGN sParticleDataSPH {
     float3	velocity;
 }   ParticleDataSPH;
 
-void __kernel SPH_Init(__global ParticleDataSPH *dataSPH) {
+void __kernel SPH_Init(__global ParticleDataSPH *dataSPH,
+                        __global ModuleParamSPH     *moduleParam) {
     __global ParticleDataSPH *sph = &dataSPH[get_global_id(0)];
 
     sph->density = 0.f;
@@ -23,6 +31,7 @@ void __kernel SPH_Init(__global ParticleDataSPH *dataSPH) {
 
 void __kernel SPH_UpdateDensity( __global ParticleData *dataParticle,
                         __global ParticleDataSPH *dataSPH,
+                        __global ModuleParamSPH     *moduleParam,
                         __local ParticleDataSPH  *sharedSPH
                         ) {
     uint work_dim = get_work_dim();
@@ -88,6 +97,7 @@ void __kernel SPH_UpdateDensity( __global ParticleData *dataParticle,
 
 void __kernel SPH_UpdatePressure( __global ParticleData *dataParticle,
                         __global ParticleDataSPH *dataSPH,
+                        __global ModuleParamSPH     *moduleParam,
                         __local ParticleDataSPH  *sharedSPH
                         ) {
     uint work_dim = get_work_dim();
@@ -165,6 +175,7 @@ void __kernel SPH_UpdatePressure( __global ParticleData *dataParticle,
 
 void __kernel SPH_UpdateViscosity( __global ParticleData *dataParticle,
                         __global ParticleDataSPH *dataSPH,
+                        __global ModuleParamSPH     *moduleParam,
                         __local ParticleDataSPH  *sharedSPH
                         ) {
     uint work_dim = get_work_dim();
