@@ -49,12 +49,12 @@ void	Transform::rotate(glm::vec3 const &axis, float angle, float deltaTime) {
 void	Transform::scale(glm::vec3 const &axis, float deltaTime) {
 	float velocity = speed_ * deltaTime;
 
-	scaling_ += (axis * velocity);
+	scaling_ *= (axis * velocity);
 }
 void	Transform::scale(float scale, float deltaTime) {
 	float velocity = speed_ * deltaTime;
 
-	scaling_ += glm::vec3(scale) * velocity;
+	scaling_ *= glm::vec3(scale) * velocity;
 }
 
 void	Transform::resetTransform() {

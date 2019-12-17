@@ -35,6 +35,8 @@ void ParticleSystemManager::renderAllParticleSystem() {
 	}
 }
 
+void ParticleSystemManager::deleteAllParticleSystem() { mapSystems_.clear(); }
+
 std::unique_ptr<ParticleSystemManager> ParticleSystemManager::instance_ = nullptr;
 
 std::map<std::string, ParticleSystem> &ParticleSystemManager::getMapParticleSystem() {

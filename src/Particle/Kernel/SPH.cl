@@ -3,7 +3,7 @@
 typedef struct ALIGN sModuleParamSPH {
     float pressure;
 	float densityRef;
-	float smoothing;
+	float smoothingRadius;
 	float viscosity;
 }   ModuleParamSPH;
 
@@ -44,10 +44,10 @@ void __kernel SPH_UpdateDensity( __global ParticleData *dataParticle,
     uint n_groups = (uint) get_num_groups(0);
 
     // PARAMS
-    const float K = 250.f; //pressure constant parameter
+    const float K = moduleParam->pressure; //pressure constant parameter
     const float p0 = 1.f; //reference density param
 
-    const float h = 1.f; // smoothing radius parameter (float)
+    const float h = moduleParam->smoothingRadius; // smoothing radius parameter (float)
     const float h2 = h * h;
     const float h9 = pow(h, 9);
 
@@ -110,10 +110,10 @@ void __kernel SPH_UpdatePressure( __global ParticleData *dataParticle,
     uint n_groups = (uint) get_num_groups(0);
 
     // PARAMS
-    const float K = 250.f; //pressure constant parameter
+    const float K = moduleParam->pressure; //pressure constant parameter
     const float p0 = 1.f; //reference density param
 
-    const float h = 1.f; // smoothing radius parameter (float)
+    const float h = moduleParam->smoothingRadius; // smoothing radius parameter (float)
     const float h2 = h * h;
     const float h9 = pow(h, 9);
 
@@ -188,10 +188,10 @@ void __kernel SPH_UpdateViscosity( __global ParticleData *dataParticle,
     uint n_groups = (uint) get_num_groups(0);
 
     // PARAMS
-    const float K = 250.f; //pressure constant parameter
+    const float K = moduleParam->pressure; //pressure constant parameter
     const float p0 = 1.f; //reference density param
 
-    const float h = 1.f; // smoothing radius parameter (float)
+    const float h = moduleParam->smoothingRadius; // smoothing radius parameter (float)
     const float h2 = h * h;
     const float h9 = pow(h, 9);
 
@@ -208,7 +208,7 @@ void __kernel SPH_UpdateViscosity( __global ParticleData *dataParticle,
     const float h6 = pow(h, 6);
     const float h3 = pow(h, 3);
     //  again, it should be coming from constant buffer
-    const float Spiky_constant = (-45 / (M_PI * h6));
+    const float Spiky_constant = (-45.f / (M_PI * h6));
 
     const float e = 0.018f;// e = viscosity constant (float) (default = 0.018f)
 
@@ -261,16 +261,16 @@ void __kernel SPH_UpdateViscosity( __global ParticleData *dataParticle,
     float3 min = mid - (float3)(20.f, 20.f, 20.f);
     float3 max = mid + (float3)(20.f, 20.f, 20.f);
     if (sphA->position.x < min.x || sphA->position.x > max.x) {
-        sphA->velocity.x = clamp(sphA->velocity.x, min.x, max.x);
-        sphA->velocity.x *= 0;
+        sphA->position.x = clamp(sphA->position.x, min.x, max.x);
+        sphA->velocity.x *= -0.1;
     }
     if (sphA->position.y < min.y || sphA->position.y > max.y) {
-        sphA->velocity.y = clamp(sphA->velocity.y, min.y, max.y);
-        sphA->velocity.y *= -0;
+        sphA->position.y = clamp(sphA->position.y, min.y, max.y);
+        sphA->velocity.y *= -0.1;
     }
     if (sphA->position.z < min.z || sphA->position.z > max.z) {
-        sphA->velocity.z = clamp(sphA->velocity.z, min.z, max.z);
-        sphA->velocity.z *= -0;
+        sphA->position.z = clamp(sphA->position.z, min.z, max.z);
+        sphA->velocity.z *= -0.1;
     }
 
     sphA->position += deltaTime * sphA->velocity;

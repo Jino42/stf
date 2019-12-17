@@ -15,10 +15,37 @@
           "_comment": "Position not yet supported",
           "name": "Lol0",
           "type": "Point",
-          "particles": 50,
+          "particles": 2500,
           "modules": [
             {
               "type": "SPH"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "abc1",
+      "options": {
+        "position": {
+          "x": 60,
+          "y": 258,
+          "z": -30
+        }
+      },
+      "emitters": [
+        {
+          "_comment": "Position not yet supported",
+          "name": "Lol2",
+          "type": "Mesh",
+          "particlesMax": 30,
+          "particlesSpawn": 2.0,
+          "modules": [
+            {
+              "type": "Movement"
+            },
+            {
+              "type": "SizeOverLifetime"
             }
           ]
         }

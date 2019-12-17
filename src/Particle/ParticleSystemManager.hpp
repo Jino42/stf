@@ -19,6 +19,7 @@ public:
 	void initAllParticleSystem();
 	void updateAllParticleSystem(float deltaTime);
 	void renderAllParticleSystem();
+	void deleteAllParticleSystem();
 
 private:
 	std::map< std::string, ParticleSystem  > mapSystems_;

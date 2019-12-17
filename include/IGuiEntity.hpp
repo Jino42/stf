@@ -1,13 +1,13 @@
 #pragma once
 
-#include <INommable.hpp>
+#include <ANommable.hpp>
 #include <string>
 
-class IGuiEntity : public INommable {
+class IGuiEntity : public ANommable {
 public:
     IGuiEntity() = delete;
     IGuiEntity(std::string const &name) :
-            INommable(name),
+            ANommable(name),
             isSelected_(false) {
     }
     virtual ~IGuiEntity() = default;

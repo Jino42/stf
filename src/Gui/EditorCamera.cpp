@@ -24,11 +24,11 @@ void EditorCamera::render() {
 	if (ImGui::Button("Add"))
         CameraManager::Get().addCamera(inputCameraName_);
 
-    if (ImGui::BeginCombo("Cameras", (itemCurrent ? itemCurrent->name.c_str() : ""), NTL_IMGUI_COMBO_FLAGS))
+    if (ImGui::BeginCombo("Cameras", (itemCurrent ? itemCurrent->getName().c_str() : ""), NTL_IMGUI_COMBO_FLAGS))
     {
         for (Camera &camera : cameras) {
             bool is_selected = (itemCurrent == &camera);
-            if (ImGui::Selectable(camera.name.c_str(), is_selected))
+            if (ImGui::Selectable(camera.getName().c_str(), is_selected))
                 itemCurrent = &camera;
             if (is_selected)
                 ImGui::SetItemDefaultFocus();
@@ -38,7 +38,7 @@ void EditorCamera::render() {
     if (itemCurrent) {
 		bool boolGuiDebugCamera = itemCurrent->getFrustum().isDebug();
         if (ImGui::Button("Delete Camera")) {
-            CameraManager::Get().removeCamera(itemCurrent->name);
+                    CameraManager::Get().removeCamera(itemCurrent->getName());
             itemCurrent = nullptr;
             return ;
         }

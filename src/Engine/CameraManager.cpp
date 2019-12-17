@@ -26,8 +26,10 @@ void CameraManager::setFocus(std::string const &name) {
 
     auto it = std::find_if(bufferCameras_.begin(), bufferCameras_.end(),
                            [name](const Camera & camera) -> bool {
-                               std::cout << "camera.name[" << camera.name << "]" "== name[" << name << "] =" << (camera.name == name) << std::endl;
-                               return camera.name == name;
+                               std::cout << "camera.name[" << camera.getName() << "]"
+                                                                                  "== name["
+                                         << name << "] =" << (camera.getName() == name) << std::endl;
+                               return camera.getName() == name;
                            });
     if (it == bufferCameras_.end())
         throw std::invalid_argument(std::string(__FUNCTION__) + std::string("Name [") + name + "] not found");
@@ -42,30 +44,30 @@ Camera &CameraManager::getFocus() {
 
 void CameraManager::addCamera(std::string const &name) {
     auto it = std::find_if(bufferCameras_.begin(), bufferCameras_.end(),
-                           [name](const Camera &camera) -> bool { return camera.name == name; });
+                           [name](const Camera &camera) -> bool { return camera.getName() == name; });
     if (it != bufferCameras_.end())
-        throw INommable::NameAlreadyTaken(std::string("Name [") + name + "] is already taken");
+        throw ANommable::NameAlreadyTaken(std::string("Name [") + name + "] is already taken");
 
     bufferCameras_.emplace_back(name);
 }
 
 Camera &CameraManager::getCamera(std::string const &name) {
     auto it = std::find_if(bufferCameras_.begin(), bufferCameras_.end(),
-                           [name](const Camera &camera) -> bool { return camera.name == name; });
+                           [name](const Camera &camera) -> bool { return camera.getName() == name; });
     if (it == bufferCameras_.end())
         return *focus_;
     return *it;
 }
 
 void	CameraManager::removeCamera(Camera const &camera) {
-    removeCamera(camera.name);
+    removeCamera(camera.getName());
 }
 void	CameraManager::removeCamera(std::string const &name) {
     if (bufferCameras_.size() < 2) {
         throw std::invalid_argument(std::string(__FUNCTION__) + " You cant remove Camera when you got only one");
     }
     auto it = std::find_if(bufferCameras_.begin(), bufferCameras_.end(),
-                           [name](const Camera &camera) -> bool { return camera.name == name; });
+                           [name](const Camera &camera) -> bool { return camera.getName() == name; });
     if (it == bufferCameras_.end())
         throw std::invalid_argument(std::string(__FUNCTION__) + "Camera not found");
 

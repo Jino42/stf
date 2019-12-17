@@ -93,6 +93,5 @@ void    ModuleRequired::reload()
 {
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
-    gpuBufferModuleParam_ = cl::Buffer(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(ModuleParamRequired));
     init();
 }

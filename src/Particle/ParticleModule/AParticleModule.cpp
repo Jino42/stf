@@ -14,4 +14,6 @@ pathKernel_(PathManager::Get().getPath("particleKernels"))
     Debug::Get().setDebug("ParticleModule", AParticleModule::debug_);
 }
 
+std::string AParticleModule::getModuleName() const { return typeid(this).name(); }
+
 bool AParticleModule::debug_ = true;

@@ -47,6 +47,8 @@ public:
 	void	render(GLenum typeOfDraw = GL_TRIANGLES) const;
 	void	render(Shader &shader, GLenum typeOfDraw = GL_TRIANGLES) const;
 
+	void	makeSphere(float radius, float sectorCount, float stackCount);
+
 private:
 	std::deque<Mesh>		mesh_;
 	boost::filesystem::path	path_;

@@ -3,8 +3,8 @@
 #include "Cl/ClProgram.hpp"
 #include <PathManager.hpp>
 
-ParticleSystem::ParticleSystem(std::string const &name) :
-		name_(name_),
+ParticleSystem::ParticleSystem(std::string const &name)
+    : ANommable(name),
 		position_(glm::vec3(0))
 {
 	if (ParticleSystem::firstSystem_) {
@@ -39,6 +39,12 @@ void ParticleSystem::render() {
 	for (auto &emitter : emitterBuffer_) {
 		emitter->render();
 	}
+}
+
+void ParticleSystem::reload() {
+  for (auto &emitter : emitterBuffer_) {
+    emitter->reload();
+  }
 }
 
 bool ParticleSystem::firstSystem_ = true;

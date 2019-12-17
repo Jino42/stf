@@ -2,6 +2,7 @@
 
 #include "AWidget.hpp"
 #include <Gui/EditorCamera.hpp>
+#include <Gui/EditorParticleSystems.hpp>
 
 class EditorCamera;
 
@@ -16,4 +17,5 @@ private:
     void beginContent_() override;
 
     EditorCamera    editorCamera_;
+    EditorParticleSystems editorParticleSystems_;
 };

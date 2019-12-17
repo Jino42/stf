@@ -18,6 +18,7 @@ ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue,
 
 	ModelManager::Get().addModel("nanosuit", PathManager::Get().getPath("objects") / "nanosuit" / "nanosuit.obj");
 	model_ = &ModelManager::Get().getModel("nanosuit");
+	model_->makeSphere(5.f, 36, 18);
 
 	glBindBuffer(GL_ARRAY_BUFFER, OCGLBufferEmitterParticles_.vbo);
 	for (const auto &mesh : model_->getMeshes()) {

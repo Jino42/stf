@@ -1,32 +1,34 @@
 #pragma once
 
-#include <boost/filesystem.hpp>
-#include <NTL.hpp>
 #include "Cl/ClKernel.hpp"
+#include <NTL.hpp>
+#include <boost/filesystem.hpp>
 
 class AParticleEmitter;
 class ClQueue;
 
 class AParticleModule {
 public:
-	explicit AParticleModule (AParticleEmitter &emitter);
-	virtual			~AParticleModule() = default;
-	virtual	void	init() {};
-	virtual	void	update(float deltaTime) {};
-	virtual	void	spawn(unsigned int, unsigned int) {};
-	virtual void    reload() {};
+  explicit AParticleModule(AParticleEmitter &emitter);
+  virtual ~AParticleModule() = default;
+  virtual void init(){};
+  virtual void update(float deltaTime){};
+  virtual void spawn(unsigned int, unsigned int){};
+  virtual void reload(){};
 
-protected:
-	AParticleEmitter		&emitter_;
-    ClQueue					&queue_;
-    unsigned int 			&nbParticleMax_;
-    unsigned int 			&nbParticlePerSec_;
-    unsigned int			&nbParticleActive_;
-	boost::filesystem::path	&pathKernel_;
+  std::string getModuleName() const;
 
-	ClKernel				kernelInit_;
-	ClKernel				kernelUpdate_;
-	ClKernel				kernelSpawn_;
+protected :
+  AParticleEmitter &emitter_;
+  ClQueue &queue_;
+  unsigned int &nbParticleMax_;
+  unsigned int &nbParticlePerSec_;
+  unsigned int &nbParticleActive_;
+  boost::filesystem::path &pathKernel_;
 
-	static bool debug_;
+  ClKernel kernelInit_;
+  ClKernel kernelUpdate_;
+  ClKernel kernelSpawn_;
+
+  static bool debug_;
 };
