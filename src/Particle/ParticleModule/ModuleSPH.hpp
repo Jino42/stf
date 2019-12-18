@@ -25,6 +25,7 @@ struct ParticleDataSPH {
 };
 
 class ModuleSPH : public AParticleModule {
+    friend class ParticleEmitterSPH;
   public:
     ModuleSPH(AParticleEmitter &emitter);
     void init() override;
@@ -39,8 +40,10 @@ class ModuleSPH : public AParticleModule {
     ClKernel kernelDensity_;
     ClKernel kernelPressure_;
     ClKernel kernelViscosity_;
-    cl::Buffer gpuBufferParticles_SPH_;
+    OCGL_Buffer OCGLBufferParticles_SPH_Data_;
 
     cl::Buffer gpuBufferModuleParam_;
     ModuleParamSPH cpuBufferModuleParam_;
+
+	std::vector<cl::Memory> ocgl_;
 };

@@ -202,7 +202,7 @@ int main(int argc, char **argv) {
 				}
 			}
 			//Reload Opengl Shader
-            if (DisplayWindow::Get().getKey(GLFW_KEY_F) == KeyState::kDown) {
+            if (DisplayWindow::Get().getKey(GLFW_KEY_P) == KeyState::kDown) {
                 try {
                     ShaderManager::Get().reload();
                 } catch (std::exception const &e) {

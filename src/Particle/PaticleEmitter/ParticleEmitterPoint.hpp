@@ -1,7 +1,6 @@
 #pragma once
 
 #include "AParticleEmitter.hpp"
-#include "Engine/ModelEngine/ActorModel.hpp"
 
 class Shader;
 
@@ -15,10 +14,6 @@ class ParticleEmitterPoint : public AParticleEmitter {
 
     void update(float deltaTime) override;
 
-    void supprMe(float scale);
-
   private:
-    //unsigned int VAO;
-    Model model_;
-    ActorModel actor_;
+    unsigned int VAO;
 };

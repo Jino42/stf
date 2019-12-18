@@ -5,12 +5,14 @@
 #include "OpenCGL_Tools.hpp"
 #include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 #include <iostream>
+#include <Engine/ModelEngine/MainGraphicExtendModel.hpp>
+#include "cl_type.hpp"
 
-#include "Particle/PaticleEmitter/ParticleEmitterPoint.hpp" // suppr
+#include "Particle/PaticleEmitter/ParticleEmitterSPH.hpp" // suppr
 
 ModuleSPH::ModuleSPH(AParticleEmitter &emitter)
     : AParticleModule(emitter),
-      gpuBufferParticles_SPH_(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(ParticleDataSPH) * nbParticleMax_),
+      OCGLBufferParticles_SPH_Data_(nbParticleMax_ * sizeof(ParticleDataSPH)),
       gpuBufferModuleParam_(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(ModuleParamSPH)) {
     ClProgram::Get().addProgram(pathKernel_ / "SPH.cl");
     kernelInit_.setKernel(emitter_, "SPH_Init");
@@ -28,14 +30,17 @@ ModuleSPH::ModuleSPH(AParticleEmitter &emitter)
     cpuBufferModuleParam_.densityRef = 1.f;
     cpuBufferModuleParam_.smoothingRadius = 1.5f;
     cpuBufferModuleParam_.viscosity = 0.018f;
+
+    ocgl_.push_back(emitter_.getParticleOCGL_BufferData().mem);
+    ocgl_.push_back(OCGLBufferParticles_SPH_Data_.mem);
 }
 
 void ModuleSPH::init() {
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
     queue_.getQueue().enqueueWriteBuffer(gpuBufferModuleParam_, CL_TRUE, 0, sizeof(ModuleParamSPH), &cpuBufferModuleParam_);
-    kernelInit_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_, gpuBufferModuleParam_);
-    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelInit_, emitter_.getParticleOCGL_BufferData().mem, cl::NullRange, cl::NDRange(nbParticleMax_));
+    kernelInit_.beginAndSetUpdatedArgs(OCGLBufferParticles_SPH_Data_.mem, gpuBufferModuleParam_);
+    OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelInit_, ocgl_, cl::NullRange, cl::NDRange(nbParticleMax_));
 }
 
 void ModuleSPH::update(float deltaTime) {
@@ -52,70 +57,72 @@ void ModuleSPH::update(float deltaTime) {
 	globalWorkSize = (rest == 0 ? nbParticleMax_ : (nbParticleMax_ - rest + (groups * localWorkSize)));
 */
 
-    dynamic_cast<ParticleEmitterPoint &>(emitter_).supprMe(cpuBufferModuleParam_.smoothingRadius);
+    dynamic_cast<ParticleEmitterSPH &>(emitter_).supprMe(cpuBufferModuleParam_.smoothingRadius / 2.f);
     
 
     size_t localWorkSize = 16;
     int divisor = ClContext::Get().deviceDefault.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>()[0];
+    divisor = 640; 
     for (; nbParticleMax_ % divisor != 0; divisor--)
-        ;
+        std::cout << "nbParticleMax_[" << nbParticleMax_ << "] % divisor[" << divisor << "] =[" << nbParticleMax_ % divisor << "]" << std::endl;
+
+    std::cout << "CL_DEVICE_LOCAL_MEM_SIZE : " << ClContext::Get().deviceDefault.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>() << std::endl;
+    std::cout << "ParticleDataSPH : " << sizeof(ParticleDataSPH) << std::endl;
+    std::cout << "all : " << sizeof(ParticleDataSPH) * divisor << std::endl;
 
     localWorkSize = divisor;
+    std::cout << "nbParticleMax_ : " << divisor << std::endl;
     std::cout << "divisor : " << divisor << std::endl;
     std::cout << "localWorkSize : " << localWorkSize << std::endl;
 
     cl::LocalSpaceArg bufferLocal = cl::Local(sizeof(ParticleDataSPH) * localWorkSize);
 
-    kernelDensity_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_, gpuBufferModuleParam_, bufferLocal);
+    kernelDensity_.beginAndSetUpdatedArgs(OCGLBufferParticles_SPH_Data_.mem, gpuBufferModuleParam_, bufferLocal);
 
     ClError err;
-    std::vector<cl::Memory> cl_vbos;
-
-    cl_vbos.push_back(emitter_.getParticleOCGL_BufferData().mem);
-    err.clCheckError();
-
     cl::Event ev;
+
     glFinish();
-    err.err = queue_.getQueue().enqueueAcquireGLObjects(&cl_vbos, nullptr, &ev);
+    err.err = queue_.getQueue().enqueueAcquireGLObjects(&ocgl_, nullptr, &ev);
     ev.wait();
     err.clCheckError();
     queue_.getQueue().finish();
     err.err = queue_.getQueue().enqueueNDRangeKernel(kernelDensity_.getKernel(), cl::NullRange, cl::NDRange(nbParticleMax_), cl::NDRange(localWorkSize));
     err.clCheckError();
     queue_.getQueue().finish();
-    err.err = queue_.getQueue().enqueueReleaseGLObjects(&cl_vbos, nullptr, nullptr);
+    err.err = queue_.getQueue().enqueueReleaseGLObjects(&ocgl_, nullptr, nullptr);
     err.clCheckError();
     queue_.getQueue().finish();
 
-    kernelPressure_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_, gpuBufferModuleParam_, bufferLocal);
+    kernelPressure_.beginAndSetUpdatedArgs(OCGLBufferParticles_SPH_Data_.mem, gpuBufferModuleParam_, bufferLocal);
 
     glFinish();
-    err.err = queue_.getQueue().enqueueAcquireGLObjects(&cl_vbos, nullptr, &ev);
+    err.err = queue_.getQueue().enqueueAcquireGLObjects(&ocgl_, nullptr, &ev);
     ev.wait();
     err.clCheckError();
     queue_.getQueue().finish();
     err.err = queue_.getQueue().enqueueNDRangeKernel(kernelPressure_.getKernel(), cl::NullRange, cl::NDRange(nbParticleMax_), cl::NDRange(localWorkSize));
     err.clCheckError();
     queue_.getQueue().finish();
-    err.err = queue_.getQueue().enqueueReleaseGLObjects(&cl_vbos, nullptr, nullptr);
+    err.err = queue_.getQueue().enqueueReleaseGLObjects(&ocgl_, nullptr, nullptr);
     err.clCheckError();
     queue_.getQueue().finish();
 
-    kernelViscosity_.beginAndSetUpdatedArgs(gpuBufferParticles_SPH_, gpuBufferModuleParam_, bufferLocal);
+    kernelViscosity_.beginAndSetUpdatedArgs(OCGLBufferParticles_SPH_Data_.mem, gpuBufferModuleParam_, bufferLocal, glmVec3toClFloat3(MainGraphicExtendModel::Get().attractorPoint));
 
     glFinish();
-    err.err = queue_.getQueue().enqueueAcquireGLObjects(&cl_vbos, nullptr, &ev);
+    err.err = queue_.getQueue().enqueueAcquireGLObjects(&ocgl_, nullptr, &ev);
     ev.wait();
     err.clCheckError();
     queue_.getQueue().finish();
     err.err = queue_.getQueue().enqueueNDRangeKernel(kernelViscosity_.getKernel(), cl::NullRange, cl::NDRange(nbParticleMax_), cl::NDRange(localWorkSize));
     err.clCheckError();
     queue_.getQueue().finish();
-    err.err = queue_.getQueue().enqueueReleaseGLObjects(&cl_vbos, nullptr, nullptr);
+    err.err = queue_.getQueue().enqueueReleaseGLObjects(&ocgl_, nullptr, nullptr);
     err.clCheckError();
     queue_.getQueue().finish();
     /*
-	ClTools::printIntArrayGpu<ParticleDataSPH>(gpuBufferParticles_SPH_, nbParticleMax_, "ParticleDataSPH", [](ParticleDataSPH *p){
+	ClTools::printIntArrayGpu<ParticleDataSPH>(OCGLBufferParticles_SPH_Data_.mem, nbParticleMax_, "ParticleDataSPH", [](ParticleDataSPH *p){
 		std::cout << "position[x:" << p->position.x << ", y:" << p->position.y << ", z:" << p->position.z << "]";
 		std::cout << " - | - ";
 		std::cout << "density[" << p->density << "]";
