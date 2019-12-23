@@ -1,21 +1,22 @@
 #pragma once
 
-#include "Particle/ParticleSystem.hpp"
 #include "Engine/AABB.hpp"
+#include "Engine/Sphere.hpp"
+#include "Particle/ParticleSystem.hpp"
 
 class MainGraphic;
 class Camera;
 
 class TestParticle {
-public:
+  public:
     void init();
 
     void update(float deltaTime);
 
-
     static TestParticle &Get();
-private:
-    AABB box_;
-    static std::unique_ptr<TestParticle> instance_;
 
+  private:
+    AABB box_;
+    Sphere sphere_;
+    static std::unique_ptr<TestParticle> instance_;
 };

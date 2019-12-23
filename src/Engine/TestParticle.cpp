@@ -5,17 +5,17 @@
 #include "TestParticle.hpp"
 #include "Particle/ParticleModule/ModuleAttractor.hpp"
 #include "Particle/ParticleModule/ModuleColor.hpp"
-#include "Particle/PaticleEmitter/ParticleEmitterMesh.hpp"
-#include "Particle/PaticleEmitter/ParticleEmitterSprite.hpp"
-#include "Particle/PaticleEmitter/ParticleEmitterPoint.hpp"
-#include "Particle/ParticleModule/ModuleMovement.hpp"
-#include "Particle/ParticleModule/ModuleSizeOverLifetime.hpp"
 #include "Particle/ParticleModule/ModuleMeshParticulizer.hpp"
 #include "Particle/ParticleModule/ModuleMoveToTarget.hpp"
+#include "Particle/ParticleModule/ModuleMovement.hpp"
+#include "Particle/ParticleModule/ModuleSizeOverLifetime.hpp"
+#include "Particle/PaticleEmitter/ParticleEmitterMesh.hpp"
+#include "Particle/PaticleEmitter/ParticleEmitterPoint.hpp"
+#include "Particle/PaticleEmitter/ParticleEmitterSprite.hpp"
 
 void TestParticle::init() {
     //Cloud Emitter
-/*
+    /*
 	particleSystem_.addEmitter<ParticleEmitterPoint>("Lol", 1024*1000);
 	ParticleEmitterPoint &emitter = dynamic_cast<ParticleEmitterPoint&>(particleSystem_.getEmitter("Lol"));
 	ParticleEmitterPoint &emitter2 = particleSystem_.getEmitter<ParticleEmitterPoint>("Lol");
@@ -25,11 +25,11 @@ void TestParticle::init() {
 	emitter.addModule<ParticleColorModule>();
 */
 
-//Sprite Emitter
+    //Sprite Emitter
 
-	//int i = 0;
-	//for (auto &system : particleSystem_) {
-/*
+    //int i = 0;
+    //for (auto &system : particleSystem_) {
+    /*
 		//system.addEmitter<ParticleEmitterSprite>("Lol", 30.f / 8.f * 0.9f, 30);
 		//system.addEmitter<ParticleEmitterSprite>("Lol", 120000.f / 8.f * 0.9f, 5000);
 		system.addEmitter<ParticleEmitterSprite>("Lol", 10000000.f / 8.f * 0.9f, 1000000);
@@ -42,7 +42,7 @@ void TestParticle::init() {
 		//emitter.addModule<ParticleAttractorModule>();
 */
 
-/*
+    /*
 		system.addEmitter<ParticleEmitterPoint>("Lol", 500000);
 
 		system.setPosition(glm::vec3(60 * i, 258.0f, -30.0f));
@@ -54,7 +54,7 @@ void TestParticle::init() {
 		emitter.addModule<ParticleColorModule>();
 */
 
-/*
+    /*
 		system.addEmitter<ParticleEmitterMesh>("Lol", 30.f / 8.f * 0.9f, 30);
 
 		system.setPosition(glm::vec3(60 * i, 258.0f, -30.0f));
@@ -65,28 +65,32 @@ void TestParticle::init() {
 
 		system.init();
 		*/
-//		i++;
-//	}
-
+    //		i++;
+    //	}
 }
 
 void TestParticle::update(float deltaTime) {
-  static bool f = false;
-  if (!f) {
+    static bool f = false;
+    if (!f) {
 
-    glm::vec3 range(20.0f, 20.0f, 20.0f);
+        glm::vec3 range(20.0f, 20.0f, 20.0f);
 
-    glm::vec3 blc(82.5f, 258.f, 200.f);
+        glm::vec3 blc(82.5f, 258.f, 200.f);
 
-    box_.setDebug(true);
-    box_.setMax(blc + range);
-    box_.setMin(blc - range);
-    f = true;
-  }
-  //	for (auto &system : particleSystem_) {
-//		system.update(deltaTime);
-//		system.render();
-//	}
+        box_.setDebug(true);
+        box_.setMax(blc + range);
+        box_.setMin(blc - range);
+
+        sphere_.setDebug(true);
+        sphere_.setRadius(5.f);
+        sphere_.setCenter(blc);
+
+        f = true;
+    }
+    //	for (auto &system : particleSystem_) {
+    //		system.update(deltaTime);
+    //		system.render();
+    //	}
 }
 
 TestParticle &TestParticle::Get() {

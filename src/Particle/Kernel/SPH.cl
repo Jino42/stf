@@ -28,6 +28,58 @@ void __kernel SPH_Init(__global ParticleDataSPH *dataSPH,
     sph->force2 = 0.0f;
     sph->velocity = 0.0f;
 }
+/*
+bool solveQuadratic(const float a, const float b, const float c, float *x0, float *x1) {
+    float discr = b * b - 4 * a * c;
+    if (discr < 0)
+        return false;
+    else if (discr == 0)
+        *x0 = *x1 = -0.5 * b / a;
+    else {
+        float q = (b > 0) ? -0.5 * (b + sqrt(discr)) : -0.5 * (b - sqrt(discr));
+        *x0 = q / a;
+        *x1 = c / q;
+    }
+    if (*x0 > *x1) {
+        float tmp = *x1;
+        *x1 = *x0;
+        *x0 = tmp;
+    }
+
+    return true;
+}
+
+bool inter_sphere(float3 center, float radius, float3 dir, float3 origin, float3 *t) {
+    float t0, t1; // solutions for t if the ray intersects
+        // analytic solution
+    float3 L = origin - center;
+    float a = dot(dir, dir);
+    float b = 2 * dot(dir, L);
+    float c = dot(L, L) - radius * radius;
+    if (!solveQuadratic(a, b, c, &t0, &t1))
+        return false;
+    if (t0 > t1) {
+        float tmp = t0;
+        t0 = t1;
+        t1 = tmp;
+    }
+
+    if (t0 < 0) {
+        t0 = t1; // if t0 is negative, let's use t1 instead
+        if (t0 < 0)
+            return false; // both t0 and t1 are negative
+    }
+
+    *t = t0;
+    return true;
+}
+*/
+
+bool sdSphere(float3 centerOfSphere, float radius, float3 checkPosition, float *t) {
+    float t0 = length(centerOfSphere - checkPosition);
+    *t = t0 - radius;
+    return (t0 < radius);
+}
 
 void __kernel SPH_UpdateDensity(__global ParticleData *dataParticle,
                                 __global ParticleDataSPH *dataSPH,
@@ -224,8 +276,8 @@ void __kernel SPH_UpdateViscosity(__global ParticleData *dataParticle,
     const float deltaTime = 0.016f; // fixed step
     const float3 G = (float3)(0.f, -9.8f, 0.f);
     float3 forceAttract = attractorPoint - sphA->position;
-    float3 ab = normalize(forceAttract) * clamp((20.f - length(forceAttract)), 0.f, 20.f) * 10.f;
-    //float3 ab = 0.f;
+    //float3 ab = normalize(forceAttract) * clamp((20.f - length(forceAttract)), 0.f, 20.f) * 10.f;
+    float3 ab = 0.f;
     sphA->velocity += deltaTime * ((sphA->force1 + sphA->force2) / sphA->density + G + ab);
 
     sphA->position += deltaTime * sphA->velocity;
@@ -240,6 +292,13 @@ void __kernel SPH_UpdateViscosity(__global ParticleData *dataParticle,
     sphA->velocity *= 0.98f;
     float elastic = 0.8;
 
+    float dist = 0.f;
+    float Sradius = 5.f;
+    float3 Sposition = (float3)(82.5f, 258.f, 200.f);
+    if (sdSphere(Sposition, Sradius, sphA->position, &dist)) {
+        sphA->position = Sposition + normalize(sphA->position - Sposition) * Sradius;
+        sphA->velocity = normalize(sphA->position - Sposition) * length(sphA->velocity);
+    }
     if (sphA->position.x < min.x || sphA->position.x > max.x) {
         sphA->position.x = clamp(sphA->position.x, min.x, max.x);
         sphA->velocity.x *= -elastic;

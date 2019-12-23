@@ -8,6 +8,7 @@
 #include "Gui/Gui.hpp"
 #include "Gui/WidgetOption.hpp"
 #include "Gui/WidgetRender.hpp"
+#include "Gui/WidgetRayMarch.hpp"
 #include "Gui/WidgetEditor.hpp"
 #include "NTL_Debug.hpp"
 #include <Engine/ShaderManager.hpp>
@@ -69,19 +70,6 @@ void Lua() {
 
 
 int main(int argc, char **argv) {
-/*
-	try {
-		radix();
-	}
-	catch (cl::Error const &e) {
-		std::cout << e.what() << "(" << e.err() << ") [" << ClError::getErrorString(e.err()) << "]"  << std::endl;
-	}
-	catch (std::exception const &e) {
-		std::cout << e.what() << std::endl;
-	}
-
-	return 0;
-*/
 //	Lua();
 //	return 0;
     noise::module::Perlin myModule;
@@ -119,6 +107,7 @@ int main(int argc, char **argv) {
         // WidgetOption widgetOption;
         WidgetEditor widgetEditor;
         WidgetRender &widgetRender = WidgetRender::Get();
+        WidgetRayMarch &widgetRayMarch = WidgetRayMarch::Get();
 
 		ClContext::Get();
 		MainGraphic::Get();
@@ -214,10 +203,15 @@ int main(int argc, char **argv) {
 			// GUI
             // widgetOption.render(true);
             ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(0, 0)));
-            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
+            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(33, 100)));
             WidgetRender::Get().render(true);
-            ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(50, 0)));
-            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
+
+            ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(33, 0)));
+            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(33, 100)));
+            WidgetRayMarch::Get().render(true);
+
+            ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(66, 0)));
+            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(33, 100)));
             widgetEditor.render(true);
 			gui.render();
         }
