@@ -1,3 +1,4 @@
+#include "NTL.hl"
 
 float sdSphere2(float3 position, float3 spherePosition, float sphereRadius) {
     return length(spherePosition - position) - sphereRadius;
@@ -21,8 +22,15 @@ float3 getCameraRayDir(float2 uv, float3 cameraPosition, float3 cameraTarget) {
     return vDir;
 }
 
+float opSmoothUnion(float d1, float d2, float k) {
+    float h = clamp(0.5f + 0.5f * (d2 - d1) / k, 0.0f, 1.0f);
+    return mix(d2, d1, h) - k * h * (1.0f - h);
+}
+
 void kernel testKernelWrite(
     __write_only image2d_t resultTexture,
+    __global ParticleDataSPH *dataSPH,
+    __global ModuleParamSPH *moduleParam,
     int width,
     int height,
     float time,
@@ -30,7 +38,6 @@ void kernel testKernelWrite(
     float3 cameraTarget) {
 
     float4 color = (float4)(0.f, 0.5f, 1.0f, 1.0f);
-    float3 position = cameraPosition;
 
     float2 uv = normalizeScreenCoords((float2)(get_global_id(0), get_global_id(1)),
                                       (float2)(width, height));
@@ -38,14 +45,22 @@ void kernel testKernelWrite(
 
 
 
+    float t = 0; // current distance traveled along ray
+    for (int i = 0; i < 32; i++) {
+        float d = 100000.f; //sdSphere2(cameraPosition + dir * t, (float3)(82.5f, 258.f, 200.f), 5.f);
 
-    for (int i = 0; i < 64; i++) {
-        float d = sdSphere2(position, (float3)(82.5f, 258.f, 200.f), 5.f);
+        for (int r = 0; r < 60; r++) {
+            __global ParticleDataSPH *sph = &dataSPH[r];
+            float tmp_d = sdSphere2(cameraPosition + dir * t, sph->position, moduleParam->smoothingRadius / 2.f);
+            d = min(d, tmp_d);
+            d = opSmoothUnion(d, tmp_d, 0.75f);
+        }
+
         if (d < 0.01f) {
             color = (float4)(1.0f, 0.f, 0.5f, 1.0f);
             break ;
         }
-        position += d * dir;
+        t += d;
     }
 
 

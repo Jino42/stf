@@ -1,25 +1,14 @@
 #include "NTL.hl"
 
-typedef struct ALIGN sModuleParamSPH {
-    float pressure;
-    float densityRef;
-    float smoothingRadius;
-    float viscosity;
-} ModuleParamSPH;
-
-typedef struct ALIGN sParticleDataSPH {
-    float3 position;
-    float density;
-    float pressure;
-    float mass;
-    float3 force1;
-    float3 force2;
-    float3 velocity;
-} ParticleDataSPH;
+#define FLAG_FOCUS (1 << 0)
+#define FLAG_NEIG  (1 << 1)
 
 void __kernel SPH_Init(__global ParticleDataSPH *dataSPH,
-                       __global ModuleParamSPH *moduleParam) {
-    __global ParticleDataSPH *sph = &dataSPH[get_global_id(0)];
+                       __global ModuleParamSPH *moduleParam,
+                       __global unsigned int *dataCellIndex,
+                       __global unsigned int *dataParticleIndex) {
+    uint g_id = get_global_id(0);
+    __global ParticleDataSPH *sph = &dataSPH[g_id];
 
     sph->density = 0.f;
     sph->pressure = 0.f;
@@ -27,53 +16,10 @@ void __kernel SPH_Init(__global ParticleDataSPH *dataSPH,
     sph->force1 = 0.0f;
     sph->force2 = 0.0f;
     sph->velocity = 0.0f;
+
+    dataCellIndex[g_id] = 0xFFFFFFFF;
+    dataParticleIndex[g_id] = g_id;
 }
-/*
-bool solveQuadratic(const float a, const float b, const float c, float *x0, float *x1) {
-    float discr = b * b - 4 * a * c;
-    if (discr < 0)
-        return false;
-    else if (discr == 0)
-        *x0 = *x1 = -0.5 * b / a;
-    else {
-        float q = (b > 0) ? -0.5 * (b + sqrt(discr)) : -0.5 * (b - sqrt(discr));
-        *x0 = q / a;
-        *x1 = c / q;
-    }
-    if (*x0 > *x1) {
-        float tmp = *x1;
-        *x1 = *x0;
-        *x0 = tmp;
-    }
-
-    return true;
-}
-
-bool inter_sphere(float3 center, float radius, float3 dir, float3 origin, float3 *t) {
-    float t0, t1; // solutions for t if the ray intersects
-        // analytic solution
-    float3 L = origin - center;
-    float a = dot(dir, dir);
-    float b = 2 * dot(dir, L);
-    float c = dot(L, L) - radius * radius;
-    if (!solveQuadratic(a, b, c, &t0, &t1))
-        return false;
-    if (t0 > t1) {
-        float tmp = t0;
-        t0 = t1;
-        t1 = tmp;
-    }
-
-    if (t0 < 0) {
-        t0 = t1; // if t0 is negative, let's use t1 instead
-        if (t0 < 0)
-            return false; // both t0 and t1 are negative
-    }
-
-    *t = t0;
-    return true;
-}
-*/
 
 bool sdSphere(float3 centerOfSphere, float radius, float3 checkPosition, float *t) {
     float t0 = length(centerOfSphere - checkPosition);
@@ -81,10 +27,69 @@ bool sdSphere(float3 centerOfSphere, float radius, float3 checkPosition, float *
     return (t0 < radius);
 }
 
+uint GetFlatCellIndex(int3 cellIndex) {
+    const uint p1 = 73856093; // some large primes
+    const uint p2 = 19349663;
+    const uint p3 = 83492791;
+    int n = p1 * cellIndex.x ^ p2 * cellIndex.y ^ p3 * cellIndex.z;
+    const uint TOTAL_GRID_CELL_COUNT = 128 * 128 * 64;
+    n %= TOTAL_GRID_CELL_COUNT;
+    return n;
+}
+
+void __kernel SPH_UpdateCellIndex(__global ParticleData *dataParticle,
+                                  __global ParticleDataSPH *dataSPH,
+                                  __global ModuleParamSPH *moduleParam,
+                                  __global unsigned int *dataCellIndex,
+                                  __global unsigned int *dataParticleIndex,
+                                  __global unsigned int *cellOffsetBuffer) {
+    uint g_id = (uint)get_global_id(0);
+
+    uint particleIndex = dataParticleIndex[g_id];
+    __global ParticleData *particleA = &dataParticle[particleIndex];
+    __global ParticleDataSPH *sphA = &dataSPH[particleA->index];
+
+    float3 cellIndexf = floor(particleA->position / moduleParam->smoothingRadius);
+    int3 cellIndex;
+    cellIndex.x = cellIndexf.x;
+    cellIndex.y = cellIndexf.y;
+    cellIndex.z = cellIndexf.z;
+    uint flatCellIndex = GetFlatCellIndex(cellIndex);
+
+    dataCellIndex[particleIndex] = flatCellIndex;
+
+    int size = (128 * 128 * 64) / get_global_size(0);
+    int start = g_id * size;
+
+    for (int i = 0; i < size; i++) {
+        cellOffsetBuffer[start + i] = 0xFFFFFFFF;
+    }
+}
+
+void __kernel SPH_UpdateCellOffset(__global ParticleData *dataParticle,
+                                   __global ParticleDataSPH *dataSPH,
+                                   __global ModuleParamSPH *moduleParam,
+                                   __global unsigned int *dataCellIndex,
+                                   __global unsigned int *dataParticleIndex,
+                                   __global unsigned int *cellOffsetBuffer) {
+
+    uint g_id = (uint)get_global_id(0);
+
+    uint particleIndex = dataParticleIndex[g_id];
+    uint cellIndex = dataCellIndex[particleIndex];
+    atomic_min(&cellOffsetBuffer[cellIndex], g_id);
+
+    //printf("g_id[%u] cellIndex[%u] = %u\n", g_id, cellIndex, cellOffsetBuffer[cellIndex]);
+}
+
 void __kernel SPH_UpdateDensity(__global ParticleData *dataParticle,
                                 __global ParticleDataSPH *dataSPH,
                                 __global ModuleParamSPH *moduleParam,
-                                __local ParticleDataSPH *sharedSPH) {
+                                __local ParticleDataSPH *sharedSPH,
+                                __global unsigned int *dataCellIndex,
+                                __global unsigned int *dataParticleIndex,
+                                __global unsigned int *cellOffsetBuffer,
+                                int focus) {
     uint work_dim = get_work_dim();
 
     uint g_id = (uint)get_global_id(0);
@@ -105,13 +110,15 @@ void __kernel SPH_UpdateDensity(__global ParticleData *dataParticle,
     const float Poly6 = (315.0f / (64.0f * M_PI * h9));
 
     __global ParticleData *particleA = &dataParticle[g_id];
+    /*
+
     __global ParticleDataSPH *sphA = &dataSPH[particleA->index];
 
     sphA->position = particleA->position;
     sphA->density = 0;
 
     barrier(CLK_GLOBAL_MEM_FENCE);
-
+    
     for (uint tile = 0; tile < n_groups; ++tile) {
         uint offset = tile * l_size;
         sharedSPH[l_id] = dataSPH[offset + l_id];
@@ -133,6 +140,67 @@ void __kernel SPH_UpdateDensity(__global ParticleData *dataParticle,
 
         sphA->pressure = K * (sphA->density - p0);
         barrier(CLK_LOCAL_MEM_FENCE);
+    }
+    */
+
+    dataSPH[particleA->index].flag = 0;
+    if (g_id == focus) {
+        dataSPH[particleA->index].flag = 1;
+    }
+    ParticleDataSPH sphA = dataSPH[particleA->index];
+    sphA.position = particleA->position;
+    sphA.density = 0;
+    barrier(CLK_GLOBAL_MEM_FENCE);
+
+    float3 cellIndexf = floor(particleA->position / moduleParam->smoothingRadius);
+    int3 cellIndex;
+    cellIndex.x = cellIndexf.x;
+    cellIndex.y = cellIndexf.y;
+    cellIndex.z = cellIndexf.z;
+
+    for (int i = -1; i <= 1; ++i) {
+        for (int j = -1; j <= 1; ++j) {
+            for (int k = -1; k <= 1; ++k) {
+                int3 neighborIndex = cellIndex + (int3)(i, j, k);
+                uint flatNeighborIndex = GetFlatCellIndex(neighborIndex);
+
+                // look up the offset to the cell:
+                uint neighborIterator = cellOffsetBuffer[flatNeighborIndex];
+                //                if (!g_id)
+                //                    printf("at[%i %i %i] cellOffset[%i]\n", cellIndex.x, cellIndex.y, cellIndex.z, cellOffsetBuffer[flatNeighborIndex]);
+
+                // iterate through particles in the neighbour cell (if iterator offset is valid)
+                while (neighborIterator != 0xFFFFFFFF && neighborIterator < get_global_size(0)) {
+                    uint particleIndexB = dataParticleIndex[neighborIterator];
+                    if (dataCellIndex[particleIndexB] != flatNeighborIndex) {
+                        break; // it means we stepped out of the neighbour cell list!
+                    }
+
+                    // Here you can load particleB and do the SPH evaluation logic
+                    __global ParticleDataSPH *sphB = &dataSPH[particleIndexB];
+                    if (!sphB->flag)
+                        sphB->flag = 2;
+
+                    const float3 diff = sphA.position - sphB->position;
+                    const float r2 = dot(diff, diff);
+                    if (r2 < h2) // h2 = h*h
+                    {
+                        const float W = Poly6 * pow(h2 - r2, 3);
+                        sphA.density += sphB->mass * W;
+                    }
+
+                    neighborIterator++; // iterate...
+                }
+            }
+        }
+    }
+    sphA.density = max(p0, sphA.density);
+    sphA.pressure = K * (sphA.density - p0);
+
+    dataSPH[particleA->index] = sphA;
+
+    if (g_id == focus) {
+        printf("FLAG : %i\n", dataSPH[particleA->index].flag);
     }
 }
 
@@ -169,6 +237,22 @@ void __kernel SPH_UpdatePressure(__global ParticleData *dataParticle,
     //  again, it should be coming from constant buffer
     const float Spiky_constant = (-45 / (M_PI * h6));
 
+    barrier(CLK_GLOBAL_MEM_FENCE);
+
+    uint global_id = get_global_id(0);
+    uint global_size = get_global_size(0);
+    uint local_id = get_local_id(0);
+    uint local_size = get_local_size(0);
+
+    /*printf("work_dim[%3u], global_id[%3u/%3u], local_id[%3u/%3u] groups_id[%3u/%3u]\n\
+               g_id[%i] Pposition[%f|%f|%f Pindex[%i]]\n",
+               
+               work_dim,
+           global_id, global_size,
+           local_id, local_size,
+            group_id, n_groups,
+               get_global_id(0), particleA->position.x, particleA->position.y, particleA->position.z, particleA->index);
+               */
     barrier(CLK_GLOBAL_MEM_FENCE);
 
     for (uint tile = 0; tile < n_groups; ++tile) {
@@ -284,7 +368,7 @@ void __kernel SPH_UpdateViscosity(__global ParticleData *dataParticle,
     sphA->force1 = 0;
     sphA->force2 = 0;
 
-    float3 mid = (float3)(82.5f, 258.f, 200.f);
+    float3 mid = (float3)(60.0f, 60.0f, 60.0f);
     float3 bounds = (float3)(10.f, 10.f, 10.f);
     float3 min = mid - bounds;
     float3 max = mid + bounds;
@@ -294,7 +378,8 @@ void __kernel SPH_UpdateViscosity(__global ParticleData *dataParticle,
 
     float dist = 0.f;
     float Sradius = 5.f;
-    float3 Sposition = (float3)(82.5f, 258.f, 200.f);
+    float3 Sposition = mid;
+
     if (sdSphere(Sposition, Sradius, sphA->position, &dist)) {
         sphA->position = Sposition + normalize(sphA->position - Sposition) * Sradius;
         sphA->velocity = normalize(sphA->position - Sposition) * length(sphA->velocity);

@@ -278,8 +278,10 @@ __kernel void coalesce(__global int* scan,
 
 /** REORDER KERNEL **/
 __kernel void reorder(__global int* array,
+                      __global int *array2,
                       __global int* histo, // Scan Buffer
                       __global int* output,
+                      __global int *output2,
                       const int pass,
                       const int nkeys,
                       __local int* local_histo)
@@ -327,7 +329,10 @@ __kernel void reorder(__global int* array,
 
     for(i = 0; i < size; i++) {
         int item = array[i + start];
+        int item2 = array2[i + start];
+
         int key = (item >> (pass * RADIX)) & (BUCK - 1);
+
         if (DEBUG == 1 && !group_id)
             printf("pipe l_size[%i/%i] | key[%i] | local_histo[%i]\n",
                 l_id, l_size, key, key * l_size + l_id);
@@ -335,6 +340,7 @@ __kernel void reorder(__global int* array,
         atomic_add(&(local_histo[key * l_size + l_id]), 1);
 
         output[pos] = item;
+        output2[pos] = item2;
     }
 
     barrier(CLK_GLOBAL_MEM_FENCE);

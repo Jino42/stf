@@ -4,6 +4,24 @@
 #include "Base_NTL.hl"
 #include "Range.hl"
 
+typedef struct ALIGN sModuleParamSPH {
+    float pressure;
+    float densityRef;
+    float smoothingRadius;
+    float viscosity;
+} ModuleParamSPH;
+
+typedef struct ALIGN sParticleDataSPH {
+    float3 position;
+    float density;
+    float pressure;
+    float mass;
+    float3 force1;
+    float3 force2;
+    float3 velocity;
+	int flag;
+} ParticleDataSPH;
+
 typedef struct ALIGN sEmitterParam {
 	float3	position;
 	uint 	nbMaxParticle;

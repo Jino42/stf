@@ -75,7 +75,7 @@ void TestParticle::update(float deltaTime) {
 
         glm::vec3 range(20.0f, 20.0f, 20.0f);
 
-        glm::vec3 blc(82.5f, 258.f, 200.f);
+        glm::vec3 blc(60.0f, 60.0f, 60.0f);
 
         box_.setDebug(true);
         box_.setMax(blc + range);

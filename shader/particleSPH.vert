@@ -8,6 +8,7 @@ layout (location = 4) in vec3 aVelocity;
 layout (location = 5) in float aPressure;
 layout (location = 6) in float aDensity;
 layout (location = 7) in float aMass;
+layout (location = 8) in int aFlag;
 
 smooth out vec2 TexCoords;
 smooth out vec3 Normal;
@@ -16,6 +17,7 @@ flat out vec3 Velocity;
 flat out float Pressure;
 flat out float Density;
 flat out float Mass;
+flat out int Flag;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -33,4 +35,5 @@ void main()
     Pressure = aPressure;
     Density = aDensity;
     Mass = aMass;
+    Flag = aFlag;
 }

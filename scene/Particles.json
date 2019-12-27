@@ -5,9 +5,9 @@
       "name": "abc",
       "options": {
         "position": {
-          "x": 82.5,
-          "y": 258,
-          "z": 200
+          "x": 60,
+          "y": 60,
+          "z": 60
         }
       },
       "emitters": [
@@ -15,7 +15,7 @@
           "_comment": "Position not yet supported",
           "name": "Lol0",
           "type": "SPH",
-          "particles": 5120,
+          "particles": 60,
           "modules": [
           ]
         }

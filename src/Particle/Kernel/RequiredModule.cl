@@ -66,15 +66,17 @@ void kernel RequiredInitialisation(
     particle->color.z = 1.f;
 
     int gs = get_global_size(0);
-    int cubicParticle = (int)cbrt((float)gs);
+    int cubicParticle = (int)ceil(cbrt((float)gs));
     float3 index;
     index.x = id % cubicParticle;
     index.y = (id / cubicParticle) % cubicParticle;
     index.z = (id / (cubicParticle * cubicParticle)) % cubicParticle;
 
+    float f = 0.5f;
     particle->position.x = index.x - cubicParticle / 2;
     particle->position.y = index.y * -1 + cubicParticle / 2;
     particle->position.z = (-index.z / 8) + index.z;
+    particle->position *= f;
 
     particle->position.x += particleSystemPosition.x;
     particle->position.y += particleSystemPosition.y;
@@ -86,6 +88,8 @@ void kernel RequiredInitialisation(
     particle->age = 5.f;
     particle->lifeTime = 5.f;
 
+    printf("g_id[%i] p[%f][%f][%f]\n", id, particle->position.x, particle->position.y, particle->position.z);
+    
     //particle->lifeTime = getRandomRangef(&moduleParams->startLifeTime, seed + id);
     //particle->age = particle->lifeTime;
 }

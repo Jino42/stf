@@ -39,11 +39,14 @@ ParticleEmitterSPH::ParticleEmitterSPH(ParticleSystem &system, ClQueue &queue, s
         glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleDataSPH), reinterpret_cast<const void *>(offsetof(ParticleDataSPH, density)));
         glEnableVertexAttribArray(7); //Mass
         glVertexAttribPointer(7, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleDataSPH), reinterpret_cast<const void *>(offsetof(ParticleDataSPH, mass)));
+        glEnableVertexAttribArray(8); //Flag
+        glVertexAttribPointer(8, 1, GL_INT, GL_FALSE, sizeof(ParticleDataSPH), reinterpret_cast<const void *>(offsetof(ParticleDataSPH, flag)));
 
         glVertexAttribDivisor(4, 1);
         glVertexAttribDivisor(5, 1);
         glVertexAttribDivisor(6, 1);
         glVertexAttribDivisor(7, 1);
+        glVertexAttribDivisor(8, 1);
 
         glBindVertexArray(0);
     }

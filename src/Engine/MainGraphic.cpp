@@ -13,6 +13,7 @@
 #include "Cl/ClProgram.hpp"
 #include "PathManager.hpp"
 #include "ShaderManager.hpp"
+#include "Particle/ParticleModule/ModuleSPH.hpp"
 
 MainGraphic::MainGraphic()
     : renderBuffer_(DisplayWindow::Get().getWidthWindow() / 3.f,
@@ -98,14 +99,14 @@ void MainGraphic::init() {
 
     CameraManager::Get().getCamera("Default").setFar(1000.0f);
     CameraManager::Get().getCamera("Default").setPosition(
-        glm::vec3(82.5f, 300.35f, 226.15f));
+    glm::vec3(60, 80.0f, 86.15f));
 
     if (doParticle_) {
         JsonParticleParser lol(PathManager::Get().getPath("scene") /
                                "Particles.json");
         lol.parse();
         ParticleSystemManager::Get().initAllParticleSystem();
-    }
+        }
 }
 
 void MainGraphic::render() {
@@ -158,19 +159,21 @@ void MainGraphic::render() {
     std::cout << "OKAKH " << height << std::endl;
 
     err.err = kernel.setArg(0, rayMarchImage_);
-    err.clCheckError();
-
-    err.err = kernel.setArg(1, width);
-    err.err |= kernel.setArg(2, height);
+    err.err |= kernel.setArg(1, ParticleSystemManager::Get().getParticleSystem("abc").getEmitter("Lol0").getModule<ModuleSPH>()->getOCGL_BufferParticles_SPH_Data().mem);
+    err.err |= kernel.setArg(2, ParticleSystemManager::Get().getParticleSystem("abc").getEmitter("Lol0").getModule<ModuleSPH>()->getGpuBufferModuleParam());
+    err.err |= kernel.setArg(3, width);
+    err.err |= kernel.setArg(4, height);
     float time = static_cast<float>(Time::Get().sinceWorldStartProgram.count<std::chrono::milliseconds>()) / 1000.0f;
-    err.err |= kernel.setArg(3, time);
-    err.err |= kernel.setArg(4, glmVec3toClFloat3(Camera::focus->getPosition()));
-    err.err |= kernel.setArg(5, glmVec3toClFloat3(Camera::focus->getPosition() + Camera::focus->getFront()));
+    err.err |= kernel.setArg(5, time);
+    err.err |= kernel.setArg(6, glmVec3toClFloat3(Camera::focus->getPosition()));
+    err.err |= kernel.setArg(7, glmVec3toClFloat3(Camera::focus->getPosition() + Camera::focus->getFront()));
     err.clCheckError();
 
 
     std::vector<cl::Memory> cl_vbos;
     cl_vbos.push_back(rayMarchImage_);
+    cl_vbos.push_back(ParticleSystemManager::Get().getParticleSystem("abc").getEmitter("Lol0").getModule<ModuleSPH>()->getOCGL_BufferParticles_SPH_Data().mem);
+
     cl::Event ev;
     glFinish();
     err.err = queue.enqueueAcquireGLObjects(&cl_vbos, nullptr, &ev);
