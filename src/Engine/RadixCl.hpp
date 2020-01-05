@@ -17,7 +17,7 @@ public:
     RadixCl(RadixCl const &) = delete;
     ~RadixCl() = default;
 
-    void radix(cl::Buffer &arrayGpuCompare, cl::Buffer &arrayGpuToSort, unsigned int lengthArrayGpu);
+    void radix(cl::Buffer &arrayGpuCompare, cl::Buffer &arrayGpuToSort, unsigned int lengthArrayGpu, bool debug = false);
     void printIntArrayGpu(cl::Buffer &buffer, unsigned int size, std::string const &name);
 	template < typename T>
 	void printArrayCpu(T *array, size_t size, std::string const &name) const {

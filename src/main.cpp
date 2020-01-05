@@ -28,8 +28,19 @@ extern "C" {
 #endif
 #include "PathManager.hpp"
 
-/*
+
 #include "Engine/RadixCl.hpp"
+
+unsigned int GetFlatCellIndex(int a, int b, int c) {
+    const uint p1 = 73856093; // some large primes
+    const uint p2 = 19349663;
+    const uint p3 = 83492791;
+    int n = p1 * a ^ p2 * b ^ p3 * c;
+    const uint TOTAL_GRID_CELL_COUNT = 128 * 128 * 64;
+    n %= TOTAL_GRID_CELL_COUNT;
+    return n;
+}
+
 void radix() {
     ClError err;
     ClContext::Get();
@@ -38,46 +49,44 @@ void radix() {
     cl::CommandQueue queue(ClContext::Get().context, ClContext::Get().deviceDefault);
     int ARRLEN = 50;
 
-    int *arrayCpuToCompare = new int[ARRLEN];
-    int *arrayCpuToSort = new int[ARRLEN];
+    unsigned int *arrayCpuToCompare = new unsigned int[ARRLEN];
+    unsigned int *arrayCpuToSort = new unsigned int[ARRLEN];
     srand(time(NULL));
     for (int i = 0; i < ARRLEN; i++) {
-        arrayCpuToCompare[i] = rand() % 5000;
-        arrayCpuToSort[i] = rand() % 5000;
+        arrayCpuToCompare[i] = GetFlatCellIndex(60 + rand() % 15, 60 + rand() % 15, 60 + rand() % 15);
+        arrayCpuToSort[i] = i;
     }
-    cl::Buffer arrayGpuToCompare(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * ARRLEN);
-    cl::Buffer arrayGpuToSort(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * ARRLEN);
+    cl::Buffer arrayGpuToCompare(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(cl_uint) * ARRLEN);
+    cl::Buffer arrayGpuToCompareToSort(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(cl_uint) * ARRLEN);
+    cl::Buffer arrayGpuToSort(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(cl_uint) * ARRLEN);
 
     //Write
-    err.err = queue.enqueueWriteBuffer(arrayGpuToCompare, CL_TRUE, 0, sizeof(int) * ARRLEN, arrayCpuToCompare);
+    err.err = queue.enqueueWriteBuffer(arrayGpuToCompare, CL_TRUE, 0, sizeof(cl_uint) * ARRLEN, arrayCpuToCompare);
     err.clCheckError();
-    err.err = queue.enqueueWriteBuffer(arrayGpuToSort, CL_TRUE, 0, sizeof(int) * ARRLEN, arrayCpuToSort);
+    err.err = queue.enqueueWriteBuffer(arrayGpuToCompareToSort, CL_TRUE, 0, sizeof(cl_uint) * ARRLEN, arrayCpuToCompare);
+    err.clCheckError();
+    err.err = queue.enqueueWriteBuffer(arrayGpuToSort, CL_TRUE, 0, sizeof(cl_uint) * ARRLEN, arrayCpuToSort);
     err.clCheckError();
 
     RadixCl radix;
-    radix.radix(arrayGpuToCompare, arrayGpuToSort, ARRLEN);
-    std::cout << "----------------------BEFORE" << std::endl;
-    std::cout << "start ["
-              << "BEFORE arrayGpuToSort"
-              << "]" << std::endl;
-    for (int i = 0; i < ARRLEN; i++) {
-        std::cout << i << " : " << arrayCpuToSort[i] << std::endl;
-    }
-    std::cout << "end ["
-              << "BEFORE arrayGpuToCompare"
-              << "]" << std::endl;
+    radix.radix(arrayGpuToCompare, arrayGpuToSort, ARRLEN, true);
 
-    std::cout << "start ["
-              << "BEFORE arrayGpuToCompare"
-              << "]" << std::endl;
+    radix.radix(arrayGpuToCompare, arrayGpuToCompareToSort, ARRLEN, true);
+
+
+    err.err = queue.enqueueReadBuffer(arrayGpuToCompare, CL_TRUE, 0, sizeof(cl_uint) * ARRLEN, arrayCpuToCompare);
+    err.clCheckError();
+    queue.finish();
+    err.err = queue.enqueueReadBuffer(arrayGpuToSort, CL_TRUE, 0, sizeof(cl_uint) * ARRLEN, arrayCpuToSort);
+    err.clCheckError();
+    queue.finish();
+
     for (int i = 0; i < ARRLEN; i++) {
-        std::cout << i << " : " << arrayCpuToCompare[i] << std::endl;
+        std::cout << i << " : " << arrayCpuToCompare[arrayCpuToSort[i]] << std::endl;
     }
-    std::cout << "end ["
-              << "BEFORE arrayGpuToCompare"
-              << "]" << std::endl;
+
 }
-*/
+
 void demoGui() {
     Gui gui;
 
@@ -119,6 +128,7 @@ void Lua() {
 int main(int argc, char **argv) {
     /*
     try {
+        DisplayWindow::Init("Sef", 1024, 720);
         radix();
     } catch (cl::Error const &e) {
         std::cout << e.what() << "(" << e.err() << ") [" << ClError::getErrorString(e.err()) << "]" << std::endl;

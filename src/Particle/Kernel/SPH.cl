@@ -37,6 +37,52 @@ uint GetFlatCellIndex(int3 cellIndex) {
     return n;
 }
 
+void __kernel SPH_GetFocusPosition(
+    __global const ParticleData *dataParticle,
+    __global const EmitterParam *emitterParam,
+    __global const ParticleDataSPH *dataSPH,
+    __global float3 *output,
+    __global uint *outputHashed) {
+
+    for (uint i = 0; i < emitterParam->nbMaxParticle; i++) {
+        __global const ParticleDataSPH *particle = dataSPH + i;
+        if ((particle->flag & FLAG_FOCUS) == FLAG_FOCUS) {
+            *output = particle->position;
+            int3 cellIndex;
+            cellIndex.x = floor(particle->position.x);
+            cellIndex.y = floor(particle->position.y);
+            cellIndex.z = floor(particle->position.z);
+            *outputHashed = GetFlatCellIndex(cellIndex);
+            break;
+        }
+    }
+}
+
+__kernel void SPH_Print(__global ParticleData *dataParticle,
+                        __global ParticleDataSPH *dataSPH,
+                        __global ModuleParamSPH *moduleParam,
+                        __global unsigned int *dataCellIndex,
+                        __global unsigned int *dataParticleIndex,
+                        __global unsigned int *cellOffsetBuffer) {
+
+    uint g_id = (uint)get_global_id(0);
+    uint particleIndex = dataParticleIndex[g_id];
+    __global ParticleData *particleA = &dataParticle[particleIndex];
+    __global ParticleDataSPH *sphA = &dataSPH[particleA->index];
+
+    float3 cellIndexf = floor(sphA->position);
+    int3 cellIndex;
+    cellIndex.x = floor(cellIndexf.x);
+    cellIndex.y = floor(cellIndexf.y);
+    cellIndex.z = floor(cellIndexf.z);
+
+    printf("g_id[%2i] particleIndex[%2i] index->%2i dataCellIndex[%7i] | SPHposition[%3.2f %3.2f %3.2f] flat[%3i %3i %3i]\n",
+           g_id, particleIndex, particleA->index, dataCellIndex[particleIndex],
+           sphA->position.x, sphA->position.y, sphA->position.z,
+           cellIndex.x, cellIndex.y, cellIndex.z
+    );
+}
+
 void __kernel SPH_UpdateCellIndex(__global ParticleData *dataParticle,
                                   __global ParticleDataSPH *dataSPH,
                                   __global ModuleParamSPH *moduleParam,
@@ -45,15 +91,22 @@ void __kernel SPH_UpdateCellIndex(__global ParticleData *dataParticle,
                                   __global unsigned int *cellOffsetBuffer) {
     uint g_id = (uint)get_global_id(0);
 
+    dataParticleIndex[g_id] = g_id;
+
     uint particleIndex = dataParticleIndex[g_id];
     __global ParticleData *particleA = &dataParticle[particleIndex];
     __global ParticleDataSPH *sphA = &dataSPH[particleA->index];
 
-    float3 cellIndexf = floor(particleA->position / moduleParam->smoothingRadius);
+    sphA->position = particleA->position;
+    sphA->density = 0;
+
+    //float3 cellIndexf = floor(particleA->position / moduleParam->smoothingRadius);
+    float3 cellIndexf = floor(sphA->position);
     int3 cellIndex;
-    cellIndex.x = cellIndexf.x;
-    cellIndex.y = cellIndexf.y;
-    cellIndex.z = cellIndexf.z;
+    cellIndex.x = floor(cellIndexf.x);
+    cellIndex.y = floor(cellIndexf.y);
+    cellIndex.z = floor(cellIndexf.z);
+
     uint flatCellIndex = GetFlatCellIndex(cellIndex);
 
     dataCellIndex[particleIndex] = flatCellIndex;
@@ -109,8 +162,8 @@ void __kernel SPH_UpdateDensity(__global ParticleData *dataParticle,
 
     const float Poly6 = (315.0f / (64.0f * M_PI * h9));
 
-    __global ParticleData *particleA = &dataParticle[g_id];
     /*
+    __global ParticleData *particleA = &dataParticle[g_id];
 
     __global ParticleDataSPH *sphA = &dataSPH[particleA->index];
 
@@ -142,43 +195,52 @@ void __kernel SPH_UpdateDensity(__global ParticleData *dataParticle,
         barrier(CLK_LOCAL_MEM_FENCE);
     }
     */
+    
+    __global ParticleData *particleA = &dataParticle[dataParticleIndex[g_id]];
 
     dataSPH[particleA->index].flag = 0;
-    if (g_id == focus) {
-        dataSPH[particleA->index].flag = 1;
+    if (dataParticleIndex[g_id] == focus) {
+        dataSPH[particleA->index].flag = FLAG_FOCUS;
     }
     ParticleDataSPH sphA = dataSPH[particleA->index];
-    sphA.position = particleA->position;
-    sphA.density = 0;
+    //printf("g_id[%2i] dataParticleIndex[%2i] particleIndex[%2i]\n", g_id, dataParticleIndex[g_id], particleA->index);
     barrier(CLK_GLOBAL_MEM_FENCE);
 
-    float3 cellIndexf = floor(particleA->position / moduleParam->smoothingRadius);
+    //float3 cellIndexf = floor(particleA->position * moduleParam->smoothingRadius);
+    float3 cellIndexf = floor(sphA.position);
     int3 cellIndex;
-    cellIndex.x = cellIndexf.x;
-    cellIndex.y = cellIndexf.y;
-    cellIndex.z = cellIndexf.z;
+    cellIndex.x = floor(cellIndexf.x);
+    cellIndex.y = floor(cellIndexf.y);
+    cellIndex.z = floor(cellIndexf.z);
 
     for (int i = -1; i <= 1; ++i) {
         for (int j = -1; j <= 1; ++j) {
             for (int k = -1; k <= 1; ++k) {
                 int3 neighborIndex = cellIndex + (int3)(i, j, k);
+
                 uint flatNeighborIndex = GetFlatCellIndex(neighborIndex);
 
                 // look up the offset to the cell:
                 uint neighborIterator = cellOffsetBuffer[flatNeighborIndex];
-                //                if (!g_id)
-                //                    printf("at[%i %i %i] cellOffset[%i]\n", cellIndex.x, cellIndex.y, cellIndex.z, cellOffsetBuffer[flatNeighborIndex]);
-
+                
+                //if (!i && !j && !k)
+                //    printf("0 at[%i %i %i] cellOffset[%i]\n", neighborIndex.x, neighborIndex.y, neighborIndex.z, cellOffsetBuffer[flatNeighborIndex]);
+                //else 
+                //    printf("a%i at[%i %i %i] cellOffset[%i]\n", particleA->index, neighborIndex.x, neighborIndex.y, neighborIndex.z, cellOffsetBuffer[flatNeighborIndex]);
+                
                 // iterate through particles in the neighbour cell (if iterator offset is valid)
                 while (neighborIterator != 0xFFFFFFFF && neighborIterator < get_global_size(0)) {
                     uint particleIndexB = dataParticleIndex[neighborIterator];
+                    
+                    //    printf("g_id[%2i] dataParticleIndex[%2i] neighborIterator[%i] index : %i || DATA CELL INDEX %i == %i ?\n",
+                    //           g_id, dataParticleIndex[g_id], neighborIterator, dataParticleIndex[neighborIterator], dataCellIndex[particleIndexB], flatNeighborIndex);
                     if (dataCellIndex[particleIndexB] != flatNeighborIndex) {
                         break; // it means we stepped out of the neighbour cell list!
                     }
 
                     // Here you can load particleB and do the SPH evaluation logic
                     __global ParticleDataSPH *sphB = &dataSPH[particleIndexB];
-                    if (!sphB->flag)
+                    if (dataParticleIndex[g_id] == focus)
                         sphB->flag = 2;
 
                     const float3 diff = sphA.position - sphB->position;
@@ -191,17 +253,34 @@ void __kernel SPH_UpdateDensity(__global ParticleData *dataParticle,
 
                     neighborIterator++; // iterate...
                 }
+                barrier(CLK_GLOBAL_MEM_FENCE);
             }
         }
     }
     sphA.density = max(p0, sphA.density);
     sphA.pressure = K * (sphA.density - p0);
 
-    dataSPH[particleA->index] = sphA;
+    barrier(CLK_GLOBAL_MEM_FENCE);
+    int f = dataSPH[particleA->index].flag;
+    barrier(CLK_GLOBAL_MEM_FENCE);
 
-    if (g_id == focus) {
-        printf("FLAG : %i\n", dataSPH[particleA->index].flag);
+    dataSPH[particleA->index] = sphA;
+    if (f && dataSPH[particleA->index].flag != 1)
+        dataSPH[particleA->index].flag = f;
+    
+    /*
+    if (dataParticleIndex[g_id] == focus) {
+
+        int c = 0;
+        for (int i = 0; i < get_global_size(0); i++) {
+            printf("f[%i]\n", dataSPH[i].flag);
+            if (dataSPH[i].flag != 0) {
+                c++;
+            }
+        }
+        printf("render[%i]\n", c);
     }
+    */
 }
 
 void __kernel SPH_UpdatePressure(__global ParticleData *dataParticle,

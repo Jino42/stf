@@ -11,11 +11,11 @@ RadixCl::RadixCl()
       kernelCoalesce_(ClProgram::Get().getKernel("coalesce")),
       kernelReorder_(ClProgram::Get().getKernel("reorder")),
       kernelBlocksum_(ClProgram::Get().getKernel("scan2")) {
-//    ClProgram::Get().addProgram(PathManager::Get().getPath("particleKernels") / "Test.cl");
+    //    ClProgram::Get().addProgram(PathManager::Get().getPath("particleKernels") / "Test.cl");
     Debug::Get().setDebug("Radix", RadixCl::debug_);
 }
 
-void RadixCl::radix(cl::Buffer &arrayGpuCompare, cl::Buffer &arrayGpuToSort, unsigned int lengthArrayGpu) {
+void RadixCl::radix(cl::Buffer &arrayGpuCompare, cl::Buffer &arrayGpuToSort, unsigned int lengthArrayGpu, bool debug) {
 
     //
     //	SETUP SIZE
@@ -33,28 +33,32 @@ void RadixCl::radix(cl::Buffer &arrayGpuCompare, cl::Buffer &arrayGpuToSort, uns
     //	CREATE BUFFERS
     //
 
-    cl::Buffer bufferArrayToCompare(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * arrayLength);
-    cl::Buffer bufferArrayToSort(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * arrayLength);
+    cl::Buffer bufferArrayToCompare(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(cl_uint) * arrayLength);
+    cl::Buffer bufferArrayToSort(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(cl_uint) * arrayLength);
 
-    cl::Buffer bufferHisto(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * BUCK * groups * localWorkSize);
-    cl::Buffer bufferScan(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * BUCK * groups * localWorkSize);
-    cl::Buffer bufferBlocksum(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * groups);
-    cl::Buffer bufferOutputToCompare(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * arrayLength);
-    cl::Buffer bufferOutputToSort(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int) * arrayLength);
+    cl::Buffer bufferHisto(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(cl_uint) * BUCK * groups * localWorkSize);
+    cl::Buffer bufferScan(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(cl_uint) * BUCK * groups * localWorkSize);
+    cl::Buffer bufferBlocksum(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(cl_uint) * groups);
+    cl::Buffer bufferOutputToCompare(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(cl_uint) * arrayLength);
+    cl::Buffer bufferOutputToSort(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(cl_uint) * arrayLength);
 
-    cl::LocalSpaceArg bufferLocalHisto = cl::Local(sizeof(int) * BUCK * localWorkSize);
-    cl::LocalSpaceArg bufferLocalScan = cl::Local(sizeof(int) * BUCK * localWorkSize);
-    cl::LocalSpaceArg bufferLocalBloclsum = cl::Local(sizeof(int) * groups);
+    cl::LocalSpaceArg bufferLocalHisto = cl::Local(sizeof(cl_uint) * BUCK * localWorkSize);
+    cl::LocalSpaceArg bufferLocalScan = cl::Local(sizeof(cl_uint) * BUCK * localWorkSize);
+    cl::LocalSpaceArg bufferLocalBloclsum = cl::Local(sizeof(cl_uint) * groups);
 
     //Write
-    err_.err = queue_.enqueueCopyBuffer(arrayGpuCompare, bufferArrayToCompare, 0, 0, sizeof(int) * baseArrayLength);
-    err_.err |= queue_.enqueueFillBuffer<int>(bufferArrayToCompare, INT_MAX, sizeof(int) * baseArrayLength, sizeof(int) * (arrayLength - baseArrayLength));
+    err_.err = queue_.enqueueCopyBuffer(arrayGpuCompare, bufferArrayToCompare, 0, 0, sizeof(cl_uint) * baseArrayLength);
+    err_.err |= queue_.enqueueFillBuffer<cl_uint>(bufferArrayToCompare, UINT_MAX, sizeof(cl_uint) * baseArrayLength, sizeof(cl_uint) * (arrayLength - baseArrayLength));
     err_.clCheckError();
 
-    err_.err = queue_.enqueueCopyBuffer(arrayGpuToSort, bufferArrayToSort, 0, 0, sizeof(int) * baseArrayLength);
-    err_.err |= queue_.enqueueFillBuffer<int>(bufferArrayToSort, INT_MAX, sizeof(int) * baseArrayLength, sizeof(int) * (arrayLength - baseArrayLength));
+    err_.err = queue_.enqueueCopyBuffer(arrayGpuToSort, bufferArrayToSort, 0, 0, sizeof(cl_uint) * baseArrayLength);
+    err_.err |= queue_.enqueueFillBuffer<cl_uint>(bufferArrayToSort, UINT_MAX, sizeof(cl_uint) * baseArrayLength, sizeof(cl_uint) * (arrayLength - baseArrayLength));
     err_.clCheckError();
 
+    if (debug) {
+        printIntArrayGpu(arrayGpuToSort, baseArrayLength, "StartArray arrayGpuToSort");
+        printIntArrayGpu(arrayGpuCompare, baseArrayLength, "StartArray arrayGpuCompare");
+    }
 
     //
     //		SET FIXED ARGS
@@ -68,7 +72,7 @@ void RadixCl::radix(cl::Buffer &arrayGpuCompare, cl::Buffer &arrayGpuToSort, uns
     //Scan
     unsigned int scanGlobalWorkSize = (BUCK * groups * localWorkSize) / 2;
     unsigned int scanLocalWorkSize = scanGlobalWorkSize / groups;
-    int doBlockSum2 = 1;
+    unsigned int doBlockSum2 = 1;
     err_.err = kernelScan_.setArg(1, bufferScan);
     err_.err |= kernelScan_.setArg(2, bufferLocalScan);
     err_.err |= kernelScan_.setArg(3, bufferBlocksum);
@@ -78,7 +82,7 @@ void RadixCl::radix(cl::Buffer &arrayGpuCompare, cl::Buffer &arrayGpuToSort, uns
     //Blocksum
     unsigned int blocksumGlobalWorkSize = groups / 2;
     unsigned int blocksumLocalWorkSize = groups / 2;
-    int doBlockSum = 0;
+    unsigned int doBlockSum = 0;
     err_.err = kernelBlocksum_.setArg(0, bufferBlocksum);
     err_.err |= kernelBlocksum_.setArg(1, bufferBlocksum);
     err_.err |= kernelBlocksum_.setArg(2, bufferLocalBloclsum);
@@ -104,7 +108,7 @@ void RadixCl::radix(cl::Buffer &arrayGpuCompare, cl::Buffer &arrayGpuToSort, uns
     //
     //		PASS
     //
-    for (int pass = 0; pass < BITS / RADIX; pass++) {
+    for (unsigned int pass = 0; pass < BITS / RADIX; pass++) {
 
         //
         //	Count
@@ -211,21 +215,22 @@ void RadixCl::radix(cl::Buffer &arrayGpuCompare, cl::Buffer &arrayGpuToSort, uns
     //
     //printIntArrayGpu(bufferArrayToCompare, baseArrayLength, "FF-----");
 
-    queue_.enqueueCopyBuffer(bufferArrayToSort, arrayGpuToSort, 0, 0, sizeof(int) * baseArrayLength);
-    //printIntArrayGpu(arrayGpuToSort, baseArrayLength, "FinalArray arrayGpuToSort");
-//    printIntArrayGpu(arrayGpuCompare, baseArrayLength, "FinalArray arrayGpuCompare");
-
+    queue_.enqueueCopyBuffer(bufferArrayToSort, arrayGpuToSort, 0, 0, sizeof(cl_uint) * baseArrayLength);
+    if (debug) {
+        printIntArrayGpu(arrayGpuToSort, baseArrayLength, "FinalArray arrayGpuToSort");
+        printIntArrayGpu(arrayGpuCompare, baseArrayLength, "FinalArray arrayGpuCompare");
+    }
 }
 
 void RadixCl::printIntArrayGpu(cl::Buffer &buffer, unsigned int length, std::string const &name) {
     std::cout << name << std::endl;
-    int *arrayCpu = new int[length];
-    err_.err = queue_.enqueueReadBuffer(buffer, CL_TRUE, 0, sizeof(int) * length, arrayCpu);
+    unsigned int *arrayCpu = new unsigned int[length];
+    err_.err = queue_.enqueueReadBuffer(buffer, CL_TRUE, 0, sizeof(cl_uint) * length, arrayCpu);
     err_.clCheckError();
     queue_.finish();
 
     std::cout << "start [" << name << "]" << std::endl;
-    for (int i = 0; i < length; i++)
+    for (unsigned int i = 0; i < length; i++)
         std::cout << i << " : " << arrayCpu[i] << std::endl;
     std::cout << "end [" << name << "]" << std::endl;
 }

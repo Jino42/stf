@@ -134,4 +134,4 @@ void DebugGraphic::updateDebugObject_(ADebugObject &object) {
     }
 }
 
-bool DebugGraphic::debug_ = true;
+bool DebugGraphic::debug_ = false;

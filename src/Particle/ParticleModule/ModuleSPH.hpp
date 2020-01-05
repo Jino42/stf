@@ -2,6 +2,7 @@
 
 #include "AParticleModule.hpp"
 #include "Cl/ClQueue.hpp"
+#include "Engine/AABB.hpp"
 #include "OCGL_Buffer.hpp"
 #include "Range.hpp"
 
@@ -52,6 +53,13 @@ class ModuleSPH : public AParticleModule {
     ClKernel kernelViscosity_;
     ClKernel kernelUpdateCellIndex_;
     ClKernel kernelUpdateCellOffset_;
+    ClKernel kernelPrint_;
+
+    ClKernel kernelGetHashedPosition_;
+    cl::Buffer gpuBuffer_FocusPosition_;
+    cl::Buffer gpuBuffer_HashedPosition_;
+    AABB aabb_;
+
     OCGL_Buffer OCGLBufferParticles_SPH_Data_;
     cl::Buffer gpuBufferParticles_CellIndex_;
     cl::Buffer gpuBufferParticles_Index_;
@@ -61,4 +69,6 @@ class ModuleSPH : public AParticleModule {
     ModuleParamSPH cpuBufferModuleParam_;
 
     std::vector<cl::Memory> ocgl_;
+
+    int focus_;
 };

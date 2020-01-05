@@ -15,7 +15,7 @@
           "_comment": "Position not yet supported",
           "name": "Lol0",
           "type": "SPH",
-          "particles": 60,
+          "particles": 4060,
           "modules": [
           ]
         }
