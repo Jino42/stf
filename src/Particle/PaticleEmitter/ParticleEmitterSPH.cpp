@@ -11,11 +11,17 @@ ParticleEmitterSPH::ParticleEmitterSPH(ParticleSystem &system, ClQueue &queue, s
     : AParticleEmitter(system, queue, name, nbParticle, 0),
       moduleSph_(nullptr) {
     modules_.emplace_back(std::make_unique<ModuleSPH>(*this));
-    moduleSph_ = &this->getModule<ModuleSPH>();
+    moduleSph_ = this->getModule<ModuleSPH>();
     ShaderManager::Get().addShader("particleSPH");
     ShaderManager::Get().getShader("particleSPH").attach((PathManager::Get().getPath("shaders") / "particleSPH.vert").generic_string());
     ShaderManager::Get().getShader("particleSPH").attach((PathManager::Get().getPath("shaders") / "particleSPH.frag").generic_string());
     ShaderManager::Get().getShader("particleSPH").link();
+
+    ShaderManager::Get().addShader("particleSPHDebug");
+    ShaderManager::Get().getShader("particleSPHDebug").attach((PathManager::Get().getPath("shaders") / "particleSPHDebug.vert").generic_string());
+    ShaderManager::Get().getShader("particleSPHDebug").attach((PathManager::Get().getPath("shaders") / "particleSPHDebug.geom").generic_string());
+    ShaderManager::Get().getShader("particleSPHDebug").attach((PathManager::Get().getPath("shaders") / "particleSPHDebug.frag").generic_string());
+    ShaderManager::Get().getShader("particleSPHDebug").link();
 
     model_.makeSphere(1.f, 36, 18);
     actor_.assign(&model_);
@@ -29,7 +35,7 @@ ParticleEmitterSPH::ParticleEmitterSPH(ParticleSystem &system, ClQueue &queue, s
         glVertexAttribDivisor(3, 1);
         
 
-        glBindBuffer(GL_ARRAY_BUFFER, (*moduleSph_)->OCGLBufferParticles_SPH_Data_.vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, moduleSph_->OCGLBufferParticles_SPH_Data_.vbo);
 
         glEnableVertexAttribArray(4); //Velocity
         glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleDataSPH), reinterpret_cast<const void *>(offsetof(ParticleDataSPH, velocity)));
@@ -42,11 +48,18 @@ ParticleEmitterSPH::ParticleEmitterSPH(ParticleSystem &system, ClQueue &queue, s
         glEnableVertexAttribArray(8); //Flag
         glVertexAttribPointer(8, 1, GL_INT, GL_FALSE, sizeof(ParticleDataSPH), reinterpret_cast<const void *>(offsetof(ParticleDataSPH, flag)));
 
+        glEnableVertexAttribArray(9); //ForcePressure
+        glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleDataSPH), reinterpret_cast<const void *>(offsetof(ParticleDataSPH, force1)));
+        glEnableVertexAttribArray(10); //ForceViscosity
+        glVertexAttribPointer(10, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleDataSPH), reinterpret_cast<const void *>(offsetof(ParticleDataSPH, force2)));
+
         glVertexAttribDivisor(4, 1);
         glVertexAttribDivisor(5, 1);
         glVertexAttribDivisor(6, 1);
         glVertexAttribDivisor(7, 1);
         glVertexAttribDivisor(8, 1);
+        glVertexAttribDivisor(9, 1);
+        glVertexAttribDivisor(10, 1);
 
         glBindVertexArray(0);
     }
@@ -86,4 +99,13 @@ void ParticleEmitterSPH::render() {
         glBindVertexArray(mesh.getVAO());
         glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(mesh.getIndice().size()), GL_UNSIGNED_INT, 0, nbParticleMax_);
     }
+
+
+    ShaderManager::Get().getShader("particleSPHDebug").activate();
+    ShaderManager::Get().getShader("particleSPHDebug").setMat4("projection", Camera::focus->getProjectionMatrix());
+    ShaderManager::Get().getShader("particleSPHDebug").setMat4("view", Camera::focus->getViewMatrix());
+    ShaderManager::Get().getShader("particleSPHDebug").setMat4("model", actor_.getTransform());
+    ShaderManager::Get().getShader("particleSPHDebug").setInt("flag", moduleSph_->flag_);
+    glLineWidth(1.0f);
+    glDrawArraysInstanced(GL_POINTS, 0, 1, nbParticleMax_);
 }

@@ -61,6 +61,7 @@ void DebugGraphic::render() {
 	ShaderManager::Get().getShader("debugWireFrame").setMat4("view", Camera::focus->getViewMatrix());
 
 	glBindVertexArray(VAO);
+	glLineWidth(3.0f);
 	glDrawArrays(GL_LINES, 0, totalLine_);
 	glBindVertexArray(0);
 }

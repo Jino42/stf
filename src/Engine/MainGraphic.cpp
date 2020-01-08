@@ -16,14 +16,14 @@
 #include "Particle/ParticleModule/ModuleSPH.hpp"
 
 MainGraphic::MainGraphic()
-    : renderBuffer_(DisplayWindow::Get().getWidthWindow() / 3.f,
+    : renderBuffer_(DisplayWindow::Get().getWidthWindow() * 0.5f,
                     DisplayWindow::Get().getHeightWindow()),
-      renderBufferRayMarch_(DisplayWindow::Get().getWidthWindow() / 3.f,
+      renderBufferRayMarch_(DisplayWindow::Get().getWidthWindow() * 0.3f,
                             DisplayWindow::Get().getHeightWindow()),
       deltaTime_(0.014f), doParticle_(true) {
     glEnable(GL_DEPTH_TEST);
     glPointSize(1.0f);
-    glLineWidth(5.0f);
+    glLineWidth(3.0f);
     glDepthFunc(GL_LESS);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -176,27 +176,28 @@ void MainGraphic::render() {
 
     cl::Event ev;
     glFinish();
-    err.err = queue.enqueueAcquireGLObjects(&cl_vbos, nullptr, &ev);
-    ev.wait();
-    err.clCheckError();
-    queue.finish();
-    err.err = queue.enqueueNDRangeKernel(kernel, cl::NullRange,
-                                         cl::NDRange(width - 1, height),
-                                         cl::NDRange(20, 20));
-    err.clCheckError();
-    queue.finish();
-    err.err = queue.enqueueReleaseGLObjects(&cl_vbos, nullptr, nullptr);
-    err.clCheckError();
-    queue.finish();
+    /*
+        err.err = queue.enqueueAcquireGLObjects(&cl_vbos, nullptr, &ev);
+        ev.wait();
+        err.clCheckError();
+        queue.finish();
+        err.err = queue.enqueueNDRangeKernel(kernel, cl::NullRange,
+                                             cl::NDRange(width - 1, height),
+                                             cl::NDRange(20, 20));
+        err.clCheckError();
+        queue.finish();
+        err.err = queue.enqueueReleaseGLObjects(&cl_vbos, nullptr, nullptr);
+        err.clCheckError();
+        queue.finish();
 
-    ShaderManager::Get().getShader("renderInRect").setInt("texture1", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, rayMarchTexture_);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    ShaderManager::Get().getShader("renderInRect").activate();
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
+        ShaderManager::Get().getShader("renderInRect").setInt("texture1", 0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, rayMarchTexture_);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        ShaderManager::Get().getShader("renderInRect").activate();
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    */
     renderBuffer_.bind();
     renderBuffer_.clear();
 

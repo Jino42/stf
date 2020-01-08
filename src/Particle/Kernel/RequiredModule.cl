@@ -88,7 +88,7 @@ void kernel RequiredInitialisation(
     particle->age = 5.f;
     particle->lifeTime = 5.f;
 
-    printf("g_id[%i] p[%f][%f][%f]\n", id, particle->position.x, particle->position.y, particle->position.z);
+    //printf("g_id[%i] p[%f][%f][%f]\n", id, particle->position.x, particle->position.y, particle->position.z);
     
     //particle->lifeTime = getRandomRangef(&moduleParams->startLifeTime, seed + id);
     //particle->age = particle->lifeTime;

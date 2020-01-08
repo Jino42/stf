@@ -21,5 +21,5 @@ class ParticleEmitterSPH : public AParticleEmitter {
   private:
     Model model_;
     ActorModel actor_;
-    std::shared_ptr<ModuleSPH> *moduleSph_;
+    std::shared_ptr<ModuleSPH> moduleSph_;
 };

@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
         // WidgetOption widgetOption;
         WidgetEditor widgetEditor;
         WidgetRender &widgetRender = WidgetRender::Get();
-        WidgetRayMarch &widgetRayMarch = WidgetRayMarch::Get();
+        //WidgetRayMarch &widgetRayMarch = WidgetRayMarch::Get();
 
         ClContext::Get();
         MainGraphic::Get();
@@ -266,6 +266,15 @@ int main(int argc, char **argv) {
 
             // GUI
             // widgetOption.render(true);
+
+            ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(0, 0)));
+            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
+            WidgetRender::Get().render(true);
+            ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(50, 0)));
+            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
+            widgetEditor.render(true);
+
+            /*
             ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(0, 0)));
             ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(33, 100)));
             WidgetRender::Get().render(true);
@@ -277,7 +286,9 @@ int main(int argc, char **argv) {
             ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(66, 0)));
             ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(33, 100)));
             widgetEditor.render(true);
+            */
             gui.render();
+
         }
     } catch (cl::Error const &e) {
         std::cout << e.what() << "(" << e.err() << ") [" << ClError::getErrorString(e.err()) << "]" << std::endl;

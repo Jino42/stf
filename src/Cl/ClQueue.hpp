@@ -1,28 +1,27 @@
 #pragma once
 
-#include <NTL.hpp>
 #include "ClContext.hpp"
-
+#include <NTL.hpp>
+#include <map>
 
 class ClQueue {
-public:
-	ClQueue() : queue_(ClContext::Get().context, ClContext::Get().deviceDefault) {}
+  public:
+    ClQueue();
+    ~ClQueue() = default;
+    ClQueue(ClQueue const &) = delete;
 
-	cl::Event &getEvent() {
-		event_.emplace_back();
-		return event_.back();
-	}
-	cl::CommandQueue &getQueue() {
-		return queue_;
-	}
-	void wait() {
-		cl::Event::waitForEvents(event_);
-		event_.clear();
-	}
-	std::vector<cl::Event> &getEventBuffer() {
-		return event_;
-	}
-private:
-	cl::CommandQueue queue_;
-	std::vector<cl::Event> event_;
+
+    cl::CommandQueue &getQueue();
+
+    void addEvent(std::string const &name);
+
+    cl::Event &getEvent(std::string const &name);
+
+    std::vector<cl::Event> &getEventBuffer();
+    std::map<std::string, unsigned int> &getEventMap();
+
+  private:
+    cl::CommandQueue queue_;
+    std::vector<cl::Event> event_;
+    std::map<std::string, unsigned int> eventMapping_;
 };

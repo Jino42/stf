@@ -9,6 +9,13 @@ typedef struct ALIGN sModuleParamSPH {
     float densityRef;
     float smoothingRadius;
     float viscosity;
+
+	float h2;
+    float h3;
+    float h6;
+    float h9;
+    float Poly6;
+    float Spiky;
 } ModuleParamSPH;
 
 typedef struct ALIGN sParticleDataSPH {

@@ -113,3 +113,36 @@ void Gui::HelpMarker(std::string const &desc) {
         ImGui::EndTooltip();
     }
 }
+
+void Gui::beginHueColor(float color, float power) {
+    ImGui::PushStyleColor(ImGuiCol_Button, static_cast<ImVec4>(ImColor::HSV(color, 0.7f * power, 0.7f * power)));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, static_cast<ImVec4>(ImColor::HSV(color, 0.8f * power, 0.8f * power)));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, static_cast<ImVec4>(ImColor::HSV(color, 0.9f * power, 0.9f * power)));
+}
+
+void Gui::beginColor(eColor color, eColor power) {
+    assert(!Gui::useColor_);
+    Gui::useColor_ = true;
+    if (color == eColor::kGrey) {
+        ImGui::PushStyleColor(ImGuiCol_Button, static_cast<ImVec4>(ImColor::HSV(0.f, 0.f, 0.5f * Gui::mapEColor_.at(power))));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, static_cast<ImVec4>(ImColor::HSV(0.f, 0.0f, 0.5f * Gui::mapEColor_.at(power))));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, static_cast<ImVec4>(ImColor::HSV(0.f, 0.00f, 0.65f * Gui::mapEColor_.at(power))));
+    } else
+        beginHueColor(Gui::mapEColor_.at(color), Gui::mapEColor_.at(power));
+}
+
+void Gui::endColor() {
+    ImGui::PopStyleColor(3);
+    Gui::useColor_ = false;
+}
+
+std::map<eColor, float> const Gui::mapEColor_ = {{eColor::kGrey, 0.f},
+                                                 {eColor::kRed, 0.f},
+                                                 {eColor::kGreen, 0.33f},
+                                                 {eColor::kPurple, 0.77f},
+                                                 {eColor::kHard, 1.f},
+                                                 {eColor::kMedium, .75f},
+                                                 {eColor::kSoft, .5f},
+                                                 {eColor::kLight, .33f}};
+
+bool Gui::useColor_ = false;

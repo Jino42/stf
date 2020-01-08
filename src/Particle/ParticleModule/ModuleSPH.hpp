@@ -6,6 +6,43 @@
 #include "OCGL_Buffer.hpp"
 #include "Range.hpp"
 
+enum class eSph { // Relation with shader SPHDebug
+    kDebug = 1 << 0,
+    kDebugNeighbor = 1 << 1,
+    kDebugVelocity = 1 << 2,
+    kDebugViscosity = 1 << 3,
+    kDebugPressure = 1 << 4,
+};
+
+inline eSph operator|(eSph const lhs, eSph const rhs) {
+    return static_cast<eSph>(static_cast<int>(lhs) | static_cast<int>(rhs));
+}
+inline eSph const &operator|=(eSph &lhs, eSph const &rhs) {
+    lhs = static_cast<eSph>(static_cast<int>(lhs) | static_cast<int>(rhs));
+    return (lhs);
+}
+inline eSph operator&(eSph const lhs, eSph const rhs) {
+    return static_cast<eSph>(static_cast<int>(lhs) & static_cast<int>(rhs));
+}
+inline eSph operator&(int const lhs, eSph const rhs) {
+    return static_cast<eSph>(lhs & static_cast<int>(rhs));
+}
+inline eSph operator&(eSph const lhs, int const rhs) {
+    return static_cast<eSph>(static_cast<int>(lhs) & rhs);
+}
+inline eSph operator^(int const lhs, eSph const rhs) {
+    return static_cast<eSph>(lhs ^ static_cast<int>(rhs));
+}
+inline eSph operator^(eSph const lhs, int const rhs) {
+    return static_cast<eSph>(static_cast<int>(lhs) ^ rhs);
+}
+inline eSph operator<<(eSph const lhs, eSph const rhs) {
+    return static_cast<eSph>(static_cast<int>(lhs) << static_cast<int>(rhs));
+}
+inline eSph operator>>(eSph const lhs, eSph const rhs) {
+    return static_cast<eSph>(static_cast<int>(lhs) >> static_cast<int>(rhs));
+}
+
 class AParticleEmitter;
 
 struct ModuleParamSPH {
@@ -13,6 +50,13 @@ struct ModuleParamSPH {
     cl_float densityRef;      //1.f
     cl_float smoothingRadius; //1.f
     cl_float viscosity;       //0.018f
+
+    cl_float h2;
+    cl_float h3;
+    cl_float h6;
+    cl_float h9;
+    cl_float Poly6;
+    cl_float Spiky;
 };
 
 struct ParticleDataSPH {
@@ -35,6 +79,10 @@ class ModuleSPH : public AParticleModule {
     void update(float deltaTime) override;
     void reload() override;
 
+    void shiftDebugViscosity();
+    void shiftDebugVelocity();
+    void shiftDebugPressure();
+
     ModuleParamSPH &getModuleParam() {
         return cpuBufferModuleParam_;
     }
@@ -48,17 +96,13 @@ class ModuleSPH : public AParticleModule {
     }
 
   private:
+    int flag_;
     ClKernel kernelDensity_;
     ClKernel kernelPressure_;
     ClKernel kernelViscosity_;
     ClKernel kernelUpdateCellIndex_;
     ClKernel kernelUpdateCellOffset_;
     ClKernel kernelPrint_;
-
-    ClKernel kernelGetHashedPosition_;
-    cl::Buffer gpuBuffer_FocusPosition_;
-    cl::Buffer gpuBuffer_HashedPosition_;
-    AABB aabb_;
 
     OCGL_Buffer OCGLBufferParticles_SPH_Data_;
     cl::Buffer gpuBufferParticles_CellIndex_;
@@ -70,5 +114,10 @@ class ModuleSPH : public AParticleModule {
 
     std::vector<cl::Memory> ocgl_;
 
+    float lastSmoothingRadius_;
+
     int focus_;
+
+    void updateConstant_();
+
 };
