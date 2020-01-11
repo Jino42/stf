@@ -14,4 +14,6 @@ public:
     void    reload() override;
 
 private:
+    bool doAttractor_;
+  std::shared_ptr<cl::Buffer> gpuBufferParticles_Physic_;
 };

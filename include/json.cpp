@@ -10,3 +10,7 @@ json getJsonFromFileRelativeToRootPath(std::string const &path) {
 	std::ifstream ifs((boost::filesystem::path(ROOT_PATH) / path).generic_string());
 	return json::parse(ifs);
 }
+
+cl_float3 jsonToFloat3(json &j) {
+    return makeFloat3(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>());
+}

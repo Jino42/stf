@@ -11,9 +11,9 @@
 
 /// Rmove
 #include "Cl/ClProgram.hpp"
+#include "Particle/ParticleModule/ModuleSPH.hpp"
 #include "PathManager.hpp"
 #include "ShaderManager.hpp"
-#include "Particle/ParticleModule/ModuleSPH.hpp"
 
 MainGraphic::MainGraphic()
     : renderBuffer_(DisplayWindow::Get().getWidthWindow() * 0.5f,
@@ -59,10 +59,10 @@ void MainGraphic::init() {
     ShaderManager::Get().getShader("renderInRect").link();
     float vertices[] = {
         // positions          // texture coords
-         1.0f,  1.0f,  0.0f,        1.0f, 1.0f,   // top right
-         1.0f, -1.0f,  0.0f,        1.0f, 0.0f,  // bottom right
-        -1.0f, -1.0f,  0.0f,        0.0f, 0.0f, // bottom left
-        -1.0f,  1.0f,  0.0f,        0.0f, 1.0f   // top left
+        1.0f, 1.0f, 0.0f, 1.0f, 1.0f,   // top right
+        1.0f, -1.0f, 0.0f, 1.0f, 0.0f,  // bottom right
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, // bottom left
+        -1.0f, 1.0f, 0.0f, 0.0f, 1.0f   // top left
     };
     unsigned int indices[] = {
         0, 1, 3, // first triangle
@@ -99,14 +99,14 @@ void MainGraphic::init() {
 
     CameraManager::Get().getCamera("Default").setFar(1000.0f);
     CameraManager::Get().getCamera("Default").setPosition(
-    glm::vec3(60, 80.0f, 86.15f));
+        glm::vec3(60, 80.0f, 86.15f));
 
     if (doParticle_) {
         JsonParticleParser lol(PathManager::Get().getPath("scene") /
                                "Particles.json");
         lol.parse();
         ParticleSystemManager::Get().initAllParticleSystem();
-        }
+    }
 }
 
 void MainGraphic::render() {
@@ -140,12 +140,14 @@ void MainGraphic::render() {
         ParticleSystemManager::Get().initAllParticleSystem();
     }
     if (DisplayWindow::Get().getKey(GLFW_KEY_G)) {
-        ParticleSystemManager::Get().getParticleSystem("abc").reload();
+        for (auto &s: ParticleSystemManager::Get().getMapParticleSystem()) {
+            s.second.reload();
+        }
     }
 
     renderBufferRayMarch_.bind();
     renderBufferRayMarch_.clear();
-
+    /*
     //do raymarch
     ClError err;
 
@@ -176,7 +178,7 @@ void MainGraphic::render() {
 
     cl::Event ev;
     glFinish();
-    /*
+    
         err.err = queue.enqueueAcquireGLObjects(&cl_vbos, nullptr, &ev);
         ev.wait();
         err.clCheckError();
@@ -201,12 +203,17 @@ void MainGraphic::render() {
     renderBuffer_.bind();
     renderBuffer_.clear();
 
-    MainGraphicExtendModel::Get().update(0.014f);
+    float time = static_cast<float>(Time::Get().sinceWorldStartProgram.count<std::chrono::milliseconds>()) / 1000.0f;
+
+    float t = static_cast<float>(Time::Get().getDeltaTime().count()) / 1000.f;
+
+    std::cout << t << std::endl;
+
+    MainGraphicExtendModel::Get().update(t);
 
     if (doParticle_) {
-        TestParticle::Get().update(0.014f);
-
-        ParticleSystemManager::Get().updateAllParticleSystem(0.014f);
+        TestParticle::Get().update(t);
+        ParticleSystemManager::Get().updateAllParticleSystem(t);
         ParticleSystemManager::Get().renderAllParticleSystem();
     }
     // VoxelWorld::Get().update();

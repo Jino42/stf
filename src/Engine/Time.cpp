@@ -1,14 +1,14 @@
 #include "Time.hpp"
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
-Timer::Timer(bool canStart) :
-        started_(false),
-        paused_(false),
-        speed_(1.0f),
-        timePointTimerCreated_(std::chrono::steady_clock::now()),
-        reference_(std::chrono::steady_clock::now()),
-        accumulated_(std::chrono::duration<long double>(0)) {
+Timer::Timer(bool canStart)
+    : started_(false),
+      paused_(false),
+      speed_(1.0f),
+      timePointTimerCreated_(std::chrono::steady_clock::now()),
+      reference_(std::chrono::steady_clock::now()),
+      accumulated_(std::chrono::duration<long double>(0)) {
     if (canStart)
         start();
     Timer::addTimer_(this);
@@ -34,7 +34,7 @@ void Timer::stop() {
     if (started_ && !paused_) {
         if (!Time::Get().isPause()) {
             std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-            accumulated_ = accumulated_ + std::chrono::duration_cast< std::chrono::duration<long double> >(now - reference_) * speed_;
+            accumulated_ = accumulated_ + std::chrono::duration_cast<std::chrono::duration<long double>>(now - reference_) * speed_;
         }
         paused_ = true;
     }
@@ -52,7 +52,7 @@ void Timer::reset() {
 
 void Timer::setSpeed(float speed) {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    accumulated_ = accumulated_ + std::chrono::duration_cast< std::chrono::duration<long double> >(now - reference_) * speed_;
+    accumulated_ = accumulated_ + std::chrono::duration_cast<std::chrono::duration<long double>>(now - reference_) * speed_;
     reference_ = std::chrono::steady_clock::now();
     speed_ = speed;
 }
@@ -63,7 +63,7 @@ float Timer::getSpeed() const {
 
 void Timer::applyWorldStart_() {
     if (!started_)
-        return ;
+        return;
     if (!Time::Get().isPause()) {
         if (!paused_)
             reference_ = std::chrono::steady_clock::now();
@@ -71,19 +71,19 @@ void Timer::applyWorldStart_() {
 }
 void Timer::applyWorldStop_() {
     if (!started_ || paused_)
-        return ;
+        return;
     if (Time::Get().isPause()) {
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-        accumulated_ = accumulated_ + std::chrono::duration_cast< std::chrono::duration<long double> >(now - reference_) * speed_;
+        accumulated_ = accumulated_ + std::chrono::duration_cast<std::chrono::duration<long double>>(now - reference_) * speed_;
     }
 }
 
 void Timer::worldStart_() {
-    for (auto *timer : Timer::timers_)
+    for (auto *timer: Timer::timers_)
         timer->applyWorldStart_();
 }
 void Timer::worldStop_() {
-    for (auto *timer : Timer::timers_)
+    for (auto *timer: Timer::timers_)
         timer->applyWorldStop_();
 }
 
@@ -102,42 +102,41 @@ std::chrono::steady_clock::time_point Timer::getReference_() {
     return reference_;
 }
 
-std::vector< Timer *> Timer::timers_;
+std::vector<Timer *> Timer::timers_;
 
 ///
 ///
 ///
 
-Time::Time() :
-        pause_(false),
-        elapsedTimeInPause_(0),
-		timeStep_(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::milliseconds(16))),
-		lag_(std::chrono::nanoseconds(0)){
+Time::Time()
+    : pause_(false),
+      elapsedTimeInPause_(0),
+      timeStep_(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::milliseconds(16))),
+      lag_(std::chrono::nanoseconds(0)),
+      deltaTime_(std::chrono::milliseconds(0)) {
 }
 
 void Time::update() {
     std::chrono::high_resolution_clock::duration deltaTime = std::chrono::high_resolution_clock::now() -
-            sinceWorldStartFrame.getReference_();
+                                                             sinceWorldStartFrame.getReference_();
     sinceWorldStartFrame.reset();
     sinceWorldStartFrame.start();
     lag_ += std::chrono::duration_cast<std::chrono::nanoseconds>(deltaTime);
 }
 bool Time::shouldUpdateLogic() {
-	if (lag_ >= timeStep_) {
-		lag_ -= timeStep_;
-		return true;
-	}
-	return false;
+    if (lag_ >= timeStep_) {
+        lag_ -= timeStep_;
+        return true;
+    }
+    return false;
 }
-
 
 void Time::pause(bool b) {
     pause_ = b;
     if (b) {
         startPause_ = std::chrono::steady_clock::now();
         Timer::worldStop_();
-    }
-    else {
+    } else {
         elapsedTimeInPause_ += std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startPause_);
         Timer::worldStart_();
     }
@@ -146,23 +145,28 @@ bool Time::isPause() const {
     return pause_;
 }
 
+void Time::endFrame() {
+    deltaTime_ = sinceWorldStartFrame.getDuration<std::chrono::milliseconds>();
+}
+
+std::chrono::milliseconds Time::getDeltaTime() {
+    return deltaTime_;
+}
+
 Time &Time::Get() {
-	if (!Time::instance_) {
+    if (!Time::instance_) {
         Time::instance_ = std::make_unique<Time>();
-	}
-	return *Time::instance_;
+    }
+    return *Time::instance_;
 }
 
 std::unique_ptr<Time> Time::instance_ = nullptr;
 
-bool  Time::debug_ = false;
-bool  Timer::debug_ = false;
+bool Timer::debug_ = false;
 
-time_t steady_clock_to_time_t(std::chrono::steady_clock::time_point const &t)
-{
+time_t steady_clock_to_time_t(std::chrono::steady_clock::time_point const &t) {
     return std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now()
-            + std::chrono::duration_cast<std::chrono::system_clock::duration>(t - std::chrono::steady_clock::now()));
+        std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::system_clock::duration>(t - std::chrono::steady_clock::now()));
 }
 
 std::ostream &operator<<(std::ostream &os, Timer const &timer) {
@@ -177,8 +181,6 @@ std::ostream &operator<<(std::ostream &os, Timer const &timer) {
     std::string strTimeReferenceTimer(std::ctime(&timeReferenceTimer));
     strTimeReferenceTimer.erase(std::remove(strTimeReferenceTimer.begin(), strTimeReferenceTimer.end(), '\n'), strTimeReferenceTimer.end());
 #endif
-
-
 
     os << "Timer {";
     os << "World pause [" << Time::Get().isPause() << "]," << std::endl;

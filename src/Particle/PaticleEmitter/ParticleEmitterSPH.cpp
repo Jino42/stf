@@ -9,7 +9,8 @@
 
 ParticleEmitterSPH::ParticleEmitterSPH(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticle)
     : AParticleEmitter(system, queue, name, nbParticle, 0),
-      moduleSph_(nullptr) {
+      moduleSph_(nullptr),
+      lineWidth_(1.f) {
     modules_.emplace_back(std::make_unique<ModuleSPH>(*this));
     moduleSph_ = this->getModule<ModuleSPH>();
     ShaderManager::Get().addShader("particleSPH");
@@ -31,9 +32,8 @@ ParticleEmitterSPH::ParticleEmitterSPH(ParticleSystem &system, ClQueue &queue, s
         glBindVertexArray(VAO);
         glEnableVertexAttribArray(3); //Position
         glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, position)));
-        
+
         glVertexAttribDivisor(3, 1);
-        
 
         glBindBuffer(GL_ARRAY_BUFFER, moduleSph_->OCGLBufferParticles_SPH_Data_.vbo);
 
@@ -100,12 +100,15 @@ void ParticleEmitterSPH::render() {
         glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(mesh.getIndice().size()), GL_UNSIGNED_INT, 0, nbParticleMax_);
     }
 
-
     ShaderManager::Get().getShader("particleSPHDebug").activate();
     ShaderManager::Get().getShader("particleSPHDebug").setMat4("projection", Camera::focus->getProjectionMatrix());
     ShaderManager::Get().getShader("particleSPHDebug").setMat4("view", Camera::focus->getViewMatrix());
     ShaderManager::Get().getShader("particleSPHDebug").setMat4("model", actor_.getTransform());
     ShaderManager::Get().getShader("particleSPHDebug").setInt("flag", moduleSph_->flag_);
-    glLineWidth(1.0f);
+    glLineWidth(lineWidth_);
     glDrawArraysInstanced(GL_POINTS, 0, 1, nbParticleMax_);
+}
+
+float &ParticleEmitterSPH::getLineWidth() {
+    return lineWidth_;
 }

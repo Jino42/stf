@@ -18,8 +18,11 @@ class ParticleEmitterSPH : public AParticleEmitter {
 
     void supprMe(float scale);
 
+    float &getLineWidth();
+
   private:
     Model model_;
     ActorModel actor_;
     std::shared_ptr<ModuleSPH> moduleSph_;
+    float lineWidth_;
 };

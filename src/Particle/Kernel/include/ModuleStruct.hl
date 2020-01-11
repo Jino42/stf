@@ -4,6 +4,19 @@
 #include "Base_NTL.hl"
 #include "Range.hl"
 
+typedef struct ALIGN sModuleParamPhysicNoise {
+    float3 gravity;
+} ModuleParamPhysicNoise;
+
+typedef struct ALIGN sModuleParamPhysicGravity {
+    float3 gravity;
+} ModuleParamPhysicGravity;
+
+typedef struct ALIGN sParticleDataPhysic {
+    float3 velocity;
+    float mass;
+} ParticleDataPhysic;
+
 typedef struct ALIGN sModuleParamSPH {
     float pressure;
     float densityRef;

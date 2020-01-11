@@ -4,7 +4,7 @@ __kernel void PrintParticle(
     __global ParticleData const *data)
 {
     int id = get_global_id(0);
-    __global ParticleData *particle = &data[id];
+    __global ParticleData const *particle = &data[id];
     if (!id)
     {
         for(int i = 0; i < get_global_size(0); i++)

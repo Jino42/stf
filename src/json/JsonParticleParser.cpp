@@ -1,16 +1,20 @@
 #include "JsonParticleParser.hpp"
 #include "Particle/ParticleSystemManager.hpp"
+#include "cl_type.hpp"
 
 #include "Particle/PaticleEmitter/ParticleEmitterMesh.hpp"
 #include "Particle/PaticleEmitter/ParticleEmitterPoint.hpp"
-#include "Particle/PaticleEmitter/ParticleEmitterSprite.hpp"
 #include "Particle/PaticleEmitter/ParticleEmitterSPH.hpp"
+#include "Particle/PaticleEmitter/ParticleEmitterSprite.hpp"
 
 #include "Particle/ParticleModule/ModuleAttractor.hpp"
 #include "Particle/ParticleModule/ModuleColor.hpp"
 #include "Particle/ParticleModule/ModuleMeshParticulizer.hpp"
 #include "Particle/ParticleModule/ModuleMoveToTarget.hpp"
 #include "Particle/ParticleModule/ModuleMovement.hpp"
+#include "Particle/ParticleModule/ModulePhysicGravity.hpp"
+#include "Particle/ParticleModule/ModulePhysicNoise.hpp"
+#include "Particle/ParticleModule/ModuleResolvePhysic.hpp"
 #include "Particle/ParticleModule/ModuleSPH.hpp"
 #include "Particle/ParticleModule/ModuleSizeOverLifetime.hpp"
 
@@ -42,6 +46,8 @@ void JsonParticleParser::parse() {
             }
             if (itSystem.find("emitters") != itSystem.end()) {
                 for (auto &itEmitter: *itSystem.find("emitters")) {
+                    if (itEmitter["active"].get<bool>() == false)
+                        continue;
                     std::cout << itEmitter["type"] << std::endl;
 
                     if (itEmitter["type"].get<std::string>() == "Sprite") {
@@ -74,21 +80,47 @@ void JsonParticleParser::parse() {
                         currentEmitter_ = nullptr;
                     }
 
+                    if (currentEmitter_ && itEmitter["options"].find("position") != itEmitter["options"].end()) {
+                        json &position = *itEmitter["options"].find("position");
+                        std::cout << "DJA DJA " << position << std::endl;
+                        currentEmitter_->getPosition() = jsonToVec3(position);
+                    }
+
                     if (currentEmitter_ && itEmitter.find("modules") != itEmitter.end()) {
                         for (auto &itModule: *itEmitter.find("modules")) {
                             std::cout << itModule["type"] << std::endl;
-                            if (itModule["type"].get<std::string>() == "Movement") {
+                            if (itModule["type"].get<std::string>() == "Physic") {
+                                currentEmitter_->addModule<ModuleResolvePhysic>();
+                            } else if (itModule["type"].get<std::string>() == "Movement") {
                                 currentEmitter_->addModule<ModuleMovement>();
-                                std::cout << "Is [Movement]" << std::endl;
+                            } else if (itModule["type"].get<std::string>() == "Target") {
+                                currentEmitter_->addModule<ModuleTarget>();
+                            } else if (itModule["type"].get<std::string>() == "MeshParticulizer") {
+                                currentEmitter_->addModule<ModuleMeshParticulizer>();
+                            } else if (itModule["type"].get<std::string>() == "MoveToTarget") {
+                                currentEmitter_->addModule<ModuleMoveToTarget>();
                             } else if (itModule["type"].get<std::string>() == "SizeOverLifetime") {
                                 currentEmitter_->addModule<ModuleSizeOverLifetime>();
-                                std::cout << "Is [SizeOverLifetime]" << std::endl;
                             } else if (itModule["type"].get<std::string>() == "Attractor") {
                                 currentEmitter_->addModule<ModuleAttractor>();
-                                std::cout << "Is [Attractor]" << std::endl;
+                            } else if (itModule["type"].get<std::string>() == "Gravity") {
+                                currentEmitter_->addModule<ModulePhysicGravity>();
+
+                                if (itModule.find("options") != itModule.end()) {
+                                    std::shared_ptr<ModulePhysicGravity> &currentModule = currentEmitter_->getModule<ModulePhysicGravity>();
+                                    std::cout << "There are options : " << std::endl;
+                                    if (itModule["options"].find("gravity") != itModule["options"].end()) {
+                                        std::cout << "Gravity" << std::endl;
+                                        json &gravity = *itModule["options"].find("gravity");
+                                        std::cout << gravity << std::endl;
+                                        currentModule->getCpuModuleParam().gravity = jsonToFloat3(gravity);
+                                    }
+                                }
+
+                            } else if (itModule["type"].get<std::string>() == "PhysicNoise") {
+                                currentEmitter_->addModule<ModulePhysicNoise>();
                             } else if (itModule["type"].get<std::string>() == "Color") {
                                 currentEmitter_->addModule<ModuleColor>();
-                                std::cout << "Is [Color]" << std::endl;
                             }
                         }
                     }

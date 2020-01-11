@@ -3,22 +3,18 @@
 #include "AParticleModule.hpp"
 #include "Engine/ModelEngine/Model.hpp"
 #include <memory>
+#include "ModuleTarget.hpp"
 
 class AParticleEmitter;
-class ModuleTarget;
-
-struct ParticleDataMeshParticulizer {
-	cl_float3	position;
-};
 
 class ModuleMeshParticulizer : public AParticleModule {
-public:
-	ModuleMeshParticulizer(AParticleEmitter &emitter);
+  public:
+    ModuleMeshParticulizer(AParticleEmitter &emitter);
 
-	void	init() override;
+    void init() override;
 
-private:
-	Model			model_;
-	std::unique_ptr<ParticleDataMeshParticulizer[]> cpuBufferParticles_Position_;
-	std::shared_ptr<ModuleTarget> moduleTarget_;
+  private:
+    Model model_;
+    std::unique_ptr<ParticleDataTarget[]> cpuBufferParticles_Target_;
+    std::shared_ptr<cl::Buffer> gpuBufferParticles_Target_;
 };

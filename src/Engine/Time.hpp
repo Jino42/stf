@@ -6,8 +6,8 @@
 ///
 
 #include <chrono>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 /// \brief For play with Time
 /// \details    Timer is like a stopwatch
@@ -17,11 +17,12 @@
 class Timer {
     friend class Time;
     friend std::ostream &operator<<(std::ostream &os, Timer const &timer);
-public:
+
+  public:
     /// \param canStart : If true, the timer is started just after construction. Otherwise, it will not be automatically started.
     explicit Timer(bool canStart = true);
     Timer(Timer const &other) = delete;
-    Timer& operator=(Timer const &other) = delete;
+    Timer &operator=(Timer const &other) = delete;
     virtual ~Timer();
 
     /// \brief Start/resume the timer.
@@ -39,11 +40,9 @@ public:
     /// \return Speed of Timer
     float getSpeed() const;
 
-
     /// \brief Reset Timer
     /// \details Timer need to be start after a reset
     void reset();
-
 
     /// \brief Return the elapsed time.
     /// \details duration_t :
@@ -63,10 +62,7 @@ public:
     template <class duration_t = std::chrono::milliseconds>
     duration_t getDuration() const;
 
-
-
-private:
-
+  private:
     //Friendly
     static void worldStart_();
     static void worldStop_();
@@ -81,15 +77,12 @@ private:
     std::chrono::steady_clock::time_point reference_;
     std::chrono::duration<long double> accumulated_;
 
-
-    static std::vector< Timer * > timers_;
+    static std::vector<Timer *> timers_;
 
     static void addTimer_(Timer *timer);
     static void deleteTimer_(Timer *timer);
 
     static bool debug_;
-
-
 };
 
 /// \brief Singleton
@@ -99,31 +92,35 @@ private:
 
 class Time {
     friend class Timer;
-public:
 
-	Time();
+  public:
+    Time();
 
     /// \brief Update of Time module
     /// \details    Time need to be update up to your render loop
     ///             Permit to set DeltaTime, Stack the Lag (Talk to ntoniolo for understand)
-	void update();
+    void update();
 
     /// \brief FixedUpdate
     /// \details    Check if Lag is > then the TimeStep (16milliseconds)
     /// \return bool : Do FixedUpdate if return true
-	bool shouldUpdateLogic();
-	static Time &Get();
+    bool shouldUpdateLogic();
+    static Time &Get();
 
     /// \brief Make WorldPause/WorldUnPause
     /// \details    Make a WorldPause/WorldUnPause and Apply for each Timer exist, a pause
     ///             If a Timer was already in a pause, it will remain after WorldUnPause
     /// \param b : True if you want WorldPause
     ///            False if you want WorldUnPause
-	void pause(bool b);
+    void pause(bool b);
 
     /// \brief Get Bool of WorldPause
     /// \return Bool of WorldPause
-	bool isPause() const;
+    bool isPause() const;
+
+    /// \brief Set deltaTime with endOfFrame
+    /// \details Used for simulation frame-based
+    void endFrame();
 
     /// \brief Timer reset each Frame
     Timer sinceWorldStartFrame;
@@ -131,19 +128,21 @@ public:
     /// \brief Timer start during Time Constructor
     Timer sinceWorldStartProgram;
 
-private:
+    std::chrono::milliseconds getDeltaTime();
+
+  private:
     bool pause_;
     std::chrono::time_point<std::chrono::steady_clock> startPause_;
     std::chrono::milliseconds elapsedTimeInPause_;
 
     std::chrono::time_point<std::chrono::steady_clock> sinceRealStartProgram_;
 
-	std::chrono::nanoseconds timeStep_;
-	std::chrono::nanoseconds lag_;
+    std::chrono::nanoseconds timeStep_;
+    std::chrono::nanoseconds lag_;
 
-	static std::unique_ptr<Time> instance_;
+    std::chrono::milliseconds deltaTime_;
 
-    static bool debug_;
+    static std::unique_ptr<Time> instance_;
 };
 
 std::ostream &operator<<(std::ostream &os, Timer const &timer);
@@ -160,7 +159,7 @@ duration_t Timer::getDuration() const {
                 std::cout << "now - ref : " << std::chrono::duration_cast<duration_t>((std::chrono::steady_clock::now() - reference_)).count() << std::endl;
             }
             return std::chrono::duration_cast<duration_t>(
-                    accumulated_ + (std::chrono::steady_clock::now() - reference_) * speed_);
+                accumulated_ + (std::chrono::steady_clock::now() - reference_) * speed_);
         }
     } else {
         return duration_t(0);
@@ -179,7 +178,8 @@ typename duration_t::rep Timer::count() const {
                 std::cout << "now - ref : " << std::chrono::duration_cast<duration_t>((std::chrono::steady_clock::now() - reference_)).count() << std::endl;
             }
             return std::chrono::duration_cast<duration_t>(
-                    accumulated_ + (std::chrono::steady_clock::now() - reference_) * speed_).count();
+                       accumulated_ + (std::chrono::steady_clock::now() - reference_) * speed_)
+                .count();
         }
     } else {
         return duration_t(0).count();

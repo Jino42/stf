@@ -1,6 +1,6 @@
 {
   "_comment": "Particles",
-  "Systems": [
+  "SystemsDISABLE": [
     {
       "name": "abc",
       "options": {
@@ -12,6 +12,7 @@
       },
       "emitters": [
         {
+          "active": true,
           "_comment": "Position not yet supported",
           "name": "Lol0",
           "type": "SPH",
@@ -32,6 +33,7 @@
       },
       "emitters": [
         {
+          "active": true,
           "_comment": "Position not yet supported",
           "name": "Lol3",
           "type": "Point",
@@ -46,11 +48,9 @@
           ]
         }
       ]
-    }
-  ],
-  "SystemsDISABLE": [
+    },
     {
-      "name": "abc",
+      "name": "Sprite",
       "options": {
         "position": {
           "x": 0,
@@ -60,6 +60,7 @@
       },
       "emitters": [
         {
+          "active": true,
           "_comment": "Position not yet supported",
           "name": "Lol0",
           "type": "Sprite",
@@ -77,7 +78,7 @@
       ]
     },
     {
-      "name": "abc1",
+      "name": "Mesh",
       "options": {
         "position": {
           "x": 60,
@@ -87,6 +88,7 @@
       },
       "emitters": [
         {
+          "active": true,
           "_comment": "Position not yet supported",
           "name": "Lol2",
           "type": "Mesh",
@@ -102,25 +104,71 @@
           ]
         }
       ]
-    },
+    }
+  ],
+  "Systems": [
     {
-      "name": "abc2",
+      "name": "Point",
       "options": {
         "position": {
-          "x": 120,
-          "y": 258,
-          "z": -30
+          "x": 60,
+          "y": 60,
+          "z": 60
         }
       },
       "emitters": [
         {
+          "active": true,
+          "options": {
+            "position": {
+              "x": 80,
+              "y": 60,
+              "z": 60
+            }
+          },
+          "name": "Lol2",
+          "type": "Point",
+          "particles": 30000,
+          "modules": [
+            {
+              "type": "Target"
+            },
+            {
+              "type": "MeshParticulizer"
+            },
+            {
+              "type": "MoveToTarget"
+            },
+            {
+              "type": "Color"
+            }
+          ]
+        },
+        {
+          "active": false,
           "_comment": "Position not yet supported",
           "name": "Lol3",
           "type": "Point",
-          "particles": 300,
+          "particles": 300000,
           "modules": [
             {
               "type": "Attractor"
+            },
+            {
+              "type": "Gravity",
+              "options": {
+                "gravity": {
+                  "x": 0,
+                  "y": -0.1,
+                  "z": 0
+                }
+              }
+            },
+            {
+              "type": "PhysicNoise"
+            },
+            {
+              "type": "Physic"
             },
             {
               "type": "Color"

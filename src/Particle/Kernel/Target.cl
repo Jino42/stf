@@ -11,7 +11,8 @@ void kernel updateMoveToTarget(__global ParticleData *dataParticle,
 
     float speed = 10.f * deltaTime;
 
-    float3 dir = normalize(target->target - particle->position);
+    float3 dir = target->target - particle->position;
 
-    particle->position += dir * speed;
+    if (length(dir) > 0.01f)
+        particle->position += normalize(dir) * speed;
 }

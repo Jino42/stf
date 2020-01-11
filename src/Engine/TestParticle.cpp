@@ -13,6 +13,8 @@
 #include "Particle/PaticleEmitter/ParticleEmitterPoint.hpp"
 #include "Particle/PaticleEmitter/ParticleEmitterSprite.hpp"
 
+#include "Particle/ParticleSystemManager.hpp"
+
 void TestParticle::init() {
     //Cloud Emitter
     /*
@@ -25,6 +27,8 @@ void TestParticle::init() {
 	emitter.addModule<ParticleColorModule>();
 */
 
+    ParticleSystemManager::Get().addParticleSystem("SAwrrr");
+    particleSystem_ = &ParticleSystemManager::Get().getParticleSystem("SAwrrr");
     //Sprite Emitter
 
     //int i = 0;
@@ -53,7 +57,17 @@ void TestParticle::init() {
 		emitter.addModule<ParticleMoveToTarget>();
 		emitter.addModule<ParticleColorModule>();
 */
+    /*
+    particleSystem_->addEmitter<ParticleEmitterPoint>("Lolqwe", 50000);
 
+    particleSystem_->setPosition(glm::vec3(60, 60.0f, 60.0f));
+    AParticleEmitter &emitter = particleSystem_->getEmitter<ParticleEmitterPoint>("Lolqwe");
+
+    //emitter.addModule<ParticleAttractorModule>();
+    emitter.addModule<ModuleMeshParticulizer>();
+    emitter.addModule<ModuleMoveToTarget>();
+    emitter.addModule<ModuleColor>();
+    */
     /*
 		system.addEmitter<ParticleEmitterMesh>("Lol", 30.f / 8.f * 0.9f, 30);
 
@@ -87,6 +101,8 @@ void TestParticle::update(float deltaTime) {
 
         f = true;
     }
+    //particleSystem_->update(deltaTime);
+    //particleSystem_->render();
     //	for (auto &system : particleSystem_) {
     //		system.update(deltaTime);
     //		system.render();

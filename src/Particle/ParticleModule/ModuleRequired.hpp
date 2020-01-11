@@ -41,6 +41,6 @@ public:
 	//bMaxDrawCount
 	//MaxDrawCount
 private:
-    ModuleParamRequired    cpuBufferModuleParam_;
-    cl::Buffer             gpuBufferModuleParam_;
+    ModuleParamRequired						cpuBufferModuleParam_;
+    std::shared_ptr<cl::Buffer>             gpuBufferModuleParam_;
 };

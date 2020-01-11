@@ -28,7 +28,6 @@ extern "C" {
 #endif
 #include "PathManager.hpp"
 
-
 #include "Engine/RadixCl.hpp"
 
 unsigned int GetFlatCellIndex(int a, int b, int c) {
@@ -73,7 +72,6 @@ void radix() {
 
     radix.radix(arrayGpuToCompare, arrayGpuToCompareToSort, ARRLEN, true);
 
-
     err.err = queue.enqueueReadBuffer(arrayGpuToCompare, CL_TRUE, 0, sizeof(cl_uint) * ARRLEN, arrayCpuToCompare);
     err.clCheckError();
     queue.finish();
@@ -84,7 +82,6 @@ void radix() {
     for (int i = 0; i < ARRLEN; i++) {
         std::cout << i << " : " << arrayCpuToCompare[arrayCpuToSort[i]] << std::endl;
     }
-
 }
 
 void demoGui() {
@@ -288,7 +285,7 @@ int main(int argc, char **argv) {
             widgetEditor.render(true);
             */
             gui.render();
-
+            Time::Get().endFrame();
         }
     } catch (cl::Error const &e) {
         std::cout << e.what() << "(" << e.err() << ") [" << ClError::getErrorString(e.err()) << "]" << std::endl;

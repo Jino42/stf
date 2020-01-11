@@ -1,6 +1,8 @@
 #include "EditorParticleSystems.hpp"
 
 #include "Particle/ParticleModule/ModuleSPH.hpp"
+#include "Particle/PaticleEmitter/ParticleEmitterSPH.hpp"
+
 #include <Gui/Gui.hpp>
 #include <Gui/GuiSettings.hpp>
 #include <Particle/ParticleSystemManager.hpp>
@@ -63,6 +65,10 @@ void EditorParticleSystems::render() {
                     if (ptrEmitter) {
                         if (ptrEmitter->getModules().size() > 0 && indexModule_ < ptrEmitter->getModules().size()) {
                             ptrModule = ptrEmitter->getModules()[indexModule_];
+                        }
+                        if (ptrEmitter && dynamic_cast<ParticleEmitterSPH *>(&(*ptrEmitter))) {
+                            ParticleEmitterSPH *emitterSph = dynamic_cast<ParticleEmitterSPH *>(&(*ptrEmitter));
+                            ImGui::DragFloat("Line Width", &emitterSph->getLineWidth(), 0.05f, 0.f, 5.f);
                         }
                         if (ImGui::BeginCombo("Modules", (ptrModule ? typeid(*ptrModule).name() : ""), NTL_IMGUI_COMBO_FLAGS)) {
                             for (auto it = ptrEmitter->getModules().begin(); it != ptrEmitter->getModules().end(); ++it) {

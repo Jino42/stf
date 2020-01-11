@@ -8,12 +8,14 @@
 #include <string>
 #include <vector>
 
+#include "ANommable.hpp"
 #include "Cl/ClQueue.hpp"
 #include "Engine/Shader.hpp"
-#include "ANommable.hpp"
 #include "NTL.hpp"
 #include "OCGL_Buffer.hpp"
 #include "Particle/ParticleModule/AParticleModule.hpp"
+#include <typeindex>
+#include <typeinfo>
 
 class ParticleSystem;
 
@@ -44,6 +46,7 @@ class AParticleEmitter : public ANommable {
 
     void spawn();
 
+    glm::vec3 &getPosition();
     std::string const &getName() const;
     OCGL_Buffer &getParticleOCGL_BufferData();
     cl::Buffer &getParticleBufferAlive();
@@ -115,9 +118,20 @@ class AParticleEmitter : public ANommable {
 
     void printParticleArray();
 
+    template <typename T>
+    std::shared_ptr<cl::Buffer> addClBuffer() {
+        clBufferMap_.try_emplace(typeid(T), std::make_shared<cl::Buffer>());
+        return clBufferMap_.at(typeid(T));
+    }
+    template <typename T>
+    std::shared_ptr<cl::Buffer> getClBuffer() const {
+        return clBufferMap_.at(typeid(T));
+    }
+
   protected:
     ParticleSystem &system_;
     ClQueue &queue_;
+    glm::vec3 position_;
     unsigned int nbParticleMax_;
     unsigned int nbParticlePerSec_;
     unsigned int nbParticleActive_;
@@ -139,6 +153,8 @@ class AParticleEmitter : public ANommable {
     unsigned int at_; // remove
     bool needReload_;
     Timer timerEmitter_;
+
+    std::unordered_map<std::type_index, std::shared_ptr<cl::Buffer>> clBufferMap_;
 
     static bool debug_;
 };

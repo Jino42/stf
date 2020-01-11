@@ -13,8 +13,10 @@ flat in     float LifeTime;
 
 void main()
 {
-    //FragColor = Color;
+    FragColor = Color;
+    /*
     vec3 veloNormalized = normalize(Velocity);
     veloNormalized = clamp(veloNormalized, vec3(0.f), vec3(1.f));
     FragColor = vec4(veloNormalized, 1.f);
+    */
 }

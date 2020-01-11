@@ -13,6 +13,7 @@ AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::
     : ANommable(name),
       system_(system),
       queue_(queue),
+      position_(glm::vec3(0.f)),
       nbParticleMax_(nbParticle),
       nbParticlePerSec_(nbParticlePerSec),
       nbParticleActive_(0),
@@ -39,6 +40,9 @@ void AParticleEmitter::reload() {
     timerEmitter_.start();
 }
 
+glm::vec3 &AParticleEmitter::getPosition() {
+    return position_;
+}
 std::string const &AParticleEmitter::getName() const {
     return name_;
 }
@@ -73,7 +77,7 @@ void AParticleEmitter::setShouldBeToSpawn(unsigned int nb, unsigned int at) {
 }
 
 void AParticleEmitter::update(float deltaTime) {
-    cpuBufferParam_Emitter_.position = glmVec3toClFloat3(system_.getPosition());
+    cpuBufferParam_Emitter_.position = glmVec3toClFloat3(system_.getPosition() + position_);
     cpuBufferParam_Emitter_.time = static_cast<float>(timerEmitter_.count<std::chrono::milliseconds>()) / 1000.f;
     cpuBufferParam_Emitter_.deltaTime = deltaTime;
     queue_.getQueue().enqueueWriteBuffer(gpuBufferParam_Emitter_, CL_TRUE, 0, sizeof(EmitterParam), &cpuBufferParam_Emitter_);
