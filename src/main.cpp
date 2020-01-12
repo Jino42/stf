@@ -12,6 +12,7 @@
 #include "Particle/ParticleSystem.hpp"
 #include "limits.h"
 #include "noiseutils.h"
+#include "json/JsonShapeParser.hpp"
 #include <Engine/CameraManager.hpp>
 #include <Engine/ShaderManager.hpp>
 #include <chrono>
@@ -194,6 +195,9 @@ int main(int argc, char **argv) {
         ShaderManager::Get().getShader("debugWireFrame").link();
 
         CameraManager::Get().addCamera("DebguFrustum");
+
+        JsonShapeParser shapeParse(PathManager::Get().getPath("scene") /"Shapes.json");
+        shapeParse.parse();
 
         while (!DisplayWindow::Get().exit()) {
             //Update

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Engine/Shape/AABB.hpp"
-#include "Engine/Shape/Sphere.hpp"
 #include "Particle/ParticleSystem.hpp"
 
 class MainGraphic;
@@ -20,8 +18,6 @@ class TestParticle {
     static TestParticle &Get();
 
   private:
-    AABB box_;
-    Sphere sphere_;
     static std::unique_ptr<TestParticle> instance_;
     ParticleSystem *particleSystem_;
 };

@@ -247,6 +247,9 @@ add_executable(${NAME}
         src/Particle/PaticleEmitter/ParticleEmitterSPH.hpp
         src/Particle/PaticleEmitter/ParticleEmitterSPH.cpp
         src/Gui/WidgetRayMarch.cpp src/Gui/WidgetRayMarch.hpp
+
+        src/json/JsonShapeParser.cpp src/json/JsonShapeParser.hpp 
+        src/Engine/Shape/ShapeManager.hpp src/Engine/Shape/ShapeManager.cpp
         )
 
 add_definitions(-DGLFW_INCLUDE_NONE -DCL_SILENCE_DEPRECATION

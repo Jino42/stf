@@ -1,9 +1,9 @@
 #include "Sphere.hpp"
-#include <iostream>
 #include <cl_type.hpp>
+#include <iostream>
 
 Sphere::Sphere()
-    : AShape(),
+    : AShape(eShape::kSphere),
       radius_(1.0f),
       sectorCount_(36),
       stackCount_(18) {
@@ -21,7 +21,7 @@ void Sphere::setPosition(glm::vec3 position) {
 
 cl_Shape *Sphere::getCl_Shape() const {
     cl_Sphere *shape = new cl_Sphere();
-    shape->flag = flag_;
+    shape->flag = static_cast<int>(flag_);
     shape->position = glmVec3toClFloat3(position_);
     shape->radius = radius_;
     return shape;

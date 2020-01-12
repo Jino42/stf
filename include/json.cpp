@@ -14,3 +14,13 @@ json getJsonFromFileRelativeToRootPath(std::string const &path) {
 cl_float3 jsonToFloat3(json &j) {
     return makeFloat3(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>());
 }
+cl_float3 jsonToFloat3(json &&j) {
+    return makeFloat3(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>());
+}
+
+glm::vec3 jsonToVec3(json &j) {
+    return glm::vec3(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>());
+}
+glm::vec3 jsonToVec3(json &&j) {
+    return glm::vec3(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>());
+}

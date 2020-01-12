@@ -1,0 +1,51 @@
+{
+  "Shapes": [
+    {
+      "type": "Sphere",
+      "name": "Sphere1",
+      "render": true,
+      "options": {
+        "position": {
+          "x": 60,
+          "y": 60,
+          "z": 60
+        },
+        "radius": 5
+      }
+    },
+    {
+      "type": "AABB",
+      "name": "AABB1",
+      "render": true,
+      "options": {
+        "position": {
+          "x": 60,
+          "y": 60,
+          "z": 60
+        },
+        "size": {
+          "x": 10,
+          "y": 10,
+          "z": 10
+        }
+      }
+    },
+    {
+      "type": "AABB",
+      "name": "AABB3",
+      "render": true,
+      "options": {
+        "position": {
+          "x": 60,
+          "y": 60,
+          "z": 60
+        },
+        "size": {
+          "x": 30,
+          "y": 30,
+          "z": 30
+        }
+      }
+    }
+  ]
+}

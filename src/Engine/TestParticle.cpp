@@ -84,23 +84,6 @@ void TestParticle::init() {
 }
 
 void TestParticle::update(float deltaTime) {
-    static bool f = false;
-    if (!f) {
-
-        glm::vec3 range(20.0f, 20.0f, 20.0f);
-
-        glm::vec3 blc(60.0f, 60.0f, 60.0f);
-
-        box_.setDebug(true);
-        box_.setPosition(blc);
-        box_.setSize(range);
-
-        sphere_.setDebug(true);
-        sphere_.setRadius(5.f);
-        sphere_.setPosition(blc);
-
-        f = true;
-    }
     //particleSystem_->update(deltaTime);
     //particleSystem_->render();
     //	for (auto &system : particleSystem_) {

@@ -3,7 +3,7 @@
 #include <iostream>
 
 AABB::AABB()
-    : AShape(),
+    : AShape(eShape::kAABB),
       size_(glm::vec3(1.0f, 1.0f, 1.0f)) {
     setDebug();
 }
@@ -20,7 +20,7 @@ void AABB::setSize(glm::vec3 const &vec) {
 
 cl_Shape *AABB::getCl_Shape() const {
     cl_AABB *shape = new cl_AABB();
-    shape->flag = flag_;
+    shape->flag = static_cast<int>(flag_);
     shape->position = glmVec3toClFloat3(position_);
     shape->size = glmVec3toClFloat3(size_);
     return shape;
