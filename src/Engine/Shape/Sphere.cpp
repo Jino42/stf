@@ -1,9 +1,10 @@
 #include "Sphere.hpp"
 #include <iostream>
+#include <cl_type.hpp>
 
 Sphere::Sphere()
-    : radius_(1.0f),
-      center_(glm::vec3(0.0f, 0.0f, 0.0f)),
+    : AShape(),
+      radius_(1.0f),
       sectorCount_(36),
       stackCount_(18) {
     setDebug();
@@ -13,18 +14,26 @@ void Sphere::setRadius(float radius) {
     radius_ = radius;
     updateLines();
 }
-void Sphere::setCenter(glm::vec3 const &center) {
-    center_ = center;
+void Sphere::setPosition(glm::vec3 position) {
+    AShape::setPosition(position);
     updateLines();
+}
+
+cl_Shape *Sphere::getCl_Shape() const {
+    cl_Sphere *shape = new cl_Sphere();
+    shape->flag = flag_;
+    shape->position = glmVec3toClFloat3(position_);
+    shape->radius = radius_;
+    return shape;
 }
 
 void Sphere::updateLines() {
     std::vector<glm::vec3> vertex;
     linesObject_.clear();
 
-    float x, y, z, xy;                           // vertex position
+    float x, y, z, xy;                            // vertex position
     float nx, ny, nz, lengthInv = 1.0f / radius_; // vertex normal
-    float s, t;                                  // vertex texCoord
+    float s, t;                                   // vertex texCoord
 
     float sectorStep = 2 * 3.14159265f / sectorCount_;
     float stackStep = 3.14159265f / stackCount_;
@@ -32,8 +41,8 @@ void Sphere::updateLines() {
 
     for (int i = 0; i <= stackCount_; ++i) {
         stackAngle = 3.14159265f / 2 - i * stackStep; // starting from pi/2 to -pi/2
-        xy = radius_ * cosf(stackAngle);               // r * cos(u)
-        z = radius_ * sinf(stackAngle);                // r * sin(u)
+        xy = radius_ * cosf(stackAngle);              // r * cos(u)
+        z = radius_ * sinf(stackAngle);               // r * sin(u)
 
         // add (sectorCount+1) vertices per stack
         // the first and last vertices have same position and normal, but different tex coords
@@ -44,7 +53,7 @@ void Sphere::updateLines() {
             x = xy * cosf(sectorAngle); // r * cos(u) * cos(v)
             y = xy * sinf(sectorAngle); // r * cos(u) * sin(v)
 
-            vertex.push_back(glm::vec3(x, y, z) + center_);
+            vertex.push_back(glm::vec3(x, y, z) + position_);
         }
     }
 

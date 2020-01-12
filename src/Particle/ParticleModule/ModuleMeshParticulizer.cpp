@@ -8,6 +8,7 @@
 #include "Particle/ParticleSystem.hpp"
 #include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 #include "cl_type.hpp"
+#include <Engine/ModelEngine/ModelManager.hpp>
 #include <PathManager.hpp>
 
 ModuleMeshParticulizer::ModuleMeshParticulizer(AParticleEmitter &emitter)
@@ -18,12 +19,10 @@ ModuleMeshParticulizer::ModuleMeshParticulizer(AParticleEmitter &emitter)
     //    emitter_.addModule<ModuleTarget>();
     //}
 
-    model_.setModel((PathManager::Get().getPath("objects") / "nanosuit" / "nanosuit.obj").generic_string());
+    model_ = &ModelManager::Get().getModel("nanosuit");
 
     ClProgram::Get().addProgram(pathKernel_ / "MeshParticulizer.cl");
-
-    kernelInit_.setKernel(emitter_, "initMeshParticulizer");
-    kernelInit_.setArgsGPUBuffers(eParticleBuffer::kData | eParticleBuffer::kEmitterParam);
+    kernelReorganise_.setKernel(emitter, "reorderMeshParticulizer");
 }
 
 void ModuleMeshParticulizer::init() {
@@ -36,7 +35,7 @@ void ModuleMeshParticulizer::init() {
         int sz;
         sz = Random::Get().getRandomSeed();
 
-        Mesh const &mesh = model_.getMeshes()[sz % model_.getMeshes().size()];
+        Mesh const &mesh = model_->getMeshes()[sz % model_->getMeshes().size()];
 
         sz = Random::Get().getRandomSeed();
         int vexterStartTriangle = sz % (mesh.getIndice().size() / 3);
@@ -59,10 +58,17 @@ void ModuleMeshParticulizer::init() {
         cpuBufferParticles_Target_[i].target.z = final.z;
     }
 
-    //	kernelInit_.beginAndSetUpdatedArgs(bufferPositionParticles_, glmVec3toClFloat3(emitter_.getSystem().getPosition()));
-    //	std::vector<cl::Memory> cl_vbos;
-    //	cl_vbos.push_back(emitter_.getParticleOCGL_BufferData().mem);
-    //	OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelInit_, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
-
     queue_.getQueue().enqueueWriteBuffer(*gpuBufferParticles_Target_, CL_TRUE, 0, sizeof(ParticleDataTarget) * nbParticleMax_, cpuBufferParticles_Target_.get());
+}
+
+void ModuleMeshParticulizer::reorganise() {
+    ClError err;
+    cl::Buffer temp(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax_ * sizeof(ParticleDataTarget));
+
+    kernelReorganise_.beginAndSetUpdatedArgs(*gpuBufferParticles_Target_, temp);
+    err.err = queue_.getQueue().enqueueNDRangeKernel(kernelReorganise_.getKernel(), cl::NullRange, cl::NDRange(nbParticleMax_));
+    err.clCheckError();
+    queue_.getQueue().finish();
+    *gpuBufferParticles_Target_ = temp;
+
 }

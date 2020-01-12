@@ -2,7 +2,7 @@
 
 #include "AParticleModule.hpp"
 #include "Cl/ClQueue.hpp"
-#include "Engine/AABB.hpp"
+#include "Engine/Shape/AABB.hpp"
 #include "OCGL_Buffer.hpp"
 #include "Range.hpp"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Engine/AABB.hpp"
-#include "Engine/Sphere.hpp"
+#include "Engine/Shape/AABB.hpp"
+#include "Engine/Shape/Sphere.hpp"
 #include "Particle/ParticleSystem.hpp"
 
 class MainGraphic;

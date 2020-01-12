@@ -14,6 +14,7 @@
 #include "Particle/ParticleModule/ModuleSPH.hpp"
 #include "PathManager.hpp"
 #include "ShaderManager.hpp"
+#include "Particle/ParticleModule/ModuleMeshParticulizer.hpp"
 
 MainGraphic::MainGraphic()
     : renderBuffer_(DisplayWindow::Get().getWidthWindow() * 0.5f,
@@ -143,6 +144,10 @@ void MainGraphic::render() {
         for (auto &s: ParticleSystemManager::Get().getMapParticleSystem()) {
             s.second.reload();
         }
+    }
+
+    if (DisplayWindow::Get().getKey(GLFW_KEY_Z)) {
+        ParticleSystemManager::Get().getParticleSystem("Point").getEmitter("Lol2").getModule<ModuleMeshParticulizer>()->reorganise();
     }
 
     renderBufferRayMarch_.bind();

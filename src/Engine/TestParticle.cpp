@@ -92,12 +92,12 @@ void TestParticle::update(float deltaTime) {
         glm::vec3 blc(60.0f, 60.0f, 60.0f);
 
         box_.setDebug(true);
-        box_.setMax(blc + range);
-        box_.setMin(blc - range);
+        box_.setPosition(blc);
+        box_.setSize(range);
 
         sphere_.setDebug(true);
         sphere_.setRadius(5.f);
-        sphere_.setCenter(blc);
+        sphere_.setPosition(blc);
 
         f = true;
     }
