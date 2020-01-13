@@ -1,4 +1,7 @@
 #include "AShape.hpp"
+#include "Sphere.hpp"
+#include "AABB.hpp"
+
 
 AShape::AShape()
     : flag_(eShape::kZero),
@@ -23,4 +26,11 @@ void AShape::setRender(bool b) {
         flag_ |= eShape::kRender;
     else if ((flag_ & eShape::kRender) == eShape::kRender)
         flag_ ^= eShape::kRender;
+}
+
+void AShape::printShapeStructSize() {
+    printf(">>> CPU SIZE STRUCT SHAPE <<<\n");
+    printf("[%5li] Shape\n", sizeof(cl_Shape));
+    printf("[%5li] Sphere\n", sizeof(cl_Sphere));
+    printf("[%5li] AABB\n", sizeof(cl_AABB));
 }

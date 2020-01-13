@@ -1,0 +1,23 @@
+#ifndef SHAPE_HL
+# define SHAPE_HL
+
+typedef struct ALIGN sShape {
+	int flag;
+	float3 position;
+} Shape;
+
+typedef struct ALIGN sSphere {
+	int flag;
+	float3 position;
+	float radius;
+} Sphere;
+
+typedef struct ALIGN sAABB {
+	int flag;
+	float3 position;
+	float3 size;
+} AABB;
+
+
+
+# endif

@@ -4,7 +4,6 @@
 #include "Engine/Display/DisplayWindow.hpp"
 #include "Engine/Random.hpp"
 #include "Enum/eParticleBuffer.hpp"
-#include "NTL_Debug.hpp"
 #include "OpenCGL_Tools.hpp"
 #include "Particle/ParticleData.hpp"
 #include "Particle/ParticleSystem.hpp"
@@ -49,9 +48,6 @@ void ModuleRequired::init() {
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelInit_, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
     queue_.getQueue().enqueueReadBuffer(emitter_.gpuBufferParticles_SubLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
     std::cout << emitter_.getNbParticleMax() << std::endl;
-
-    printStructSizeCPU();
-    printStructSizeGPU(emitter_, queue_.getQueue());
 }
 
 void ModuleRequired::update(float deltaTime) {

@@ -179,33 +179,3 @@ void kernel RequiredUpdate(__global ParticleData *data,
 void kernel do_nothing(__global ParticleData *data) {
     (void)data;
 }
-//////////
-//////////
-
-void kernel printStructSize(__global ParticleData *dataParticle) {
-	printf(">>> GPU SIZE STRUCT <<<\n");
-	printf("%f\n", dataParticle->rotate);
-	printf("[%5li] ParticleData\n", sizeof(ParticleData));
-	printf("[%5li] ModuleParamRequired\n", sizeof(ModuleParamRequired));
-	printf("[%5li] ModuleParamSpawn\n", sizeof(ModuleParamSpawn));
-	printf("[%5li] ModuleParamSizeOverLifetime\n", sizeof(ModuleParamSizeOverLifetime));
-	printf("[%5li] Rangef\n", sizeof(Rangef));
-	printf("[%5li] Rangei\n", sizeof(Rangei));
-	printf("[%5li] ParticleData\n", sizeof(ParticleData));
-	printf("[%5li] ParticleDataSprite\n", sizeof(ParticleDataSprite));
-	printf("[%5li] ParticleDataMovement\n", sizeof(ParticleDataMovement));
-}
-
-void kernel printStructSizeFunc() {
-    printf(">>> GPU SIZE STRUCT <<< \n");
-	printf("[%5li] ParticleData\n", sizeof(ParticleData));
-	printf("[%5li] ModuleParamRequired\n", sizeof(ModuleParamRequired));
-	printf("[%5li] ModuleParamSpawn\n", sizeof(ModuleParamSpawn));
-	printf("[%5li] ModuleParamSizeOverLifetime\n", sizeof(ModuleParamSizeOverLifetime));
-	printf("[%5li] Rangef\n", sizeof(Rangef));
-	printf("[%5li] Rangei\n", sizeof(Rangei));
-	printf("[%5li] ParticleData\n", sizeof(ParticleData));
-	printf("[%5li] ParticleDataSprite\n", sizeof(ParticleDataSprite));
-	printf("[%5li] ParticleDataMovement\n", sizeof(ParticleDataMovement));
-}
-

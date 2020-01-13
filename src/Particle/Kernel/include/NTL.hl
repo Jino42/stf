@@ -8,5 +8,6 @@
     #include "Base_NTL.hl"
     #include "ParticleData.hl"
     #include "ModuleStruct.hl"
+    #include "Shape.hl"
 
 #endif

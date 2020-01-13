@@ -8,7 +8,7 @@
 #include "Gui/WidgetOption.hpp"
 #include "Gui/WidgetRayMarch.hpp"
 #include "Gui/WidgetRender.hpp"
-#include "NTL_Debug.hpp"
+#include "Particle/DebugClPrint.hpp"
 #include "Particle/ParticleSystem.hpp"
 #include "limits.h"
 #include "noiseutils.h"
@@ -18,6 +18,7 @@
 #include <chrono>
 #include <iostream>
 #include <noise/noise.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -196,9 +197,11 @@ int main(int argc, char **argv) {
 
         CameraManager::Get().addCamera("DebguFrustum");
 
-        JsonShapeParser shapeParse(PathManager::Get().getPath("scene") /"Shapes.json");
+        JsonShapeParser shapeParse(PathManager::Get().getPath("scene") / "Shapes.json");
         shapeParse.parse();
 
+        DebugClPrint::Get();
+        DebugClPrint::Get().printAllStructSize();
         while (!DisplayWindow::Get().exit()) {
             //Update
             Time::Get().update();

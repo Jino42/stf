@@ -69,6 +69,8 @@ class AShape {
 
     virtual cl_Shape *getCl_Shape() const = 0;
 
+    static void printShapeStructSize();
+
   protected:
     eShape flag_;
     glm::vec3 position_;

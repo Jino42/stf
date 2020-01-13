@@ -10,7 +10,6 @@
 #include <Engine/Camera.hpp>
 #include <Engine/ShaderManager.hpp>
 #include "Cl/ClKernel.hpp"
-#include "NTL_Debug.hpp"
 #include <string.h>
 #include <PathManager.hpp>
 

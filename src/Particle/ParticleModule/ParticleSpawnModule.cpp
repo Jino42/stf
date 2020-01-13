@@ -11,7 +11,6 @@
 #include "Engine/Random.hpp"
 #include "cl_type.hpp"
 #include "Engine/TimerOnConstructOffDestruct.hpp"
-#include "NTL_Debug.hpp"
 #include "Cl/ClKernel.hpp"
 
 ParticleSpawnModule::ParticleSpawnModule(AParticleEmitter &emitter) :
