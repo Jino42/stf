@@ -145,7 +145,7 @@
           ]
         },
         {
-          "active": false,
+          "active": true,
           "_comment": "Position not yet supported",
           "name": "Lol3",
           "type": "Point",
@@ -155,7 +155,7 @@
               "type": "Attractor"
             },
             {
-              "type": "Gravity",
+              "type": "PhysicGravity",
               "options": {
                 "gravity": {
                   "x": 0,
@@ -166,6 +166,12 @@
             },
             {
               "type": "PhysicNoise"
+            },
+            {
+              "type": "PhysicConstrainInShape",
+              "options": {
+                "shape": "AABB3"
+              }
             },
             {
               "type": "Physic"

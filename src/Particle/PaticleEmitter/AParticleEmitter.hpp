@@ -87,6 +87,11 @@ class AParticleEmitter : public ANommable {
         modules_.emplace_back(std::make_shared<T>(*this));
     }
 
+    template <typename T, class... Args>
+    void addModule(Args... args) {
+        modules_.emplace_back(std::make_shared<T>(*this, args...));
+    }
+
     virtual void reload();
 
     void checkReload() {

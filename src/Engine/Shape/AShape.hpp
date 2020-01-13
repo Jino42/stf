@@ -53,7 +53,7 @@ inline eShape operator>>(eShape const lhs, eShape const rhs) {
 }
 
 struct cl_Shape {
-    virtual ~cl_Shape() = default;
+    //virtual ~cl_Shape() = default;
     cl_int flag;
     cl_float3 position;
 };

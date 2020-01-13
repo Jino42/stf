@@ -8,15 +8,16 @@ class AParticleEmitter;
 
 class ModulePhysicConstrainInShape : public AParticleModule {
   public:
-    ModulePhysicConstrainInShape(AParticleEmitter &emitter);
+    ModulePhysicConstrainInShape(AParticleEmitter &emitter, std::string nameShape);
     void init() override;
     void update(float deltaTime) override;
     void reload() override;
 
   private:
+    std::string nameShape_;
     std::shared_ptr<cl::Buffer> gpuBufferParticles_Physic_;
 
     cl::Buffer gpuBufferLocal_ShapeConstrain_;
 
-    void setShapeContrain_(std::string const &name);
+    void setShapeContrain_();
 };

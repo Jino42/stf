@@ -174,6 +174,8 @@ int main(int argc, char **argv) {
         //WidgetRayMarch &widgetRayMarch = WidgetRayMarch::Get();
 
         ClContext::Get();
+        JsonShapeParser shapeParse(PathManager::Get().getPath("scene") / "Shapes.json");
+            shapeParse.parse();
         MainGraphic::Get();
         ShaderManager::Get();
         CameraManager::Get();
@@ -196,9 +198,6 @@ int main(int argc, char **argv) {
         ShaderManager::Get().getShader("debugWireFrame").link();
 
         CameraManager::Get().addCamera("DebguFrustum");
-
-        JsonShapeParser shapeParse(PathManager::Get().getPath("scene") / "Shapes.json");
-        shapeParse.parse();
 
         DebugClPrint::Get();
         DebugClPrint::Get().printAllStructSize();

@@ -1,6 +1,21 @@
 #ifndef SHAPE_HL
 # define SHAPE_HL
 
+enum eShape {
+    kZero = 0,
+    kNone = 1 << 0,
+    kRender = 1 << 1,
+
+    kMaskOptions = kRender,
+
+    kSphere = 1 << 16,
+    kAABB = 1 << 17,
+    kPlane = 1 << 18,
+    kTorus = 1 << 19,
+
+    kMaskShape = kSphere | kAABB | kPlane | kTorus,
+};
+
 typedef struct ALIGN sShape {
 	int flag;
 	float3 position;

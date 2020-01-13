@@ -7,6 +7,7 @@
 #include "Particle/PaticleEmitter/ParticleEmitterSPH.hpp"
 #include "Particle/PaticleEmitter/ParticleEmitterSprite.hpp"
 
+#include "Particle/ParticleModule/ModulePhysicConstrainInShape.hpp"
 #include "Particle/ParticleModule/ModuleAttractor.hpp"
 #include "Particle/ParticleModule/ModuleColor.hpp"
 #include "Particle/ParticleModule/ModuleMeshParticulizer.hpp"
@@ -103,7 +104,7 @@ void JsonParticleParser::parse() {
                                 currentEmitter_->addModule<ModuleSizeOverLifetime>();
                             } else if (itModule["type"].get<std::string>() == "Attractor") {
                                 currentEmitter_->addModule<ModuleAttractor>();
-                            } else if (itModule["type"].get<std::string>() == "Gravity") {
+                            } else if (itModule["type"].get<std::string>() == "PhysicGravity") {
                                 currentEmitter_->addModule<ModulePhysicGravity>();
 
                                 if (itModule.find("options") != itModule.end()) {
@@ -121,6 +122,8 @@ void JsonParticleParser::parse() {
                                 currentEmitter_->addModule<ModulePhysicNoise>();
                             } else if (itModule["type"].get<std::string>() == "Color") {
                                 currentEmitter_->addModule<ModuleColor>();
+                            } else if (itModule["type"].get<std::string>() == "PhysicConstrainInShape") {
+                                currentEmitter_->addModule<ModulePhysicConstrainInShape>(itModule["options"].find("shape")->get<std::string>());
                             }
                         }
                     }
