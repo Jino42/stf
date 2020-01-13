@@ -19,7 +19,7 @@ void Sphere::setPosition(glm::vec3 position) {
     updateLines();
 }
 
-cl_Shape *Sphere::getCl_Shape() const {
+cl_Sphere *Sphere::getCl_Shape() const {
     cl_Sphere *shape = new cl_Sphere();
     shape->flag = static_cast<int>(flag_);
     shape->position = glmVec3toClFloat3(position_);

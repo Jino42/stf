@@ -6,10 +6,6 @@
 
 class AParticleEmitter;
 
-struct ModuleParamPhysicConstrainInShape {
-    cl_float3 gravity;
-};
-
 class ModulePhysicConstrainInShape : public AParticleModule {
   public:
     ModulePhysicConstrainInShape(AParticleEmitter &emitter);
@@ -17,12 +13,10 @@ class ModulePhysicConstrainInShape : public AParticleModule {
     void update(float deltaTime) override;
     void reload() override;
 
-    ModuleParamPhysicConstrainInShape &getCpuModuleParam();
-
   private:
-    bool doAttractor_;
     std::shared_ptr<cl::Buffer> gpuBufferParticles_Physic_;
 
-    std::shared_ptr<cl::Buffer> gpuBufferModuleParam_;
-    ModuleParamPhysicConstrainInShape cpuBufferModuleParam_;
+    cl::Buffer gpuBufferLocal_ShapeConstrain_;
+
+    void setShapeContrain_(std::string const &name);
 };

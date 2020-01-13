@@ -17,7 +17,7 @@ class Sphere : public AShape, public ADebugObject {
     void setRadius(float radius);
     void setPosition(glm::vec3 position) override;
 
-    cl_Shape *getCl_Shape() const override;
+    cl_Sphere *getCl_Shape() const override;
 
   private:
     float radius_;

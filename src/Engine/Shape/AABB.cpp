@@ -18,7 +18,7 @@ void AABB::setSize(glm::vec3 const &vec) {
     updateLines();
 }
 
-cl_Shape *AABB::getCl_Shape() const {
+cl_AABB *AABB::getCl_Shape() const {
     cl_AABB *shape = new cl_AABB();
     shape->flag = static_cast<int>(flag_);
     shape->position = glmVec3toClFloat3(position_);
