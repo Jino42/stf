@@ -147,7 +147,7 @@ void MainGraphic::render() {
     }
 
     if (DisplayWindow::Get().getKey(GLFW_KEY_Z)) {
-        ParticleSystemManager::Get().getParticleSystem("Point").getEmitter("Lol2").getModule<ModuleMeshParticulizer>()->reorganise();
+        ParticleSystemManager::Get().getParticleSystem("Point").getEmitter("LolPoint").getModule<ModuleMeshParticulizer>()->reorganise();
     }
 
     renderBufferRayMarch_.bind();

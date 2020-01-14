@@ -8,6 +8,7 @@
 #include "Particle/PaticleEmitter/ParticleEmitterSPH.hpp" // suppr
 #include "cl_type.hpp"
 #include <Engine/ModelEngine/MainGraphicExtendModel.hpp>
+#include <Gui/Gui.hpp>
 #include <iostream>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -81,7 +82,7 @@ void ModuleSPH::updateConstant_() {
         cpuBufferModuleParam_.h3 = powf(cpuBufferModuleParam_.smoothingRadius, 3.f);
         cpuBufferModuleParam_.h6 = powf(cpuBufferModuleParam_.smoothingRadius, 6.f);
         cpuBufferModuleParam_.h9 = powf(cpuBufferModuleParam_.smoothingRadius, 9.f);
-        cpuBufferModuleParam_.Poly6 = (315.0f / (64.0f *  M_PI * cpuBufferModuleParam_.h9));
+        cpuBufferModuleParam_.Poly6 = (315.0f / (64.0f * M_PI * cpuBufferModuleParam_.h9));
         cpuBufferModuleParam_.Spiky = (-45.0f / (M_PI * cpuBufferModuleParam_.h6));
     }
 }
@@ -146,14 +147,11 @@ void ModuleSPH::update(float deltaTime) {
     if (DisplayWindow::Get().getKeyState(GLFW_KEY_KP_SUBTRACT) == KeyState::kDown)
         focus_--;
 
-
     for (auto &pair: queue_.getEventMap()) {
 
         std::cout << "F[" << pair.first << "]" << std::endl;
 
-
         cl::Event &ev = queue_.getEvent(pair.first);
-
 
         cl_ulong start = 0, end = 0;
         cl_double time = 0;
@@ -180,4 +178,53 @@ void ModuleSPH::shiftDebugVelocity() {
 }
 void ModuleSPH::shiftDebugPressure() {
     flag_ = static_cast<int>(flag_ ^ eSph::kDebugPressure);
+}
+
+void ModuleSPH::gui() {
+    ImGui::DragFloat("Pressure", &getModuleParam().pressure, 0.1f, 0, 2500.f);
+    ImGui::DragFloat("SmoothingRadius: ", &getModuleParam().smoothingRadius, 0.05f, 0, 200.f);
+    ImGui::DragFloat("Viscosity: ", &getModuleParam().viscosity, 0.001f, 0, 1.f);
+    ImGui::DragFloat("DensityRef: ", &getModuleParam().densityRef, 0.1f, 0, 10.f);
+
+    Gui::beginColor(eColor::kRed, eColor::kMedium);
+    if (ImGui::Button("D_Velocity")) {
+        shiftDebugVelocity();
+    }
+    Gui::endColor();
+    ImGui::SameLine();
+    Gui::beginColor(eColor::kPurple, eColor::kMedium);
+    if (ImGui::Button("D_Viscosity")) {
+        shiftDebugViscosity();
+    }
+    Gui::endColor();
+    ImGui::SameLine();
+    Gui::beginColor(eColor::kGreen, eColor::kMedium);
+    if (ImGui::Button("D_Pressure")) {
+        shiftDebugPressure();
+    }
+    Gui::endColor();
+
+    float *arr = new float[emitter_.getQueue().getEventMap().size()];
+    unsigned int i = 0;
+    float max = 10.0f;
+    ClError err;
+    for (auto &pair: emitter_.getQueue().getEventMap()) {
+        cl::Event &ev = emitter_.getQueue().getEvent(pair.first);
+
+        cl_ulong start = 0, end = 0;
+        cl_double time = 0;
+        err.err = ev.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_START, &start);
+        err.err |= ev.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_END, &end);
+        err.clCheckError();
+
+        time = (cl_double)(end - start) * (cl_double)(1e-06);
+        if (time > max) {
+            max = time;
+        }
+        arr[i] = (float)time;
+        std::cout << arr[i] << " | " << IM_ARRAYSIZE(arr) << std::endl;
+        i++;
+    }
+    ImGui::PlotHistogram("Histogram", arr, emitter_.getQueue().getEventMap().size(),
+                         0, NULL, 0.0f, max, ImVec2(0, 80));
 }

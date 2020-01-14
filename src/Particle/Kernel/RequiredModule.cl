@@ -141,6 +141,17 @@ int removeDeath(__global int *arrayParticlesDeath,
     return ret;
 }
 
+void kernel RequiredSpawnAllParticleWithoutLifetime(__global ParticleData *data,
+                                                    __global int *arrayParticlesAlive,
+                                                    __global int *arrayParticlesLengthSub) {
+    uint id = get_global_id(0);
+    addAliveToArray(arrayParticlesAlive, arrayParticlesLengthSub, id);
+    __global ParticleData *particle = &data[id];
+
+    particle->isAlive = 1;
+    particle->lifeTime = 0.f;
+}
+
 void kernel RequiredUpdate(__global ParticleData *data,
                            __global int *arrayParticlesAlive,
                            __global int *arrayParticlesAlive2,

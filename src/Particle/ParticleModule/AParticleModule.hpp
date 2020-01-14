@@ -3,6 +3,7 @@
 #include "Cl/ClKernel.hpp"
 #include <NTL.hpp>
 #include <boost/filesystem.hpp>
+#include <json.hpp>
 
 class AParticleEmitter;
 class ClQueue;
@@ -17,6 +18,10 @@ public:
   virtual void reload(){};
 
   std::string getModuleName() const;
+
+  virtual void jsonParse(json &itModule){};
+  virtual void gui() {};
+
 
 protected :
   AParticleEmitter &emitter_;

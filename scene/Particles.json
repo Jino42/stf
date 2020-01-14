@@ -1,81 +1,5 @@
 {
   "_comment": "Particles",
-  "SystemsDISABLE": [
-    {
-      "name": "abc",
-      "options": {
-        "position": {
-          "x": 60,
-          "y": 60,
-          "z": 60
-        }
-      },
-      "emitters": [
-        {
-          "active": true,
-          "name": "Lol0",
-          "type": "SPH",
-          "particles": 50600,
-          "modules": [
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Sprite",
-      "options": {
-        "position": {
-          "x": 0,
-          "y": 258,
-          "z": -30
-        }
-      },
-      "emitters": [
-        {
-          "active": true,
-          "name": "Lol0",
-          "type": "Sprite",
-          "particlesMax": 5000,
-          "particlesSpawn": 12000,
-          "modules": [
-            {
-              "type": "Movement"
-            },
-            {
-              "type": "SizeOverLifetime"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Mesh",
-      "options": {
-        "position": {
-          "x": 60,
-          "y": 258,
-          "z": -30
-        }
-      },
-      "emitters": [
-        {
-          "active": true,
-          "name": "Lol2",
-          "type": "Mesh",
-          "particlesMax": 30,
-          "particlesSpawn": 2.0,
-          "modules": [
-            {
-              "type": "Movement"
-            },
-            {
-              "type": "SizeOverLifetime"
-            }
-          ]
-        }
-      ]
-    }
-  ],
   "Systems": [
     {
       "name": "Point",
@@ -89,6 +13,14 @@
       "emitters": [
         {
           "active": false,
+          "name": "LolSph",
+          "type": "SPH",
+          "particlesMax": 50600,
+          "modules": [
+          ]
+        },
+        {
+          "active": true,
           "options": {
             "position": {
               "x": 80,
@@ -96,9 +28,9 @@
               "z": 60
             }
           },
-          "name": "Lol2",
+          "name": "LolPoint",
           "type": "Point",
-          "particles": 30000,
+          "particlesMax": 30000,
           "modules": [
             {
               "type": "Target"
@@ -115,11 +47,37 @@
           ]
         },
         {
-          "active": true,
-          "name": "Lol3",
-          "type": "Point",
-          "particles": 300000,
+          "active": false,
+          "name": "LolMesh",
+          "type": "Mesh",
+          "particlesMax": 30,
           "modules": [
+            {
+              "type": "Spawn",
+              "options": {
+                "rate": 2
+              }
+            },
+            {
+              "type": "Movement"
+            },
+            {
+              "type": "SizeOverLifetime"
+            }
+          ]
+        },
+        {
+          "active": true,
+          "name": "LolPointMaisc2",
+          "type": "Point",
+          "particlesMax": 300000,
+          "modules": [
+            {
+              "type": "Spawn",
+              "options": {
+                "rate": 100
+              }
+            },
             {
               "type": "Attractor"
             },
@@ -153,11 +111,16 @@
         },
         {
           "active": false,
-          "name": "Lol006",
+          "name": "LolSprite",
           "type": "Sprite",
           "particlesMax": 5000,
-          "particlesSpawn": 12000,
           "modules": [
+            {
+              "type": "Spawn",
+              "options": {
+                "rate": 100
+              }
+            },
             {
               "type": "Movement"
             },

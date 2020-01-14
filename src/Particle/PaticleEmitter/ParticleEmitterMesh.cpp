@@ -7,11 +7,9 @@
 #include <PathManager.hpp>
 #include <Engine/ModelEngine/ModelManager.hpp>
 
-ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax) :
-	AParticleEmitter(system, queue, name, nbParticleMax, nbParticlePerSec)
+ParticleEmitterMesh::ParticleEmitterMesh(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticleMax) :
+	AParticleEmitter(system, queue, name, nbParticleMax, 0)
 {
-	modules_.emplace_back(std::make_unique<ParticleSpawnModule>(*this));
-
 	shader_.attach((PathManager::Get().getPath("shaders") / "particleMesh.vert").generic_string());
 	shader_.attach((PathManager::Get().getPath("shaders") / "particleMesh.frag").generic_string());
 	shader_.link();

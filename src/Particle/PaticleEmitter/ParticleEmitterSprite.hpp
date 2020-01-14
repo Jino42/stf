@@ -13,7 +13,7 @@ struct ParticleDataSprite {
 
 class ParticleEmitterSprite : public AParticleEmitter {
 public:
-	ParticleEmitterSprite(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax);
+	ParticleEmitterSprite(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticleMax);
 
 	void init() override;
 

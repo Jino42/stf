@@ -10,15 +10,15 @@
 #include "Particle/ParticleModule/ParticleSpawnModule.hpp"
 
 ParticleEmitterPoint::ParticleEmitterPoint(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticle)
-    : AParticleEmitter(system, queue, name, nbParticle, 1000) {
+    : AParticleEmitter(system, queue, name, nbParticle, 0) {
 
-    modules_.emplace_back(std::make_unique<ParticleSpawnModule>(*this));
-
-    ShaderManager::Get().addShader("particlePoint");
-    ShaderManager::Get().getShader("particlePoint").attach((PathManager::Get().getPath("shaders") / "particlePoint.vert").generic_string());
-    ShaderManager::Get().getShader("particlePoint").attach((PathManager::Get().getPath("shaders") / "particlePoint.geom").generic_string());
-    ShaderManager::Get().getShader("particlePoint").attach((PathManager::Get().getPath("shaders") / "particlePoint.frag").generic_string());
-    ShaderManager::Get().getShader("particlePoint").link();
+    if (ShaderManager::Get().addShader("particlePoint")) {
+        ShaderManager::Get().getShader("particlePoint").attach((PathManager::Get().getPath("shaders") / "particlePoint.vert").generic_string());
+        ShaderManager::Get().getShader("particlePoint").attach((PathManager::Get().getPath("shaders") / "particlePoint.geom").generic_string());
+        ShaderManager::Get().getShader("particlePoint").attach((PathManager::Get().getPath("shaders") / "particlePoint.frag").generic_string());
+        ShaderManager::Get().getShader("particlePoint").link();
+    }
+    
 
     AParticleEmitter::reload();
 

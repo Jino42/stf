@@ -28,12 +28,16 @@ AParticleEmitter::AParticleEmitter(ParticleSystem &system, ClQueue &queue, std::
       needReload_(false) {
     modules_.emplace_back(std::make_unique<ModuleRequired>(*this));
     ClProgram::Get().addProgram(PathManager::Get().getPath("particleKernels") / "Print.cl");
+    updateCpuBufferParam_();
+}
+
+void AParticleEmitter::updateCpuBufferParam_() {
     cpuBufferParam_Emitter_.position = glmVec3toClFloat3(system_.getPosition());
     cpuBufferParam_Emitter_.nbMaxParticle = nbParticleMax_;
     cpuBufferParam_Emitter_.spawnParticlePerSec = nbParticlePerSec_;
 }
 
-void AParticleEmitter::reload() {
+    void AParticleEmitter::reload() {
     for (auto &module: modules_)
         module->reload();
     timerEmitter_.reset();
@@ -77,6 +81,7 @@ void AParticleEmitter::setShouldBeToSpawn(unsigned int nb, unsigned int at) {
 }
 
 void AParticleEmitter::update(float deltaTime) {
+    updateCpuBufferParam_();
     cpuBufferParam_Emitter_.position = glmVec3toClFloat3(system_.getPosition() + position_);
     cpuBufferParam_Emitter_.time = static_cast<float>(timerEmitter_.count<std::chrono::milliseconds>()) / 1000.f;
     cpuBufferParam_Emitter_.deltaTime = deltaTime;

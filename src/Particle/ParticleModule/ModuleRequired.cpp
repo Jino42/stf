@@ -6,6 +6,7 @@
 #include "Enum/eParticleBuffer.hpp"
 #include "OpenCGL_Tools.hpp"
 #include "Particle/ParticleData.hpp"
+#include "Particle/ParticleModule/ParticleSpawnModule.hpp"
 #include "Particle/ParticleSystem.hpp"
 #include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 #include "cl_type.hpp"
@@ -28,6 +29,7 @@ ModuleRequired::ModuleRequired(AParticleEmitter &emitter)
 void ModuleRequired::init() {
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
+    ClError err;
 
     queue_.getQueue().enqueueWriteBuffer(*gpuBufferModuleParam_, CL_TRUE, 0, sizeof(ModuleParamRequired), &cpuBufferModuleParam_);
 
@@ -48,6 +50,30 @@ void ModuleRequired::init() {
     OpenCGL::RunKernelWithMem(queue_.getQueue(), kernelInit_, cl_vbos, cl::NullRange, cl::NDRange(nbParticleMax_));
     queue_.getQueue().enqueueReadBuffer(emitter_.gpuBufferParticles_SubLength_, CL_TRUE, 0, sizeof(int) * 3, &emitter_.indexSub_);
     std::cout << emitter_.getNbParticleMax() << std::endl;
+
+    if (!emitter_.getModule<ParticleSpawnModule>()) {
+        cl::Kernel kernel(ClProgram::Get().getKernel("RequiredSpawnAllParticleWithoutLifetime"));
+        err.err = kernel.setArg(0, emitter_.getParticleOCGL_BufferData().mem);
+        err.err = kernel.setArg(1, emitter_.getParticleBufferAlive());
+        err.err |= kernel.setArg(2, emitter_.getParticleSubBuffersLength());
+        err.clCheckError();
+
+        cl::Event ev;
+        std::vector<cl::Memory> cl_vbos;
+        cl_vbos.push_back(emitter_.getParticleOCGL_BufferData().mem);
+
+        err.err = queue_.getQueue().enqueueAcquireGLObjects(&cl_vbos, nullptr, &ev);
+        ev.wait();
+        err.clCheckError();
+
+        err.err = queue_.getQueue().enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(nbParticleMax_));
+        err.clCheckError();
+        queue_.getQueue().finish();
+
+        err.err = queue_.getQueue().enqueueReleaseGLObjects(&cl_vbos, nullptr, nullptr);
+        err.clCheckError();
+        queue_.getQueue().finish();
+    }
 }
 
 void ModuleRequired::update(float deltaTime) {

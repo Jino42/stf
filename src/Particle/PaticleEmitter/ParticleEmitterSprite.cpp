@@ -13,15 +13,14 @@
 #include <string.h>
 #include <PathManager.hpp>
 
-ParticleEmitterSprite::ParticleEmitterSprite(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticlePerSec, size_t nbParticleMax) :
-		AParticleEmitter(system, queue, name, nbParticleMax, nbParticlePerSec),
+ParticleEmitterSprite::ParticleEmitterSprite(ParticleSystem &system, ClQueue &queue, std::string const &name, size_t nbParticleMax)
+    :
+		AParticleEmitter(system, queue, name, nbParticleMax, 0),
 		OCGLBufferParticles_SpriteData_(nbParticleMax * sizeof(ParticleDataSprite)),
 		atlas_("bloup.png", PathManager::Get().getPath("atlas"), 4),
 		gpuBufferParticles_Dist_(ClContext::Get().context, CL_MEM_WRITE_ONLY, nbParticleMax * sizeof(CL_FLOAT)),
 		gpuBufferOutput_nbParticleActive_(ClContext::Get().context, CL_MEM_READ_WRITE, sizeof(int))
 {
-
-	modules_.emplace_back(std::make_unique<ParticleSpawnModule>(*this));
 
 	ClProgram &program = ClProgram::Get();
 	program.addProgram(PathManager::Get().getPath("particleKernels") / "Sort.cl");

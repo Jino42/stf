@@ -46,6 +46,8 @@ class AParticleEmitter : public ANommable {
 
     void spawn();
 
+    void updateCpuBufferParam_();
+
     glm::vec3 &getPosition();
     std::string const &getName() const;
     OCGL_Buffer &getParticleOCGL_BufferData();
@@ -113,9 +115,15 @@ class AParticleEmitter : public ANommable {
     unsigned int &getNbParticlePerSec() { return nbParticlePerSec_; }
     unsigned int &getNbParticleActive() { return nbParticleActive_; }
 
-    void setNbParticleMax(unsigned int value) { nbParticleMax_ = value; }
-    void setNbParticlePerSec(unsigned int value) { nbParticlePerSec_ = value; }
-    void setNbParticleActive(unsigned int value) { nbParticleActive_ = value; }
+    void setNbParticleMax(unsigned int value) {
+        nbParticleMax_ = value;
+    }
+    void setNbParticlePerSec(unsigned int value) {
+        nbParticlePerSec_ = value;
+    }
+    void setNbParticleActive(unsigned int value) {
+        nbParticleActive_ = value;
+    }
 
     void setReload(bool b) { needReload_ = b; }
 

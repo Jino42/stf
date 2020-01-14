@@ -17,6 +17,8 @@ class ModulePhysicGravity : public AParticleModule {
     void update(float deltaTime) override;
     void reload() override;
 
+    void jsonParse(json &itModule) override;
+
     ModuleParamPhysicGravity &getCpuModuleParam();
 
   private:

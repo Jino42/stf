@@ -49,3 +49,12 @@ void ModulePhysicGravity::reload() {
 ModuleParamPhysicGravity &ModulePhysicGravity::getCpuModuleParam() {
     return cpuBufferModuleParam_;
 }
+
+void ModulePhysicGravity::jsonParse(json &itModule) {
+    if (itModule.find("options") != itModule.end()) {
+        if (itModule["options"].find("gravity") != itModule["options"].end()) {
+            json &gravity = *itModule["options"].find("gravity");
+            getCpuModuleParam().gravity = jsonToFloat3(gravity);
+        }
+    }
+}

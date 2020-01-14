@@ -1,9 +1,12 @@
 #include "ShaderManager.hpp"
 
 
-void ShaderManager::addShader(std::string const &name) {
-    if (mapShaders_.find(name) == mapShaders_.end())
+bool ShaderManager::addShader(std::string const &name) {
+    if (mapShaders_.find(name) == mapShaders_.end()) {
         mapShaders_.try_emplace(name);
+        return true;
+    }
+    return false;
 }
 
 Shader &ShaderManager::getShader(std::string const &name) {

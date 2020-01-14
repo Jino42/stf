@@ -79,6 +79,8 @@ class ModuleSPH : public AParticleModule {
     void update(float deltaTime) override;
     void reload() override;
 
+    void gui() override;
+
     void shiftDebugViscosity();
     void shiftDebugVelocity();
     void shiftDebugPressure();

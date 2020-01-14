@@ -27,9 +27,10 @@ public:
     ///              He is not necessary. You can getShader without add Shader, that will create them
     ///              Maybe i should remove it ...
     /// \param Name of Shader
+    /// \return IsSuccess
     /// \section Example
     /// \snippet snippetShaderManager.cpp ShaderManagerAddShader example
-    void addShader(std::string const &name);
+    bool addShader(std::string const &name);
 
     /// \brief Get Shader reference
     /// \details Shearch in map, the Shader associated to this name
