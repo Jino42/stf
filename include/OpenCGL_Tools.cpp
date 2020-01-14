@@ -40,3 +40,14 @@ void OpenCGL::RunKernelWithMem(cl::CommandQueue const &queue, ClKernel const &ke
 	err.clCheckError();
 	queue.finish();
 }
+
+void OpenCGL::RunKernelWithMem(cl::CommandQueue const &queue, ClKernel const &kernel, cl::NDRange at, cl::NDRange global, cl::NDRange local) {
+    ClError err;
+
+    glFinish();
+    err.clCheckError();
+    queue.finish();
+    err.err = queue.enqueueNDRangeKernel(kernel.getKernel(), at, global, local);
+    err.clCheckError();
+    queue.finish();
+}

@@ -91,7 +91,7 @@ void ParticleEmitterSprite::reload() {
     glEnableVertexAttribArray(9); //LifeTime
     glVertexAttribPointer(9, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, lifeTime)));
 	glEnableVertexAttribArray(10); //IsAlive
-	glVertexAttribPointer(10, 1, GL_INT, GL_FALSE, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, isAlive)));
+	glVertexAttribIPointer(10, 1, GL_INT, sizeof(ParticleData), reinterpret_cast<const void *>(offsetof(ParticleData, isAlive)));
 
     glVertexAttribDivisor(3, 1);
     glVertexAttribDivisor(4, 1);

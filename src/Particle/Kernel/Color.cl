@@ -102,7 +102,7 @@ void kernel color_radius_from_position(__global ParticleData *data,
                                        float3 from,
                                        float radius,
                                        float deltaTime) {
-    size_t id = get_global_id(0);
+    uint id = get_global_id(0);
     __global ParticleData *particle = &data[id];
 
     float4 end = hsv_to_rgb(0.f, 0.93f, 0.5f);

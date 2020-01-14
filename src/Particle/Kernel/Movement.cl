@@ -4,7 +4,7 @@ void kernel spawnMovementRandom(__global ParticleData *dataParticle,
                                 __global int *arrayParticlesAlive2,
                                 __global ParticleDataMovement *dataMovement,
                                 int seed) {
-    size_t id = arrayParticlesAlive2[get_global_id(0)];
+    uint id = arrayParticlesAlive2[get_global_id(0)];
 
 
     __global ParticleDataMovement *movement = &dataMovement[dataParticle[id].index];
@@ -22,7 +22,7 @@ void kernel spawnMovementRandom(__global ParticleData *dataParticle,
 void kernel movement(__global ParticleData *dataParticle,
         __global ParticleDataMovement *dataMovement,
         float3 attractor) {
-    size_t id = get_global_id(0);
+    uint id = get_global_id(0);
     __global ParticleData *particle = &dataParticle[id];
     __global ParticleDataMovement *movement = &dataMovement[particle->index];
 

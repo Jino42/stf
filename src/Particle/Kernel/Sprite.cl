@@ -40,7 +40,7 @@ void updateSpriteCoordInfo(
 __kernel void sprite(__global ParticleData *data,
                     __global ParticleDataSprite *spriteData,
                     unsigned int numberRows) {
-    size_t id = get_global_id(0);
+    uint id = get_global_id(0);
     __global ParticleData *particle = &data[id];
 
     updateSpriteCoordInfo(particle, &spriteData[id], numberRows);

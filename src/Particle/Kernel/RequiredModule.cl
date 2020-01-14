@@ -1,47 +1,42 @@
 #include "NTL.hl"
 
-
 ////////////////////////////////////////
 
 void kernel PrintSubArrayParticle(
-        __global int *arrayParticlesAlive,
-        __global int *arrayParticlesAlive2,
-        __global int *arrayParticlesDeath,
-        __global int *arrayParticlesLengthSub,
-        int nbMaxParticles)
-{
+    __global int *arrayParticlesAlive,
+    __global int *arrayParticlesAlive2,
+    __global int *arrayParticlesDeath,
+    __global int *arrayParticlesLengthSub,
+    int nbMaxParticles) {
     printf("STTT : [ALIV][ALI2][DEAT]\n");
     for (int i = 0; i < nbMaxParticles; i++) {
         printf("%4d : [%4d][%4d][%4d]\n",
-                            i,
-                            arrayParticlesAlive[i],
-                            arrayParticlesAlive2[i],
-                            arrayParticlesDeath[i]
-                            );
+               i,
+               arrayParticlesAlive[i],
+               arrayParticlesAlive2[i],
+               arrayParticlesDeath[i]);
     }
 
     printf("INDEX : [%4d][%4d][%4d]\n",
-        arrayParticlesLengthSub[SUB_LENGTH_ALIVE],
-        arrayParticlesLengthSub[SUB_LENGTH_ALIVE2],
-        arrayParticlesLengthSub[SUB_LENGTH_DEATH]
-    );
+           arrayParticlesLengthSub[SUB_LENGTH_ALIVE],
+           arrayParticlesLengthSub[SUB_LENGTH_ALIVE2],
+           arrayParticlesLengthSub[SUB_LENGTH_DEATH]);
 }
 
 void kernel RequiredInitialisation(
 
-        __global ParticleData *data,
-        __global int *arrayParticlesAlive,
-        __global int *arrayParticlesAlive2,
-        __global int *arrayParticlesDeath,
-        __global int *arrayParticlesLengthSub,
+    __global ParticleData *data,
+    __global int *arrayParticlesAlive,
+    __global int *arrayParticlesAlive2,
+    __global int *arrayParticlesDeath,
+    __global int *arrayParticlesLengthSub,
 
-        __global ModuleParamRequired *moduleParams,
+    __global ModuleParamRequired *moduleParams,
 
-
-        float4 particleSystemPosition,
-        int seed,
-        int nbMaxParticles){
-	size_t id = get_global_id(0);
+    float4 particleSystemPosition,
+    int seed,
+    int nbMaxParticles) {
+    uint id = get_global_id(0);
     __global ParticleData *particle = &data[id];
 
     arrayParticlesAlive[id] = -1;
@@ -56,7 +51,7 @@ void kernel RequiredInitialisation(
 
     particle->index = id;
 
-///////////
+    ///////////
     particle->position.x = 0.f;
     particle->position.y = 0.f;
     particle->position.z = id * 0.1f;
@@ -83,24 +78,22 @@ void kernel RequiredInitialisation(
     particle->position.z += particleSystemPosition.z;
 
     particle->lifeTime = 5.f;
-///////////
+    ///////////
 
     particle->age = 5.f;
     particle->lifeTime = 5.f;
+    particle->isAlive = 0;
 
     //printf("g_id[%i] p[%f][%f][%f]\n", id, particle->position.x, particle->position.y, particle->position.z);
-    
+
     //particle->lifeTime = getRandomRangef(&moduleParams->startLifeTime, seed + id);
     //particle->age = particle->lifeTime;
 }
 
-
-
 void addDeathToArray(
-                     __global int *arrayParticlesDeath,
-                     __global int *arrayParticlesLengthSub,
-                     size_t id)
-{
+    __global int *arrayParticlesDeath,
+    __global int *arrayParticlesLengthSub,
+    uint id) {
     int szDeath = atomic_add(&(arrayParticlesLengthSub[SUB_LENGTH_DEATH]), 1) + 1;
 
     //check §
@@ -110,10 +103,9 @@ void addDeathToArray(
 }
 
 void addAliveToArray(
-                     __global int *arrayParticlesAlive,
-                     __global int *arrayParticlesLengthSub,
-                     size_t id)
-{
+    __global int *arrayParticlesAlive,
+    __global int *arrayParticlesLengthSub,
+    uint id) {
     int szAlive = atomic_add(&(arrayParticlesLengthSub[SUB_LENGTH_ALIVE]), 1) + 1;
 
     //check §
@@ -123,10 +115,9 @@ void addAliveToArray(
 }
 
 void addAlive2222222ToArray(
-                     __global int *arrayParticlesAlive2,
-                     __global int *arrayParticlesLengthSub,
-                     size_t id)
-{
+    __global int *arrayParticlesAlive2,
+    __global int *arrayParticlesLengthSub,
+    uint id) {
     int szAlive2 = atomic_add(&(arrayParticlesLengthSub[SUB_LENGTH_ALIVE2]), 1) + 1;
 
     //check §
@@ -135,10 +126,9 @@ void addAlive2222222ToArray(
         arrayParticlesAlive2[szAlive2 - 1] = id;
 }
 
-int removeDeath(    __global int *arrayParticlesDeath,
-                     __global int *arrayParticlesLengthSub,
-                     size_t id)
-{
+int removeDeath(__global int *arrayParticlesDeath,
+                __global int *arrayParticlesLengthSub,
+                size_t id) {
     int szDeath = atomic_sub(&(arrayParticlesLengthSub[SUB_LENGTH_DEATH]), 1);
 
     if (szDeath - 1 < 0)
@@ -152,26 +142,23 @@ int removeDeath(    __global int *arrayParticlesDeath,
 }
 
 void kernel RequiredUpdate(__global ParticleData *data,
-                            __global int *arrayParticlesAlive,
-                            __global int *arrayParticlesAlive2,
-                            __global int *arrayParticlesDeath,
-                            __global int *arrayParticlesLengthSub,
-                                float deltaTime) {
-    size_t id = get_global_id(0);
+                           __global int *arrayParticlesAlive,
+                           __global int *arrayParticlesAlive2,
+                           __global int *arrayParticlesDeath,
+                           __global int *arrayParticlesLengthSub,
+                           float deltaTime) {
+    uint id = get_global_id(0);
     __global ParticleData *particle = &data[id];
 
     particle->age += deltaTime;
 
     if (id < arrayParticlesLengthSub[SUB_LENGTH_ALIVE2])
-            arrayParticlesAlive2[id] = -1;
+        arrayParticlesAlive2[id] = -1;
 
-    if (particle->isAlive && !particleIsActive(particle))
-    {
+    if (particle->isAlive && !particleIsActive(particle)) {
         particle->isAlive = 0;
         addDeathToArray(arrayParticlesDeath, arrayParticlesLengthSub, id);
-    }
-    else if (particle->isAlive)
-    {
+    } else if (particle->isAlive) {
         addAliveToArray(arrayParticlesAlive, arrayParticlesLengthSub, id);
     }
 }

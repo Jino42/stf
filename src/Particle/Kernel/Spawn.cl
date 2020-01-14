@@ -16,7 +16,7 @@ __kernel void spawnParticle(
 
 
 
-    size_t id = get_global_id(0);
+    uint id = get_global_id(0);
     int res = removeDeath(
                       arrayParticlesDeath,
                       arrayParticlesLengthSub,

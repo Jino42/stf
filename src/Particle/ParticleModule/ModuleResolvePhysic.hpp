@@ -15,6 +15,7 @@ class ModuleResolvePhysic : public AParticleModule {
     ModuleResolvePhysic(AParticleEmitter &emitter);
     void init() override;
     void update(float deltaTime) override;
+    void spawn(unsigned int nbToSpawn, unsigned int) override;
     void reload() override;
 
   private:

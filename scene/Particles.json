@@ -13,38 +13,10 @@
       "emitters": [
         {
           "active": true,
-          "_comment": "Position not yet supported",
           "name": "Lol0",
           "type": "SPH",
           "particles": 50600,
           "modules": [
-          ]
-        }
-      ]
-    },
-    {
-      "name": "abc2",
-      "options": {
-        "position": {
-          "x": 120,
-          "y": 258,
-          "z": -30
-        }
-      },
-      "emitters": [
-        {
-          "active": true,
-          "_comment": "Position not yet supported",
-          "name": "Lol3",
-          "type": "Point",
-          "particles": 300,
-          "modules": [
-            {
-              "type": "Attractor"
-            },
-            {
-              "type": "Color"
-            }
           ]
         }
       ]
@@ -61,7 +33,6 @@
       "emitters": [
         {
           "active": true,
-          "_comment": "Position not yet supported",
           "name": "Lol0",
           "type": "Sprite",
           "particlesMax": 5000,
@@ -89,7 +60,6 @@
       "emitters": [
         {
           "active": true,
-          "_comment": "Position not yet supported",
           "name": "Lol2",
           "type": "Mesh",
           "particlesMax": 30,
@@ -118,7 +88,7 @@
       },
       "emitters": [
         {
-          "active": true,
+          "active": false,
           "options": {
             "position": {
               "x": 80,
@@ -146,7 +116,6 @@
         },
         {
           "active": true,
-          "_comment": "Position not yet supported",
           "name": "Lol3",
           "type": "Point",
           "particles": 300000,
@@ -168,6 +137,7 @@
               "type": "PhysicNoise"
             },
             {
+              "active": false,
               "type": "PhysicConstrainInShape",
               "options": {
                 "shape": "AABB3"
@@ -178,6 +148,21 @@
             },
             {
               "type": "Color"
+            }
+          ]
+        },
+        {
+          "active": false,
+          "name": "Lol006",
+          "type": "Sprite",
+          "particlesMax": 5000,
+          "particlesSpawn": 12000,
+          "modules": [
+            {
+              "type": "Movement"
+            },
+            {
+              "type": "SizeOverLifetime"
             }
           ]
         }

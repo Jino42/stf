@@ -4,7 +4,7 @@ void kernel updateMoveToTarget(__global ParticleData *dataParticle,
         __global ParticleDataTarget *targetDataParticles,
         float deltaTime) {
 
-    size_t id = get_global_id(0);
+    uint id = get_global_id(0);
     __global ParticleData *particle = &dataParticle[id];
     __global ParticleDataTarget *target = &targetDataParticles[particle->index];
 
