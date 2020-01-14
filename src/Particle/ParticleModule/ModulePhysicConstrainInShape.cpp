@@ -45,16 +45,13 @@ void ModulePhysicConstrainInShape::reload() {
 
 void ModulePhysicConstrainInShape::setShapeContrain_() {
     ClError err;
-    std::shared_ptr<AShape> shape = std::dynamic_pointer_cast<AABB>(ShapeManager::Get().getShape(nameShape_));
+    std::shared_ptr<AShape> shape = std::dynamic_pointer_cast<AShape>(ShapeManager::Get().getShape(nameShape_));
     std::shared_ptr<AABB> aabb = std::dynamic_pointer_cast<AABB>(shape);
     std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(shape);
 
     if (aabb) {
-        std::cout << "OH MAMA " << std::endl;
         gpuBufferLocal_ShapeConstrain_ = cl::Buffer(ClContext::Get().context, CL_MEM_WRITE_ONLY, sizeof(cl_AABB));
         cl_AABB *clAABB = aabb->getCl_Shape();
-        std::cout << "Position [" << clAABB->position.x << "][" << clAABB->position.y << "][" << clAABB->position.z << "]" << std::endl;
-        std::cout << "Size     [" << clAABB->size.x << "][" << clAABB->size.y << "][" << clAABB->size.z << "]" << std::endl;
         err.err = queue_.getQueue().enqueueWriteBuffer(gpuBufferLocal_ShapeConstrain_, GL_TRUE, 0, sizeof(cl_AABB), clAABB);
         err.clCheckError();
         queue_.getQueue().finish();

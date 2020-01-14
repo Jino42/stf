@@ -70,16 +70,26 @@
           "active": true,
           "name": "LolPointMaisc2",
           "type": "Point",
-          "particlesMax": 300000,
+          "particlesMax": 30000,
           "modules": [
             {
               "type": "Spawn",
               "options": {
-                "rate": 100
+                "rate": 10000,
+                "lifetime": {
+                  "min": 0.3,
+                  "max":  2.8
+                }
               }
             },
             {
-              "type": "Attractor"
+              "type": "Attractor",
+              "options": {
+                "shape": [
+                  "ATTRACT_1",
+                  "ATTRACT_2"
+                ]
+              }
             },
             {
               "type": "PhysicGravity",

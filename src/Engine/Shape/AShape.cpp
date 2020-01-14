@@ -1,6 +1,7 @@
 #include "AShape.hpp"
 #include "Sphere.hpp"
 #include "AABB.hpp"
+#include <cl_type.hpp>
 
 
 AShape::AShape()
@@ -26,6 +27,13 @@ void AShape::setRender(bool b) {
         flag_ |= eShape::kRender;
     else if ((flag_ & eShape::kRender) == eShape::kRender)
         flag_ ^= eShape::kRender;
+}
+
+cl_Shape *AShape::getCl_Shape() const {
+    cl_Shape *shape = new cl_Shape();
+    shape->flag = static_cast<int>(flag_);
+    shape->position = glmVec3toClFloat3(position_);
+    return shape;
 }
 
 void AShape::printShapeStructSize() {

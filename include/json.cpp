@@ -11,6 +11,13 @@ json getJsonFromFileRelativeToRootPath(std::string const &path) {
 	return json::parse(ifs);
 }
 
+Rangef jsonToRangef(json &j) {
+    Rangef range;
+    range.rangeMin = j["min"].get<float>();
+    range.rangeMax = j["max"].get<float>();
+    return range;
+}
+
 cl_float3 jsonToFloat3(json &j) {
     return makeFloat3(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>());
 }

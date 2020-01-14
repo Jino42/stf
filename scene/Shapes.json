@@ -46,6 +46,40 @@
           "z": 30
         }
       }
+    },
+    {
+      "type": "AABB",
+      "name": "ATTRACT_1",
+      "render": true,
+      "options": {
+        "position": {
+          "x": 80,
+          "y": 60,
+          "z": 60
+        },
+        "size": {
+          "x": 10,
+          "y": 10,
+          "z": 10
+        }
+      }
+    },
+    {
+      "type": "AABB",
+      "name": "ATTRACT_2",
+      "render": true,
+      "options": {
+        "position": {
+          "x": 50,
+          "y": 70,
+          "z": 60
+        },
+        "size": {
+          "x": 10,
+          "y": 10,
+          "z": 10
+        }
+      }
     }
   ]
 }

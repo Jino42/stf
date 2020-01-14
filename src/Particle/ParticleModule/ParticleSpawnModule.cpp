@@ -114,9 +114,14 @@ void ParticleSpawnModule::jsonParse(json &itModule) {
         if (itModule["options"].find("rate") != itModule["options"].end()) {
             std::cout << "rate" << std::endl;
             json &rate = *itModule["options"].find("rate");
-            std::cout << rate << std::endl;
             setRate(rate.get<unsigned int>());
         }
+        if (itModule["options"].find("lifetime") != itModule["options"].end())
+            cpuBufferModuleParam_.startLifeTime = jsonToRangef(itModule["options"]["lifetime"]);
+        if (itModule["options"].find("rotation") != itModule["options"].end())
+            cpuBufferModuleParam_.startLifeTime = jsonToRangef(itModule["options"]["rotation"]);
+        if (itModule["options"].find("size") != itModule["options"].end())
+            cpuBufferModuleParam_.startLifeTime = jsonToRangef(itModule["options"]["size"]);
     }
 }
 

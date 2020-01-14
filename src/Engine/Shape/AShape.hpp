@@ -68,7 +68,7 @@ class AShape {
     virtual void setPosition(glm::vec3 position);
     void setRender(bool b);
 
-    virtual cl_Shape *getCl_Shape() const = 0;
+    virtual cl_Shape *getCl_Shape() const;
 
     static void printShapeStructSize();
 
