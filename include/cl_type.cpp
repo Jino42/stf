@@ -8,6 +8,13 @@ cl_float3 glmVec3toClFloat3(glm::vec3 vec) {
     return ret;
 }
 
+cl_float4 glmVec4toClFloat4(glm::vec4 vec) {
+    cl_float4 ret;
+
+    *reinterpret_cast<glm::vec4 *>(&ret) = vec;
+    return ret;
+}
+
 cl_float3 makeFloat3(float x, float y, float z) {
     cl_float3 ret;
 

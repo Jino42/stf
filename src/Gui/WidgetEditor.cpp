@@ -16,6 +16,7 @@ void WidgetEditor::beginContent_() {
 
   editorCamera_.render();
   editorParticleSystems_.render();
+  editorShape_.render();
 
   /*
   static Timer test;

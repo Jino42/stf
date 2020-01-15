@@ -7,6 +7,15 @@ ADebugObject::ADebugObject() :
     color(glm::vec4(0.f, 9.f, 0.f, 1.f)) {
 }
 
+ADebugObject::~ADebugObject() {
+    if (debug_)
+        setDebug(false);
+}
+
+bool &ADebugObject::getDebug() {
+    return debug_;
+}
+
 void	ADebugObject::setDebug(bool b) {
     if (debug_ == b)
         return ;

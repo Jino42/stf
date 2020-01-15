@@ -78,13 +78,14 @@
                 "rate": 10000,
                 "lifetime": {
                   "min": 0.3,
-                  "max":  2.8
+                  "max": 2.8
                 }
               }
             },
             {
               "type": "Attractor",
               "options": {
+                "mouse":  true,
                 "shape": [
                   "ATTRACT_1",
                   "ATTRACT_2"
@@ -115,7 +116,13 @@
               "type": "Physic"
             },
             {
-              "type": "Color"
+              "active": true,
+              "type": "Color",
+              "options": {
+                "radius": 10,
+                "debugRadius": true,
+                "attractor": true
+              }
             }
           ]
         },

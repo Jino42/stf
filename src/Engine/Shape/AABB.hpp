@@ -16,6 +16,8 @@ class AABB : public AShape, public ADebugObject {
     void setSize(glm::vec3 const &vec);
     void setPosition(glm::vec3 position) override;
 
+    glm::vec3 &getSize() { return size_; }
+
     cl_AABB *getCl_Shape() const override;
 
 

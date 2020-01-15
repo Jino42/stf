@@ -101,14 +101,13 @@ float4 lerpColorVec4(float4 a, float4 b, float t) {
 void kernel color_radius_from_position(__global ParticleData *data,
                                        float3 from,
                                        float radius,
+                                       float4 colorSart,
+                                       float4 colorEnd,
                                        float deltaTime) {
     uint id = get_global_id(0);
     __global ParticleData *particle = &data[id];
 
-    float4 end = hsv_to_rgb(0.f, 0.93f, 0.5f);
-    float4 start = hsv_to_rgb(60.5f, 1.f, 0.5f * clamp(length(particle->velocity), 0.0f, 3.0f) / 3.0f * 2.0f);
     float3 velocity = particle->velocity;
     float3 position = particle->position;
-    float r = 10.f;
-    particle->color = lerpColorVec4(start, end, clamp(fabs(length(from - position)) / r, 0.f, 1.f));
+    particle->color = lerpColorVec4(colorSart, colorEnd, clamp(fabs(length(from - position)) / radius, 0.f, 1.f));
 }

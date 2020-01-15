@@ -74,6 +74,23 @@ void ModuleAttractor::reload() {
     init();
 }
 
+glm::vec3 ModuleAttractor::getCenterOfAllAttractors() const {
+    if (!namesShapeAttractor_.size())
+        return glm::vec3(0.0f);
+    glm::vec3 finalPosition = glm::vec3(0.f);
+    glm::vec3 position = std::dynamic_pointer_cast<AShape>(ShapeManager::Get().getShape(namesShapeAttractor_[0]))->getPosition();
+    for (unsigned int i = 1; i < namesShapeAttractor_.size(); i++) {
+        std::shared_ptr<AShape> shape = std::dynamic_pointer_cast<AShape>(ShapeManager::Get().getShape(namesShapeAttractor_[i]));
+
+        glm::vec3 diff = shape->getPosition() - position;
+
+        finalPosition += diff;
+    }
+    finalPosition /= namesShapeAttractor_.size();
+    finalPosition += position; 
+    return finalPosition;
+}
+
 void ModuleAttractor::jsonParse(json &itModule) {
     if (itModule.find("options") != itModule.end()) {
         if (itModule["options"].find("shape") != itModule["options"].end()) {

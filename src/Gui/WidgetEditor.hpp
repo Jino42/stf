@@ -3,6 +3,7 @@
 #include "AWidget.hpp"
 #include <Gui/EditorCamera.hpp>
 #include <Gui/EditorParticleSystems.hpp>
+#include <Gui/EditorShape.hpp>
 
 class EditorCamera;
 
@@ -18,4 +19,5 @@ private:
 
     EditorCamera    editorCamera_;
     EditorParticleSystems editorParticleSystems_;
+    EditorShape editorShape_;
 };

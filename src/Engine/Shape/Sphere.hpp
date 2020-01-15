@@ -17,6 +17,10 @@ class Sphere : public AShape, public ADebugObject {
     void setRadius(float radius);
     void setPosition(glm::vec3 position) override;
 
+    float &getRadius() { return radius_; };
+    int &getSectorCount() { return sectorCount_; };
+    int &getStackCount() { return stackCount_; };
+
     cl_Sphere *getCl_Shape() const override;
 
   private:

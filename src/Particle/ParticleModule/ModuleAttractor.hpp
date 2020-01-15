@@ -18,7 +18,7 @@ class ModuleAttractor : public AParticleModule {
 
 
     void addNameShapeAttractor(std::string name);
-
+    glm::vec3 getCenterOfAllAttractors() const;
 
   private:
     bool mouse_;

@@ -22,7 +22,6 @@ public:
   virtual void jsonParse(json &itModule){};
   virtual void gui() {};
 
-
 protected :
   AParticleEmitter &emitter_;
   ClQueue &queue_;
