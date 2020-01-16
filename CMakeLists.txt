@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-set(NAME ntl_ps)
+set(NAME stf)
 project(${NAME})
 
 

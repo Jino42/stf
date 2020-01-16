@@ -42,6 +42,8 @@ void ParticleSpawnModule::init() {
 }
 
 void ParticleSpawnModule::update(float deltaTime) {
+    if (!isActive_)
+        return;
     TimerOnConstructOffDestruct timer(__FUNCTION_NAME__);
 
     int shouldBeAlreadySpawn = (int)(emitter_.getTimer().count() / (1000.f / nbParticlePerSec_));
@@ -126,6 +128,7 @@ void ParticleSpawnModule::jsonParse(json &itModule) {
 }
 
 void ParticleSpawnModule::gui() {
+    AParticleModule::gui();
     static int speedDrag = 1;
     ImGui::DragInt("speedDrag", &speedDrag, 1, 0, 10000);
     ImGui::DragInt("rate", (int *)&nbParticlePerSec_, speedDrag, 0, 1000000);

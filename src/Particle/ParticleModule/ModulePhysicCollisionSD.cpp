@@ -28,6 +28,8 @@ void ModulePhysicCollisionSD::init() {
 }
 
 void ModulePhysicCollisionSD::update(float deltaTime) {
+    if (!isActive_)
+        return;
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
 

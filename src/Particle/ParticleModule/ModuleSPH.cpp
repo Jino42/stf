@@ -88,6 +88,8 @@ void ModuleSPH::updateConstant_() {
 }
 
 void ModuleSPH::update(float deltaTime) {
+    if (!isActive_)
+        return;
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
 
@@ -181,6 +183,7 @@ void ModuleSPH::shiftDebugPressure() {
 }
 
 void ModuleSPH::gui() {
+    AParticleModule::gui();
     ImGui::DragFloat("Pressure", &getModuleParam().pressure, 0.1f, 0, 2500.f);
     ImGui::DragFloat("SmoothingRadius: ", &getModuleParam().smoothingRadius, 0.05f, 0, 200.f);
     ImGui::DragFloat("Viscosity: ", &getModuleParam().viscosity, 0.001f, 0, 1.f);

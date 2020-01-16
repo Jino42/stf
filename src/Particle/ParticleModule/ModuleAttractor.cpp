@@ -50,8 +50,12 @@ void ModuleAttractor::init() {
 }
 
 void ModuleAttractor::update(float deltaTime) {
+    if (!isActive_)
+        return;
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
+
+    updateAttractor_();
 
     glm::vec3 attractorPosition = MainGraphicExtendModel::Get().attractorPoint;
     unsigned int flag = mouse_ ? 1 : 0;
@@ -106,5 +110,6 @@ void ModuleAttractor::jsonParse(json &itModule) {
 }
 
 void ModuleAttractor::gui() {
+    AParticleModule::gui();
     ImGui::Checkbox("Attract With Mouse", &mouse_);
 }

@@ -31,6 +31,8 @@ void	ModuleMovement::init() {
 }
 
 void	ModuleMovement::update(float deltaTime) {
+    if (!isActive_)
+        return;
 	if (debug_)
 		printf("%s\n", __FUNCTION_NAME__);
 

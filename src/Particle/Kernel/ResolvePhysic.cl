@@ -42,6 +42,11 @@ __kernel void ResolvePhysicUpdate(__global ParticleData *data,
         particlePhysic->velocity.z *= 0.997f;
 
     particle->position += particlePhysic->velocity * deltaTime;
+    if (!id)
+        printf("%f %f %f\n",
+               particle->position.x,
+               particle->position.y,
+               particle->position.z);
 
     particle->velocity = particlePhysic->velocity;
 }

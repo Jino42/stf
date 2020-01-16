@@ -34,6 +34,8 @@ void JsonShapeParser::parse() {
         std::shared_ptr<ADebugObject> debugObject = std::dynamic_pointer_cast<ADebugObject>(ShapeManager::Get().getShape(itShape["name"].get<std::string>()));
         if (itShape["render"].get<bool>())
             debugObject->setDebug(true);
+        if (itShape["options"].find("color") != itShape["options"].end())
+            debugObject->color = glm::vec4((jsonToVec3(*itShape["options"].find("color"))), 1.0f);
 
         currentShape_ = ShapeManager::Get().getShape(itShape["name"].get<std::string>());
         currentShape_->setPosition(jsonToVec3(*itShape["options"].find("position")));

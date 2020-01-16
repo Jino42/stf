@@ -15,12 +15,13 @@
           "active": false,
           "name": "LolSph",
           "type": "SPH",
-          "particlesMax": 50600,
+          "particlesMax": 5600,
           "modules": [
+
           ]
         },
         {
-          "active": true,
+          "active": false,
           "options": {
             "position": {
               "x": 80,
@@ -67,12 +68,13 @@
           ]
         },
         {
-          "active": true,
+          "active": false,
           "name": "LolPointMaisc2",
           "type": "Point",
-          "particlesMax": 30000,
+          "particlesMax": 300000,
           "modules": [
             {
+              "active": true,
               "type": "Spawn",
               "options": {
                 "rate": 10000,
@@ -85,7 +87,7 @@
             {
               "type": "Attractor",
               "options": {
-                "mouse":  true,
+                "mouse":  false,
                 "shape": [
                   "ATTRACT_1",
                   "ATTRACT_2"
@@ -103,10 +105,11 @@
               }
             },
             {
+              "active":  true,
               "type": "PhysicNoise"
             },
             {
-              "active": false,
+              "active": true,
               "type": "PhysicConstrainInShape",
               "options": {
                 "shape": "AABB3"
@@ -119,6 +122,16 @@
               "active": true,
               "type": "Color",
               "options": {
+                "startColor": {
+                  "r": 0.718,
+                  "g": 0,
+                  "b": 0.971
+                },
+                "endColor": {
+                  "r": 0.371,
+                  "g": 0.083,
+                  "b": 0.946
+                },
                 "radius": 10,
                 "debugRadius": true,
                 "attractor": true
@@ -139,7 +152,38 @@
               }
             },
             {
-              "type": "Movement"
+              "type": "Attractor",
+              "options": {
+                "mouse": false,
+                "shape": [
+                  "ATTRACT_1",
+                  "ATTRACT_2"
+                ]
+              }
+            },
+            {
+              "type": "PhysicGravity",
+              "options": {
+                "gravity": {
+                  "x": 0,
+                  "y": -0.1,
+                  "z": 0
+                }
+              }
+            },
+            {
+              "active": true,
+              "type": "PhysicNoise"
+            },
+            {
+              "active": true,
+              "type": "PhysicConstrainInShape",
+              "options": {
+                "shape": "AABB3"
+              }
+            },
+            {
+              "type": "Physic"
             },
             {
               "type": "SizeOverLifetime"

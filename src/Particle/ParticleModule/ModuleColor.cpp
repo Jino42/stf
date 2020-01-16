@@ -33,6 +33,8 @@ void ModuleColor::init() {
 }
 
 void ModuleColor::update(float deltaTime) {
+    if (!isActive_)
+        return;
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
 
@@ -77,6 +79,12 @@ void ModuleColor::reload() {
 
 void ModuleColor::jsonParse(json &itModule) {
     if (itModule.find("options") != itModule.end()) {
+        if (itModule["options"].find("startColor") != itModule["options"].end()) {
+            startColor_ = glm::vec4(jsonToVec3(itModule["options"]["startColor"]), 1.0f);
+        }
+        if (itModule["options"].find("endColor") != itModule["options"].end()) {
+            endColor_ = glm::vec4(jsonToVec3(itModule["options"]["endColor"]), 1.0f);
+        }
         if (itModule["options"].find("radius") != itModule["options"].end()) {
             radius_ = itModule["options"]["radius"].get<float>();
         }
@@ -100,7 +108,7 @@ void ModuleColor::jsonParse(json &itModule) {
 
 
 void ModuleColor::gui() {
-
+    AParticleModule::gui();
     ImGui::DragFloat("Radius ", &radius_, 0.5f, 0.f, 1000.f);
     if (ImGui::Button("DebugRadius"))
         sphere_.setDebug(!sphere_.getDebug());

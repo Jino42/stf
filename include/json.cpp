@@ -18,16 +18,41 @@ Rangef jsonToRangef(json &j) {
     return range;
 }
 
+static void setXYZ(json &j, float *x, float *y, float *z) {
+    if (j.find("x") != j.end())
+        *x = j["x"].get<float>();
+    if (j.find("r") != j.end())
+        *x = j["r"].get<float>();
+
+    if (j.find("y") != j.end())
+        *y = j["y"].get<float>();
+    if (j.find("g") != j.end())
+        *y = j["g"].get<float>();
+
+    if (j.find("z") != j.end())
+        *z = j["z"].get<float>();
+    if (j.find("b") != j.end())
+        *z = j["b"].get<float>();
+}
+
 cl_float3 jsonToFloat3(json &j) {
-    return makeFloat3(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>());
+    glm::vec3 v;
+    setXYZ(j, &v.x, &v.y, &v.z);
+    return makeFloat3(v.x, v.y, v.z);
 }
 cl_float3 jsonToFloat3(json &&j) {
-    return makeFloat3(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>());
+    glm::vec3 v;
+    setXYZ(j, &v.x, &v.y, &v.z);
+    return makeFloat3(v.x, v.y, v.z);
 }
 
 glm::vec3 jsonToVec3(json &j) {
-    return glm::vec3(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>());
+    glm::vec3 v;
+    setXYZ(j, &v.x, &v.y, &v.z);
+    return v;
 }
 glm::vec3 jsonToVec3(json &&j) {
-    return glm::vec3(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>());
+    glm::vec3 v;
+    setXYZ(j, &v.x, &v.y, &v.z);
+    return v;
 }

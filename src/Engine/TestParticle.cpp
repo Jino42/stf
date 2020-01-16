@@ -27,8 +27,8 @@ void TestParticle::init() {
 	emitter.addModule<ParticleColorModule>();
 */
 
-    ParticleSystemManager::Get().addParticleSystem("SAwrrr");
-    particleSystem_ = &ParticleSystemManager::Get().getParticleSystem("SAwrrr");
+    //ParticleSystemManager::Get().addParticleSystem("SAwrrr");
+    //particleSystem_ = &ParticleSystemManager::Get().getParticleSystem("SAwrrr");
     //Sprite Emitter
 
     //int i = 0;

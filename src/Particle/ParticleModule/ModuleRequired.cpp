@@ -77,6 +77,8 @@ void ModuleRequired::init() {
 }
 
 void ModuleRequired::update(float deltaTime) {
+    if (!isActive_)
+        return;
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
 

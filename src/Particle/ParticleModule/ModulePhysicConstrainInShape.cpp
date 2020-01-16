@@ -1,14 +1,14 @@
+#include "ModulePhysicConstrainInShape.hpp"
 #include "Cl/ClKernel.hpp"
 #include "Cl/ClProgram.hpp"
-#include "ModulePhysicConstrainInShape.hpp"
+#include "Engine/Shape/AABB.hpp"
+#include "Engine/Shape/ShapeManager.hpp"
+#include "Engine/Shape/Sphere.hpp"
 #include "ModuleResolvePhysic.hpp"
 #include "OpenCGL_Tools.hpp"
 #include "Particle/PaticleEmitter/AParticleEmitter.hpp"
 #include "cl_type.hpp"
 #include <iostream>
-#include "Engine/Shape/ShapeManager.hpp"
-#include "Engine/Shape/AABB.hpp"
-#include "Engine/Shape/Sphere.hpp"
 
 ModulePhysicConstrainInShape::ModulePhysicConstrainInShape(AParticleEmitter &emitter, std::string nameShape)
     : AParticleModule(emitter),
@@ -29,6 +29,8 @@ void ModulePhysicConstrainInShape::init() {
 }
 
 void ModulePhysicConstrainInShape::update(float deltaTime) {
+    if (!isActive_)
+        return;
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
 

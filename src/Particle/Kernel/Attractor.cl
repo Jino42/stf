@@ -23,9 +23,6 @@ void kernel attractor(__global ParticleData *data,
 
         for (uint i = 0; i < nbShape; i++) {
             __global Shape const *shape = dataShape + i;
-            if (!id) {
-                printf("%f %f %f\n", shape->position.x, shape->position.y, shape->position.z);
-            }
             float3 dist = shape->position - particle->position;
 
             float3 acceleration;

@@ -9,30 +9,33 @@ class AParticleEmitter;
 class ClQueue;
 
 class AParticleModule {
-public:
-  explicit AParticleModule(AParticleEmitter &emitter);
-  virtual ~AParticleModule() = default;
-  virtual void init(){};
-  virtual void update(float deltaTime){};
-  virtual void spawn(unsigned int, unsigned int){};
-  virtual void reload(){};
+  public:
+    explicit AParticleModule(AParticleEmitter &emitter);
+    virtual ~AParticleModule() = default;
+    virtual void init(){};
+    virtual void update(float deltaTime){};
+    virtual void spawn(unsigned int, unsigned int){};
+    virtual void reload(){};
 
-  std::string getModuleName() const;
+    std::string getModuleName() const;
 
-  virtual void jsonParse(json &itModule){};
-  virtual void gui() {};
+    bool &getIsActive() { return isActive_; }
 
-protected :
-  AParticleEmitter &emitter_;
-  ClQueue &queue_;
-  unsigned int &nbParticleMax_;
-  unsigned int &nbParticlePerSec_;
-  unsigned int &nbParticleActive_;
-  boost::filesystem::path &pathKernel_;
+    virtual void jsonParse(json &itModule){};
+    virtual void gui();
 
-  ClKernel kernelInit_;
-  ClKernel kernelUpdate_;
-  ClKernel kernelSpawn_;
+  protected:
+    AParticleEmitter &emitter_;
+    ClQueue &queue_;
+    unsigned int &nbParticleMax_;
+    unsigned int &nbParticlePerSec_;
+    unsigned int &nbParticleActive_;
+    boost::filesystem::path &pathKernel_;
+    bool isActive_;
 
-  static bool debug_;
+    ClKernel kernelInit_;
+    ClKernel kernelUpdate_;
+    ClKernel kernelSpawn_;
+
+    static bool debug_;
 };

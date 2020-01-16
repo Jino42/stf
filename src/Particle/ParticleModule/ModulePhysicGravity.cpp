@@ -32,6 +32,8 @@ void ModulePhysicGravity::init() {
 }
 
 void ModulePhysicGravity::update(float deltaTime) {
+    if (!isActive_)
+        return;
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
 

@@ -29,7 +29,9 @@ void ModuleMoveToTarget::init() {
     gpuBufferParticles_Target_ = emitter_.getClBuffer<ModuleTarget>();
 }
 
-    void ModuleMoveToTarget::update(float deltaTime) {
+void ModuleMoveToTarget::update(float deltaTime) {
+    if (!isActive_)
+        return;
     if (debug_)
         printf("%s\n", __FUNCTION_NAME__);
     kernelUpdate_.beginAndSetUpdatedArgs(*gpuBufferParticles_Target_, deltaTime);

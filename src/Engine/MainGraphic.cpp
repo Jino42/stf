@@ -17,7 +17,7 @@
 #include "Particle/ParticleModule/ModuleMeshParticulizer.hpp"
 
 MainGraphic::MainGraphic()
-    : renderBuffer_(DisplayWindow::Get().getWidthWindow() * 0.5f,
+    : renderBuffer_(DisplayWindow::Get().getWidthWindow() * 0.7f,
                     DisplayWindow::Get().getHeightWindow()),
       renderBufferRayMarch_(DisplayWindow::Get().getWidthWindow() * 0.3f,
                             DisplayWindow::Get().getHeightWindow()),
@@ -140,7 +140,7 @@ void MainGraphic::render() {
         lol.parse();
         ParticleSystemManager::Get().initAllParticleSystem();
     }
-    if (DisplayWindow::Get().getKey(GLFW_KEY_G)) {
+    if (DisplayWindow::Get().getKey(GLFW_KEY_F)) {
         for (auto &s: ParticleSystemManager::Get().getMapParticleSystem()) {
             s.second.reload();
         }

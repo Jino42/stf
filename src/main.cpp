@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
     srand(time(NULL));
     try {
         std::string windowTitle = "ft_vox";
-        DisplayWindow::Init(windowTitle.c_str(), 1024, 720);
+        DisplayWindow::Init(windowTitle.c_str(), 1900, 1080);
 
         if (argc > 1 && !strcmp(argv[1], "-gd")) {
             demoGui();
@@ -271,10 +271,10 @@ int main(int argc, char **argv) {
             // widgetOption.render(true);
 
             ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(0, 0)));
-            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
+            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(70, 100)));
             WidgetRender::Get().render(true);
-            ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(50, 0)));
-            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(50, 100)));
+            ImGui::SetNextWindowPos(gui.positionByPercent(ImVec2(70, 0)));
+            ImGui::SetNextWindowSize(gui.positionByPercent(ImVec2(30, 100)));
             widgetEditor.render(true);
 
             /*
