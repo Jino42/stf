@@ -62,23 +62,7 @@ Is not very interesting, and seems to be really logic !
 But its a praticale explanation
 
 
-```mermaid
-graph TD;
-    ParticleSystem_A-->ParticleEmitter_AA;
-    ParticleEmitter_AA-->ParticleModule_AAA
-    ParticleEmitter_AA-->ParticleModule_Attractor
-    ParticleEmitter_AA-->ParticleModule_Gravity
-    ParticleEmitter_AA-->ParticleModule_ResolvePhysic
-    ParticleEmitter_AA-->id1
-	id1((GpuBuffer))-->id2>ParticleDataBasic]
-	id2-->Position
-	id2-->Lifetime
-	id2-->Age
-	id2-->...
-	id1((GpuBuffer))-->id3>ParticleDataPhysic]
-	id3-->Velocity
-	id3-->Mass
-```
+[![](https://mermaid.ink/img/eyJjb2RlIjoiZ3JhcGggVEQ7XG4gICAgUGFydGljbGVTeXN0ZW1fQS0tPlBhcnRpY2xlRW1pdHRlcl9BQTtcbiAgICBQYXJ0aWNsZUVtaXR0ZXJfQUEtLT5QYXJ0aWNsZU1vZHVsZV9BQUFcbiAgICBQYXJ0aWNsZUVtaXR0ZXJfQUEtLT5QYXJ0aWNsZU1vZHVsZV9BdHRyYWN0b3JcbiAgICBQYXJ0aWNsZUVtaXR0ZXJfQUEtLT5QYXJ0aWNsZU1vZHVsZV9HcmF2aXR5XG4gICAgUGFydGljbGVFbWl0dGVyX0FBLS0-UGFydGljbGVNb2R1bGVfUmVzb2x2ZVBoeXNpY1xuICAgIFBhcnRpY2xlRW1pdHRlcl9BQS0tPmlkMVxuXHRpZDEoKEdwdUJ1ZmZlcikpLS0-aWQyPlBhcnRpY2xlRGF0YUJhc2ljXVxuXHRpZDItLT5Qb3NpdGlvblxuXHRpZDItLT5MaWZldGltZVxuXHRpZDItLT5BZ2Vcblx0aWQyLS0-Li4uXG5cdGlkMSgoR3B1QnVmZmVyKSktLT5pZDM-UGFydGljbGVEYXRhUGh5c2ljXVxuXHRpZDMtLT5WZWxvY2l0eVxuXHRpZDMtLT5NYXNzIiwibWVybWFpZCI6eyJ0aGVtZSI6ImZvcmVzdCJ9fQ)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoiZ3JhcGggVEQ7XG4gICAgUGFydGljbGVTeXN0ZW1fQS0tPlBhcnRpY2xlRW1pdHRlcl9BQTtcbiAgICBQYXJ0aWNsZUVtaXR0ZXJfQUEtLT5QYXJ0aWNsZU1vZHVsZV9BQUFcbiAgICBQYXJ0aWNsZUVtaXR0ZXJfQUEtLT5QYXJ0aWNsZU1vZHVsZV9BdHRyYWN0b3JcbiAgICBQYXJ0aWNsZUVtaXR0ZXJfQUEtLT5QYXJ0aWNsZU1vZHVsZV9HcmF2aXR5XG4gICAgUGFydGljbGVFbWl0dGVyX0FBLS0-UGFydGljbGVNb2R1bGVfUmVzb2x2ZVBoeXNpY1xuICAgIFBhcnRpY2xlRW1pdHRlcl9BQS0tPmlkMVxuXHRpZDEoKEdwdUJ1ZmZlcikpLS0-aWQyPlBhcnRpY2xlRGF0YUJhc2ljXVxuXHRpZDItLT5Qb3NpdGlvblxuXHRpZDItLT5MaWZldGltZVxuXHRpZDItLT5BZ2Vcblx0aWQyLS0-Li4uXG5cdGlkMSgoR3B1QnVmZmVyKSktLT5pZDM-UGFydGljbGVEYXRhUGh5c2ljXVxuXHRpZDMtLT5WZWxvY2l0eVxuXHRpZDMtLT5NYXNzIiwibWVybWFpZCI6eyJ0aGVtZSI6ImZvcmVzdCJ9fQ)
 
 ### An example
 
