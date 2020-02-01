@@ -2,6 +2,7 @@
 
 #include "NTL.hpp"
 #include "Cl/ClError.hpp"
+#include <iostream>
 
 class ClKernel;
 

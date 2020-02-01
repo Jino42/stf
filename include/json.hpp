@@ -7,8 +7,8 @@
 
 using json = nlohmann::json;
 
-json getJsonFromFileAbsolutePath(std::string const &path);
-json getJsonFromFileRelativeToRootPath(std::string const &path);
+json getJsonFromFileAbsolutePath(std::string path);
+json getJsonFromFileRelativeToRootPath(std::string path);
 
 Rangef jsonToRangef(json &j);
 

@@ -1,12 +1,13 @@
 #include <json.hpp>
 #include <boost/filesystem.hpp>
 
-json getJsonFromFileAbsolutePath(std::string const &path) {
+json getJsonFromFileAbsolutePath(std::string  path) {
 	std::ifstream ifs(path.c_str());
 	return json::parse(ifs);
 }
 
-json getJsonFromFileRelativeToRootPath(std::string const &path) {
+json getJsonFromFileRelativeToRootPath(std::string path) {
+	std::cout << (boost::filesystem::path(ROOT_PATH) / path).generic_string() << std::endl;
 	std::ifstream ifs((boost::filesystem::path(ROOT_PATH) / path).generic_string());
 	return json::parse(ifs);
 }
