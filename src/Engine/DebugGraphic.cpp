@@ -2,6 +2,7 @@
 #include <Engine/ShaderManager.hpp>
 #include <Engine/Camera.hpp>
 #include <iostream>
+#include <algorithm>
 
 DebugGraphic::DebugGraphic() :
 		VAO(0),

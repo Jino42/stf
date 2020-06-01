@@ -1,11 +1,13 @@
-
 #include "ClContext.hpp"
-#ifdef WIN32
-#include <Windows.h>
-#endif
+
 #include <exception>
 #include <Engine/Display/DisplayWindow.hpp>
 #include <NTL.hpp>
+#ifdef WIN32
+#include <Windows.h>
+#else
+#include <GL/glx.h>
+#endif
 #include <sstream>
 
 static const std::string NVIDIA_PLATFORM = "NVIDIA";
@@ -153,6 +155,13 @@ ClContext::ClContext() {
 			CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties) gl_sharegroup,
 			0
 	};
+#else
+	cl_context_properties properties[] = {
+            CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
+                        CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
+            CL_CONTEXT_PLATFORM, (cl_context_properties)defaultPlatform(),
+            0
+        };
 #endif
 
 	std::vector<cl::Device> devices;

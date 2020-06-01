@@ -1,12 +1,13 @@
 #pragma once
 #include <random>
 #include <memory>
+#include <limits>
 
 class Random {
 public:
 
     Random() :
-        seed_(0, INT_MAX) {
+        seed_(0, std::numeric_limits<int>().max()) {
     }
 
     int getRandomSeed()

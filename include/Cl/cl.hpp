@@ -142,7 +142,7 @@
  * \endcode
  *
  */
-#ifndef CL_HPP_
+#ifndef CL_HPP_glad.h
 #define CL_HPP_
 
 #ifdef _WIN32

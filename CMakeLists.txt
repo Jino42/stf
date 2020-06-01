@@ -4,7 +4,7 @@ project(${NAME})
 
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DROOT_PATH=\\\"${CMAKE_SOURCE_DIR}\\\"")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLFW_INCLUDE_NONE -DROOT_PATH=\\\"${CMAKE_SOURCE_DIR}\\\"")
 set(CMAKE_BUILD_PARALLEL_LEVEL true)
 set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -20,7 +20,7 @@ else()
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    add_compile_options(-Wall -Werror -Wextra -Wvla -Wpedantic -ansi -pedantic -O3)
+	add_compile_options(-Wall -Wextra -Wvla -Wpedantic -ansi -pedantic -O3)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 endif()
 
@@ -40,7 +40,6 @@ if (WIN32)
     endif()
     find_package(OpenGL 3.3 REQUIRED)
     #OpenCL_INCLUDE_DIR = "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v8.0/include"
-elseif (UNIX AND NOT APPLE)
 elseif (APPLE)
     link_directories(/usr/lib/)
     link_directories($ENV{HOME}/.brew/lib/)
@@ -101,10 +100,10 @@ endif()
 #endif()
 
 list(APPEND CMAKE_MODULE_PATH "~/.brew/lib/cmake/glfw3")
-find_package(glfw QUIET)
-if (glfw_FOUND)
+find_package(glfw3 QUIET)
+if (glfw3_FOUND)
     message("EXTERN : glfw finded")
-elseif (NOT TARGET glfw)
+elseif (NOT TARGET glfw3)
     message("EXTERN : Unable to find glfw, cloning...")
     if (GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
         execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init extern/glfw
@@ -251,7 +250,8 @@ add_executable(${NAME}
         src/Particle/PaticleEmitter/ParticleEmitterSPH.cpp
         src/Gui/WidgetRayMarch.cpp src/Gui/WidgetRayMarch.hpp
 
-        src/json/JsonShapeParser.cpp src/json/JsonShapeParser.hpp 
+        src/json/JsonShapeParser.cpp 
+	src/json/JsonShapeParser.hpp 
         src/Engine/Shape/ShapeManager.hpp src/Engine/Shape/ShapeManager.cpp
         )
 

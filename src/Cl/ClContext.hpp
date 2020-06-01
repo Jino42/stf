@@ -3,6 +3,7 @@
 #include <vector>
 #include <exception>
 #include <iostream>
+#include <memory>
 #include <NTL.hpp>
 #include "ClError.hpp"
 

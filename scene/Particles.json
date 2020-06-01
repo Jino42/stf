@@ -12,7 +12,7 @@
       },
       "emitters": [
         {
-          "active": false,
+          "active": true,
           "name": "LolSph",
           "type": "SPH",
           "particlesMax": 5600,

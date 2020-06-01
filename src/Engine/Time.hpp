@@ -8,7 +8,7 @@
 #include <chrono>
 #include <iostream>
 #include <vector>
-
+#include <memory>
 /// \brief For play with Time
 /// \details    Timer is like a stopwatch
 /// \section HowToUse

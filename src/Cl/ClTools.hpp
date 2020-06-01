@@ -1,5 +1,5 @@
 #pragma once
-#include<cl/cl.hpp>
+#include <NTL.hpp>
 #include <iostream>
 #include <Cl/ClContext.hpp>
 #include <Cl/ClError.hpp>

@@ -1,6 +1,7 @@
 #include "Time.hpp"
 #include <iomanip>
 #include <iostream>
+#include <algorithm>
 
 Timer::Timer(bool canStart)
     : started_(false),
@@ -117,7 +118,7 @@ Time::Time()
 }
 
 void Time::update() {
-    std::chrono::high_resolution_clock::duration deltaTime = std::chrono::high_resolution_clock::now() -
+    std::chrono::high_resolution_clock::duration deltaTime = std::chrono::steady_clock::now() -
                                                              sinceWorldStartFrame.getReference_();
     sinceWorldStartFrame.reset();
     sinceWorldStartFrame.start();
