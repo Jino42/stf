@@ -1,6 +1,6 @@
 #include "ClError.hpp"
 #include <exception>
-
+#include <stdexcept>
 
 ClError::ClError() : err(0) {}
 

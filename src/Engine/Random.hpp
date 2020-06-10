@@ -6,9 +6,7 @@
 class Random {
 public:
 
-    Random() :
-        seed_(0, std::numeric_limits<int>().max()) {
-    }
+    Random();
 
     int getRandomSeed()
     {

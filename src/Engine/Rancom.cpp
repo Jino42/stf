@@ -11,3 +11,7 @@ float Random::getRandom01() {
 
 	return distribution(rng);
 }
+Random::Random()
+        :
+        seed_(0, std::numeric_limits<int>::max()) {
+}
