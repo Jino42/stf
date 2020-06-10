@@ -111,24 +111,26 @@ void MainGraphic::init() {
 }
 
 void MainGraphic::render() {
+    float t = static_cast<float>(Time::Get().getDeltaTime().count()) / 1000.f;
+
     if (DisplayWindow::Get().getKey(GLFW_KEY_RIGHT) ||
         DisplayWindow::Get().getKey(GLFW_KEY_D))
-        Camera::focus->processPosition(Camera::Movement::RIGHT, deltaTime_ * 5);
+        Camera::focus->processPosition(Camera::Movement::RIGHT,  t * 5);
     if (DisplayWindow::Get().getKey(GLFW_KEY_LEFT) ||
         DisplayWindow::Get().getKey(GLFW_KEY_A))
-        Camera::focus->processPosition(Camera::Movement::LEFT, deltaTime_ * 5);
+        Camera::focus->processPosition(Camera::Movement::LEFT, t * 5);
     if (DisplayWindow::Get().getKey(GLFW_KEY_DOWN) ||
         DisplayWindow::Get().getKey(GLFW_KEY_S))
-        Camera::focus->processPosition(Camera::Movement::BACKWARD, deltaTime_ * 5);
+        Camera::focus->processPosition(Camera::Movement::BACKWARD, t * 5);
     if (DisplayWindow::Get().getKey(GLFW_KEY_UP) ||
         DisplayWindow::Get().getKey(GLFW_KEY_W))
-        Camera::focus->processPosition(Camera::Movement::FORWARD, deltaTime_ * 5);
+        Camera::focus->processPosition(Camera::Movement::FORWARD, t * 5);
     if (DisplayWindow::Get().getKey(GLFW_KEY_RIGHT_CONTROL) ||
         DisplayWindow::Get().getKey(GLFW_KEY_Q))
-        Camera::focus->processPosition(Camera::Movement::DOWN, deltaTime_ * 5);
+        Camera::focus->processPosition(Camera::Movement::DOWN, t * 5);
     if (DisplayWindow::Get().getKey(GLFW_KEY_RIGHT_SHIFT) ||
         DisplayWindow::Get().getKey(GLFW_KEY_E))
-        Camera::focus->processPosition(Camera::Movement::UP, deltaTime_ * 5);
+        Camera::focus->processPosition(Camera::Movement::UP, t * 5);
 
     if (DisplayWindow::Get().getKey(GLFW_KEY_V))
         Debug::Get().flipDebug("ParticleModule");
@@ -210,15 +212,11 @@ void MainGraphic::render() {
 
     float time = static_cast<float>(Time::Get().sinceWorldStartProgram.count<std::chrono::milliseconds>()) / 1000.0f;
 
-    float t = static_cast<float>(Time::Get().getDeltaTime().count()) / 1000.f;
-
-    std::cout << t << std::endl;
 
     MainGraphicExtendModel::Get().update(t);
 
     if (doParticle_) {
-        TestParticle::Get().update(t);
-        ParticleSystemManager::Get().updateAllParticleSystem(t);
+
         ParticleSystemManager::Get().renderAllParticleSystem();
     }
     // VoxelWorld::Get().update();
@@ -227,6 +225,14 @@ void MainGraphic::render() {
     debug_.render();
 
     renderBuffer_.unbind();
+}
+
+void MainGraphic::logic(float t) {
+    if (doParticle_)
+    {
+        TestParticle::Get().update(t);
+        ParticleSystemManager::Get().updateAllParticleSystem(t);
+    }
 }
 
 void MainGraphic::update() {

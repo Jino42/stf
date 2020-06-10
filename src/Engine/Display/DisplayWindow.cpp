@@ -1,34 +1,35 @@
 #include "DisplayWindow.hpp"
 #include "Engine/Camera.hpp"
 
-DisplayWindow::DisplayWindow(std::string const &name, unsigned int width, unsigned int height) : cursor_(true) {
+DisplayWindow::DisplayWindow(std::string const &name, unsigned int width, unsigned int height)
+    : cursor_(true) {
     DisplayWindow::setWidthWindow(width);
-	DisplayWindow::setHeightWindow(height);
-	glfwSetErrorCallback(DisplayWindow::callbackError_);
+    DisplayWindow::setHeightWindow(height);
+    glfwSetErrorCallback(DisplayWindow::callbackError_);
     glfwSetErrorCallback(DisplayWindow::callbackError_);
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    #ifdef __APPLE__
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    #endif
-    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); 
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
     if (!(window_ = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr))) {
         clean_();
-		throw (DisplayWindow::ConstructorException("GlfwConstructorException: window was not created"));
+        throw(DisplayWindow::ConstructorException("GlfwConstructorException: window was not created"));
     }
     glfwMakeContextCurrent(window_);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glfwSwapInterval(0);
 
-	glfwSetKeyCallback(window_, DisplayWindow::callbackKey_);
+    glfwSetKeyCallback(window_, DisplayWindow::callbackKey_);
     glfwSetCursorPosCallback(window_, DisplayWindow::mouseCallback_);
-	glfwSetWindowSizeCallback(window_, DisplayWindow::windowSizeCallback_);
-	glfwSetFramebufferSizeCallback(window_, DisplayWindow::FramebufferSizeCallback_);
-	glfwSetWindowContentScaleCallback(window_, DisplayWindow::WindowContentScaleCallback_);
+    glfwSetWindowSizeCallback(window_, DisplayWindow::windowSizeCallback_);
+    glfwSetFramebufferSizeCallback(window_, DisplayWindow::FramebufferSizeCallback_);
+    glfwSetWindowContentScaleCallback(window_, DisplayWindow::WindowContentScaleCallback_);
 
-    DisplayWindow::glfwByWindow_.insert(std::pair<GLFWwindow*, DisplayWindow&>(window_, *this));
+    DisplayWindow::glfwByWindow_.insert(std::pair<GLFWwindow *, DisplayWindow &>(window_, *this));
 }
 
 DisplayWindow::~DisplayWindow() {
@@ -36,7 +37,7 @@ DisplayWindow::~DisplayWindow() {
     clean_();
 }
 
-void    DisplayWindow::clean_() {
+void DisplayWindow::clean_() {
     if (window_) {
         glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         glfwDestroyWindow(window_);
@@ -44,50 +45,42 @@ void    DisplayWindow::clean_() {
     glfwTerminate();
 }
 
-void			DisplayWindow::callbackKey_(GLFWwindow* window, int key, int, int action, int) {
-    for (auto &glfw : DisplayWindow::glfwByWindow_) {
+void DisplayWindow::callbackKey_(GLFWwindow *window, int key, int, int action, int) {
+    for (auto &glfw: DisplayWindow::glfwByWindow_) {
         if (glfw.first == window) {
             if (action == GLFW_REPEAT) {
-				glfw.second.callbackKey(key, KeyState::kPress);
-            }
-            else if (action == GLFW_RELEASE) {
-				glfw.second.callbackKey(key, KeyState::kUp);
-            }
-            else if (action == GLFW_PRESS) {
-				glfw.second.callbackKey(key, KeyState::kDown);
-
+                glfw.second.callbackKey(key, KeyState::kPress);
+            } else if (action == GLFW_RELEASE) {
+                glfw.second.callbackKey(key, KeyState::kUp);
+            } else if (action == GLFW_PRESS) {
+                glfw.second.callbackKey(key, KeyState::kDown);
             }
         }
     }
 }
 
-void			DisplayWindow::windowSizeCallback_(GLFWwindow* window, int width, int height)
-{
-	if (window)
-	{
-		DisplayWindow::Get().setWidthWindow(static_cast<unsigned int>(width));
-		DisplayWindow::Get().setHeightWindow(static_cast<unsigned int>(height));
-	}
+void DisplayWindow::windowSizeCallback_(GLFWwindow *window, int width, int height) {
+    if (window) {
+        DisplayWindow::Get().setWidthWindow(static_cast<unsigned int>(width));
+        DisplayWindow::Get().setHeightWindow(static_cast<unsigned int>(height));
+    }
 }
 
-void			DisplayWindow::FramebufferSizeCallback_(GLFWwindow* window, int width, int height)
-{
-	if (window)
-	{
-		glViewport(0, 0, width, height);
-	}
+void DisplayWindow::FramebufferSizeCallback_(GLFWwindow *window, int width, int height) {
+    if (window) {
+        glViewport(0, 0, width, height);
+    }
 }
 
-void			DisplayWindow::WindowContentScaleCallback_(GLFWwindow* window, float xscale, float yscale)
-{
-	;
+void DisplayWindow::WindowContentScaleCallback_(GLFWwindow *window, float xscale, float yscale) {
+    ;
 }
 
-void DisplayWindow::callbackError_(int, const char* errorMessage) {
-    throw (DisplayWindow::ConstructorException(errorMessage));
+void DisplayWindow::callbackError_(int, const char *errorMessage) {
+    throw(DisplayWindow::ConstructorException(errorMessage));
 }
 
-void            DisplayWindow::swapCursor() {
+void DisplayWindow::swapCursor() {
     if (cursor_)
         glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     else
@@ -95,35 +88,34 @@ void            DisplayWindow::swapCursor() {
     cursor_ = !cursor_;
 }
 
-void            DisplayWindow::update() {
+void DisplayWindow::update() {
+    KeyStateManager::update();
 
-	KeyStateManager::update();
-
-    if (!cursor_  && DisplayWindow::mouseCallbackCalled_) {
+    if (!cursor_ && DisplayWindow::mouseCallbackCalled_) {
         Camera::focus->processMouseMovement(DisplayWindow::offsetX_, DisplayWindow::offsetY_);
         DisplayWindow::mouseCallbackCalled_ = false;
     }
-	if (getKeyState(GLFW_KEY_ESCAPE) == KeyState::kDown)
+    if (getKeyState(GLFW_KEY_ESCAPE) == KeyState::kDown)
         glfwSetWindowShouldClose(window_, true);
 }
 
-void            DisplayWindow::render() {
+void DisplayWindow::render() {
     glfwSwapBuffers(window_);
     glfwPollEvents();
 }
 
-bool            DisplayWindow::exit() const {
+bool DisplayWindow::exit() const {
     return static_cast<bool>(glfwWindowShouldClose(window_));
 }
 
-std::map<GLFWwindow*, DisplayWindow&>     DisplayWindow::glfwByWindow_;
+std::map<GLFWwindow *, DisplayWindow &> DisplayWindow::glfwByWindow_;
 
-bool        DisplayWindow::firstMouse_ = true;
-bool        DisplayWindow::mouseCallbackCalled_ = false;
-float       DisplayWindow::lastX_ = DISPLAY_GLFW_WIN_WIDTH / 2.0f;
-float       DisplayWindow::lastY_ = DISPLAY_GLFW_WIN_HEIGHT / 2.0f;
-float       DisplayWindow::offsetX_ = 0.f;
-float       DisplayWindow::offsetY_ = 0.f;
+bool DisplayWindow::firstMouse_ = true;
+bool DisplayWindow::mouseCallbackCalled_ = false;
+float DisplayWindow::lastX_ = DISPLAY_GLFW_WIN_WIDTH / 2.0f;
+float DisplayWindow::lastY_ = DISPLAY_GLFW_WIN_HEIGHT / 2.0f;
+float DisplayWindow::offsetX_ = 0.f;
+float DisplayWindow::offsetY_ = 0.f;
 
 void DisplayWindow::mouseCallback_(GLFWwindow *, double xpos, double ypos) {
     if (DisplayWindow::firstMouse_) {
@@ -160,7 +152,7 @@ void DisplayWindow::setHeightWindow(unsigned int height) {
     height_ = height;
 }
 
-void		DisplayWindow::Init(char const *windowName, unsigned int width, unsigned int height) {
+void DisplayWindow::Init(char const *windowName, unsigned int width, unsigned int height) {
     instance_ = std::make_unique<DisplayWindow>(windowName, width, height);
 }
 

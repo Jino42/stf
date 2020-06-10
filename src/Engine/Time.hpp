@@ -129,6 +129,7 @@ class Time {
     Timer sinceWorldStartProgram;
 
     std::chrono::milliseconds getDeltaTime();
+    std::chrono::milliseconds getTimeStep();
 
   private:
     bool pause_;

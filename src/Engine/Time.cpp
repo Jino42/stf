@@ -154,6 +154,10 @@ std::chrono::milliseconds Time::getDeltaTime() {
     return deltaTime_;
 }
 
+std::chrono::milliseconds Time::getTimeStep() {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(timeStep_);
+}
+
 Time &Time::Get() {
     if (!Time::instance_) {
         Time::instance_ = std::make_unique<Time>();

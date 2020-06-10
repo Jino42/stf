@@ -15,6 +15,7 @@ class MainGraphic {
     void init();
     void render();
     void update();
+    void logic(float t);
 
     static MainGraphic &Get();
 

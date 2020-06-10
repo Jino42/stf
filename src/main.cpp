@@ -204,6 +204,7 @@ int main(int argc, char **argv) {
         while (!DisplayWindow::Get().exit()) {
             //Update
             Time::Get().update();
+
             DisplayWindow::Get().update();
             CameraManager::Get().update();
             gui.update();
@@ -229,6 +230,7 @@ int main(int argc, char **argv) {
 
             //Logical Loop
             while (Time::Get().shouldUpdateLogic()) {
+                MainGraphic::Get().logic(Time::Get().getTimeStep().count() / 1000.f);
             }
 
             //Render
